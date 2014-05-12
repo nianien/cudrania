@@ -1,5 +1,6 @@
 package com.kavas.misc.hibernate.transformer;
 
+import com.kavas.misc.utils.CaseInsensitiveMap;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.transform.BasicTransformerAdapter;
 
@@ -10,9 +11,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 /**
- * 查询结果存储Map中,其中key为字段名,value为字段值,需要注意的是:key值区分大小写
+ * 查询结果存储Map中,其中key为字段名,value为字段值,key值不区分大小写
  *
  * @author skyfalling
+ * @see  CaseInsensitiveMap
  */
 public class MapResultTransFormer extends BasicTransformerAdapter implements Serializable {
     /**
@@ -39,11 +41,6 @@ public class MapResultTransFormer extends BasicTransformerAdapter implements Ser
      * 别名到属性名称的映射
      */
     protected Map<String, String> aliasMap = new HashMap<String, String>();
-
-    /**
-     *
-     */
-    private boolean caseInsensitive = false;
 
 
     /**
@@ -93,11 +90,11 @@ public class MapResultTransFormer extends BasicTransformerAdapter implements Ser
 
 
     /**
-     * 返回Map对象,键值为数据库查询字段别名(区分大小写,以SQL语句指定名称为准)
+     * 返回Map对象,键值为数据库查询字段别名,不区分大小写
      * {@inheritDoc}
      */
     public Object transformTuple(Object[] tuple, String[] aliases) {
-        Map result = new HashMap(tuple.length);
+        Map result = new CaseInsensitiveMap(tuple.length);
         for (int i = 0; i < tuple.length; i++) {
             String name = getAlias(aliases[i]);
             Object value = tuple[i];
