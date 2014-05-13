@@ -6,7 +6,7 @@
 
     <groupId>com.kavas</groupId>
     <artifactId>kavas-misc</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>3.2.8.RELEASE</spring.version>
