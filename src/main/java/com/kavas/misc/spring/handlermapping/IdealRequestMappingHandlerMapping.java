@@ -12,22 +12,10 @@ import java.lang.reflect.Method;
 import java.util.*;
 
 /**
- * 可配置的请求映射处理类，满足以下功能：<br/>
- * <ul>
- * <li>
- * 支持{@link org.springframework.web.bind.annotation.RequestMapping}注解和类自动映射，RequestMapping配置优先级高于类映射；<br/>
- * 当未使用{@link org.springframework.web.bind.annotation.RequestMapping}注解或者未指定映射路径时，则采用类映射
- * <li>采用正则表达式配置类映射规则，见方法{@link #setClassPattern(String)}和{@link #setClassReplacement(String)}</li>
- * <li>采用正则表达式配置包路径映射，见方法{@link #setPackagePattern(String)}和{@link #setPackageReplacement(String)}</li>
- * </li>
- * </ul>
- * <pre>
- *      <code>设存在类com.abc.controller.xyz.XxxController，在未配置{@link org.springframework.web.bind.annotation.RequestMapping}注解的情况下，则默认取Xxx作为映射路径
- *      此时如果配置packagePattern="^com.abc.controller.?"，packageReplacement="/api"，则映射路径为/api/xyz/Xxx<br/>
- *      </code>
- *  </pre>
+ * 扩展基于注解的请求映射处理类,实现自动映射功能和统一配置，具体配置项参考{@link RequestMappingConfiguration}<br/>
  *
  * @author skyfalling
+ * @see RequestMappingConfiguration
  */
 public class IdealRequestMappingHandlerMapping extends
         RequestMappingHandlerMapping {
@@ -56,7 +44,7 @@ public class IdealRequestMappingHandlerMapping extends
     /**
      * RequestMethod映射配置
      */
-    private Map<String, RequestMethod[]> requestMethodMapping = new HashMap<String, RequestMethod[]>();
+    private LinkedHashMap<String, RequestMethod[]> requestMethodMapping = new LinkedHashMap<String, RequestMethod[]>();
 
     /**
      * 类名及方法名的处理
@@ -73,7 +61,6 @@ public class IdealRequestMappingHandlerMapping extends
      * 默认构造方法
      */
     public IdealRequestMappingHandlerMapping() {
-
     }
 
     /**

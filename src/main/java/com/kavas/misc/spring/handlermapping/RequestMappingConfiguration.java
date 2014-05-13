@@ -3,8 +3,7 @@ package com.kavas.misc.spring.handlermapping;
 import org.springframework.util.StringValueResolver;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 /**
  * 可配置的请求映射处理类，满足以下功能：<br/>
@@ -14,6 +13,8 @@ import java.util.Map;
  * 当未使用{@link org.springframework.web.bind.annotation.RequestMapping}注解或者未指定映射路径时，则采用类映射
  * <li>采用正则表达式配置类映射规则，见方法{@link #setClassPattern(String)}和{@link #setClassReplacement(String)}</li>
  * <li>采用正则表达式配置包路径映射，见方法{@link #setPackagePattern(String)}和{@link #setPackageReplacement(String)}</li>
+ * <li>配置默认{@link RequestMethod}请求方法列表，见方法{@link #setDefaultRequestMethods(String[])}</li>
+ * <li>配置{@link RequestMethod}请求方法映射，见方法{@link #setRequestMethodMapping(java.util.LinkedHashMap)}</li>
  * </li>
  * </ul>
  * <pre>
@@ -49,7 +50,7 @@ public class RequestMappingConfiguration {
     /**
      * RequestMethod映射配置
      */
-    private Map<String, RequestMethod[]> requestMethodMapping = new HashMap<String, RequestMethod[]>();
+    private LinkedHashMap<String, RequestMethod[]> requestMethodMapping = new LinkedHashMap<String, RequestMethod[]>();
 
     /**
      * 类名及方法名的处理
@@ -127,23 +128,28 @@ public class RequestMappingConfiguration {
         this.defaultRequestMethods = getRequestMethods(requestMethods);
     }
 
-    public Map<String, RequestMethod[]> getRequestMethodMapping() {
+    /**
+     * 获取 RequestMethod 映射配置
+     *
+     * @return
+     */
+    public LinkedHashMap<String, RequestMethod[]> getRequestMethodMapping() {
         return requestMethodMapping;
     }
 
     /**
-     * 根据方法名正则表达式设置允许的RequestMethod
+     * 根据方法名设置 RequestMethod 映射
      *
      * @param requestMethodMapping
      */
-    public void setRequestMethodMapping(Map<String, String[]> requestMethodMapping) {
+    public void setRequestMethodMapping(LinkedHashMap<String, String[]> requestMethodMapping) {
         for (String key : requestMethodMapping.keySet()) {
             this.requestMethodMapping.put(key, getRequestMethods(requestMethodMapping.get(key)));
         }
     }
 
     /**
-     * 方法名转换对象
+     * 进行Controller方法名转换的{@link StringValueResolver}实现
      *
      * @return
      */
@@ -152,7 +158,7 @@ public class RequestMappingConfiguration {
     }
 
     /**
-     * 设置方法名转换对象
+     * 设置进行Controller方法名转换的{@link StringValueResolver}实现
      *
      * @param nameResolver
      */
