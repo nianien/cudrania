@@ -3,24 +3,25 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                         http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
                         http://www.springframework.org/schema/mvc
                         http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
                         http://www.springframework.org/schema/context
-                        http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+                        http://www.springframework.org/schema/context/spring-context-3.2.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
     <context:component-scan base-package="com.kavas.misc.spring"/>
     <bean id="requestMappingConfiguration"
           class="com.kavas.misc.spring.handlermapping.RequestMappingConfiguration">
         <property name="packagePattern" value="^com.nianien.controller.?"/>
         <property name="packageReplacement" value="/api/"/>
-        <property name="defaultRequestMethods" value="GET,POST"/>
+        <property name="defaultRequestMethods" value="POST"/>
         <property name="requestMethodMapping">
-            <map>
+            <util:map map-class="java.util.LinkedHashMap">
                 <entry key="get.*" value="GET"/>
                 <entry key="update.*" value="POST"/>
                 <entry key="save.*" value="GET,POST"/>
-            </map>
+            </util:map>
         </property>
         <property name="nameResolver">
             <bean class="com.kavas.misc.spring.handlermapping.NamingResolver"/>
