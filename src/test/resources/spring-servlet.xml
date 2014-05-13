@@ -9,25 +9,22 @@
                         http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
                         http://www.springframework.org/schema/context
                         http://www.springframework.org/schema/context/spring-context-3.2.xsd">
-    <context:component-scan base-package="com.nianien"/>
+    <context:component-scan base-package="com.kavas.misc.spring"/>
     <bean id="requestMappingConfiguration"
           class="com.kavas.misc.spring.handlermapping.RequestMappingConfiguration">
         <property name="packagePattern" value="^com.nianien.controller.?"/>
         <property name="packageReplacement" value="/api/"/>
-        <property name="requestMethodPatterns">
+        <property name="defaultRequestMethods" value="GET,POST"/>
+        <property name="requestMethodMapping">
             <map>
                 <entry key="get.*" value="GET"/>
                 <entry key="update.*" value="POST"/>
+                <entry key="save.*" value="GET,POST"/>
             </map>
         </property>
         <property name="nameResolver">
             <bean class="com.kavas.misc.spring.handlermapping.NamingResolver"/>
         </property>
-    </bean>
-    <bean name="messageSource"
-          class="org.springframework.context.support.ResourceBundleMessageSource">
-        <property name="basenames" value="i18n/messages,i18n/errors"/>
-        <property name="defaultEncoding" value="UTF-8"/>
     </bean>
     <!--容器默认的DefaultServletHandler处理 所有静态内容与无RequestMapping处理的URL -->
     <mvc:resources mapping="/resources/**" location="/META-INF"/>

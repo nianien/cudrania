@@ -59,18 +59,10 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
     @Bean
     @Override
     public RequestMappingHandlerMapping requestMappingHandlerMapping() {
-        IdealRequestMappingHandlerMapping handlerMapping = new IdealRequestMappingHandlerMapping();
+        IdealRequestMappingHandlerMapping handlerMapping = new IdealRequestMappingHandlerMapping(requestMappingConfiguration);
         handlerMapping.setOrder(0);
         handlerMapping.setInterceptors(getInterceptors());
         handlerMapping.setContentNegotiationManager(mvcContentNegotiationManager());
-        if (requestMappingConfiguration != null) {
-            handlerMapping.setPackagePattern(requestMappingConfiguration.getPackagePattern());
-            handlerMapping.setPackageReplacement(requestMappingConfiguration.getPackageReplacement());
-            handlerMapping.setClassPattern(requestMappingConfiguration.getClassPattern());
-            handlerMapping.setClassReplacement(requestMappingConfiguration.getClassReplacement());
-            handlerMapping.setRequestMethodPatterns(requestMappingConfiguration.getRequestMethodPatterns());
-            handlerMapping.setNameResolver(requestMappingConfiguration.getNameResolver());
-        }
         return handlerMapping;
     }
 

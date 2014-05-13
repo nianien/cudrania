@@ -9,10 +9,7 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 可配置的请求映射处理类，满足以下功能：<br/>
@@ -53,9 +50,13 @@ public class IdealRequestMappingHandlerMapping extends
     private String classReplacement = "$1";
 
     /**
-     * 请求方法配置
+     * 默认RequestMethod列表
      */
-    private Map<String, RequestMethod> requestMethodPatterns = new HashMap<String, RequestMethod>();
+    private RequestMethod[] defaultRequestMethods = new RequestMethod[0];
+    /**
+     * RequestMethod映射配置
+     */
+    private Map<String, RequestMethod[]> requestMethodMapping = new HashMap<String, RequestMethod[]>();
 
     /**
      * 类名及方法名的处理
@@ -67,83 +68,31 @@ public class IdealRequestMappingHandlerMapping extends
         }
     };
 
-    public String getPackagePattern() {
-        return packagePattern;
+
+    /**
+     * 默认构造方法
+     */
+    public IdealRequestMappingHandlerMapping() {
+
     }
 
     /**
-     * 设置包名匹配模式,默认值".*"
+     * 构造方法,指定配置
      *
-     * @param packagePattern
+     * @param requestMappingConfiguration
      */
-    public void setPackagePattern(String packagePattern) {
-        this.packagePattern = packagePattern;
+    public IdealRequestMappingHandlerMapping(RequestMappingConfiguration requestMappingConfiguration) {
+        if (requestMappingConfiguration != null) {
+            this.packagePattern = requestMappingConfiguration.getPackagePattern();
+            this.packageReplacement = requestMappingConfiguration.getPackageReplacement();
+            this.classPattern = requestMappingConfiguration.getClassPattern();
+            this.classReplacement = requestMappingConfiguration.getClassReplacement();
+            this.defaultRequestMethods = requestMappingConfiguration.getDefaultRequestMethods();
+            this.requestMethodMapping = requestMappingConfiguration.getRequestMethodMapping();
+            this.nameResolver = requestMappingConfiguration.getNameResolver();
+        }
     }
 
-    public String getPackageReplacement() {
-        return packageReplacement;
-    }
-
-    /**
-     * 设置匹配包名的替换表达式,默认值""
-     *
-     * @param packageReplacement
-     */
-    public void setPackageReplacement(String packageReplacement) {
-        this.packageReplacement = packageReplacement;
-    }
-
-    public String getClassPattern() {
-        return classPattern;
-    }
-
-    /**
-     * 设置匹配类名的正则表达式,默认值"(.*)Controller"
-     *
-     * @param classPattern
-     */
-    public void setClassPattern(String classPattern) {
-        this.classPattern = classPattern;
-    }
-
-    public String getClassReplacement() {
-        return classReplacement;
-    }
-
-    /**
-     * 设置匹配类名的替换表达式,默认值"$1"
-     *
-     * @param classReplacement
-     */
-    public void setClassReplacement(String classReplacement) {
-        this.classReplacement = classReplacement;
-    }
-
-    public Map<String, RequestMethod> getRequestMethodPatterns() {
-        return requestMethodPatterns;
-    }
-
-    /**
-     * 根据方法名正则表达式设置允许的RequestMethod
-     *
-     * @param requestMethodPatterns
-     */
-    public void setRequestMethodPatterns(Map<String, RequestMethod> requestMethodPatterns) {
-        this.requestMethodPatterns = requestMethodPatterns;
-    }
-
-    public StringValueResolver getNameResolver() {
-        return nameResolver;
-    }
-
-    /**
-     * 设置匹配路径的处理类,这里用于对匹配路径的转换
-     *
-     * @param nameResolver
-     */
-    public void setNameResolver(StringValueResolver nameResolver) {
-        this.nameResolver = nameResolver;
-    }
 
     /**
      * Uses method and type-level @{@link org.springframework.web.bind.annotation.RequestMapping} annotations to create
@@ -175,14 +124,15 @@ public class IdealRequestMappingHandlerMapping extends
         config.value(annotation != null && annotation.value().length != 0 ?
                 annotation.value() :
                 new String[]{nameResolver.resolveStringValue(methodName)});
-
-        List<RequestMethod> requestMethods = new ArrayList<RequestMethod>();
-        for (String key : requestMethodPatterns.keySet()) {
+        //默认RequestMethod
+        config.method(defaultRequestMethods);
+        for (String key : requestMethodMapping.keySet()) {
             if (methodName.matches(key)) {
-                requestMethods.add(requestMethodPatterns.get(key));
+                //配置RequestMethod
+                config.method(requestMethodMapping.get(key));
+                break;
             }
         }
-        config.method(requestMethods.toArray(new RequestMethod[0]));
         config.requestCondition(getCustomMethodCondition(method));
         return config;
     }

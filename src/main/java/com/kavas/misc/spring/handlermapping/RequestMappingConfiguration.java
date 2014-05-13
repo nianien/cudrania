@@ -43,9 +43,13 @@ public class RequestMappingConfiguration {
     private String classReplacement = "$1";
 
     /**
-     * 请求方法配置
+     * 默认RequestMethod列表
      */
-    private Map<String, RequestMethod> requestMethodPatterns = new HashMap<String, RequestMethod>();
+    private RequestMethod[] defaultRequestMethods = new RequestMethod[0];
+    /**
+     * RequestMethod映射配置
+     */
+    private Map<String, RequestMethod[]> requestMethodMapping = new HashMap<String, RequestMethod[]>();
 
     /**
      * 类名及方法名的处理
@@ -104,25 +108,51 @@ public class RequestMappingConfiguration {
         this.classReplacement = classReplacement;
     }
 
-    public Map<String, RequestMethod> getRequestMethodPatterns() {
-        return requestMethodPatterns;
+
+    /**
+     * 默认请求方法列表
+     *
+     * @return
+     */
+    public RequestMethod[] getDefaultRequestMethods() {
+        return defaultRequestMethods;
+    }
+
+    /**
+     * 设置默认请求方法列表
+     *
+     * @param requestMethods
+     */
+    public void setDefaultRequestMethods(String[] requestMethods) {
+        this.defaultRequestMethods = getRequestMethods(requestMethods);
+    }
+
+    public Map<String, RequestMethod[]> getRequestMethodMapping() {
+        return requestMethodMapping;
     }
 
     /**
      * 根据方法名正则表达式设置允许的RequestMethod
      *
-     * @param requestMethodPatterns
+     * @param requestMethodMapping
      */
-    public void setRequestMethodPatterns(Map<String, RequestMethod> requestMethodPatterns) {
-        this.requestMethodPatterns = requestMethodPatterns;
+    public void setRequestMethodMapping(Map<String, String[]> requestMethodMapping) {
+        for (String key : requestMethodMapping.keySet()) {
+            this.requestMethodMapping.put(key, getRequestMethods(requestMethodMapping.get(key)));
+        }
     }
 
+    /**
+     * 方法名转换对象
+     *
+     * @return
+     */
     public StringValueResolver getNameResolver() {
         return nameResolver;
     }
 
     /**
-     * 设置匹配路径的处理类,这里用于对匹配路径的转换
+     * 设置方法名转换对象
      *
      * @param nameResolver
      */
@@ -130,5 +160,20 @@ public class RequestMappingConfiguration {
         this.nameResolver = nameResolver;
     }
 
+
+    /**
+     * 字符串转RequestMethod对象
+     *
+     * @param array
+     * @return
+     */
+    private RequestMethod[] getRequestMethods(String[] array) {
+        RequestMethod[] requestMethods = new RequestMethod[array.length];
+        int i = 0;
+        for (String method : array) {
+            requestMethods[i++] = RequestMethod.valueOf(method);
+        }
+        return requestMethods;
+    }
 
 }
