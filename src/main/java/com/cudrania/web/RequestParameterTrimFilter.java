@@ -41,7 +41,6 @@ public class RequestParameterTrimFilter implements Filter {
             }
 
         };
-        System.out.println(request.getParameterMap());
         chain.doFilter(request, response);
     }
 
