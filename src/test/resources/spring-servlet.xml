@@ -10,9 +10,9 @@
                         http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
                         http://www.springframework.org/schema/context
                         http://www.springframework.org/schema/context/spring-context-3.2.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
-    <context:component-scan base-package="com.kavas.misc.spring"/>
+    <context:component-scan base-package="com.cudrania.spring"/>
     <bean id="requestMappingConfiguration"
-          class="com.kavas.misc.spring.handlermapping.RequestMappingConfiguration">
+          class="com.cudrania.spring.handlermapping.RequestMappingConfiguration">
         <property name="packagePattern" value="^com.nianien.controller.?"/>
         <property name="packageReplacement" value="/api/"/>
         <property name="defaultRequestMethods" value="POST"/>
@@ -24,7 +24,7 @@
             </util:map>
         </property>
         <property name="nameResolver">
-            <bean class="com.kavas.misc.spring.handlermapping.NamingResolver"/>
+            <bean class="com.cudrania.spring.handlermapping.NamingResolver"/>
         </property>
     </bean>
     <!--容器默认的DefaultServletHandler处理 所有静态内容与无RequestMapping处理的URL -->
