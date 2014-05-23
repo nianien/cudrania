@@ -1,11 +1,8 @@
 package com.cudrania.hibernate;
 
-import com.cudrania.hibernate.transformer.BeanResultTransFormer;
-import com.cudrania.hibernate.transformer.MapResultTransFormer;
 import com.cudrania.common.utils.Page;
 import com.cudrania.hibernate.transformer.BeanResultTransFormer;
 import com.cudrania.hibernate.transformer.MapResultTransFormer;
-import com.cudrania.common.utils.Page;
 import org.hibernate.*;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.jdbc.Work;
@@ -171,7 +168,7 @@ public class HibernateDao {
      *
      * @param entity
      */
-    @Transactional(propagation = Propagation.REQUIRED, readOnly = false)
+    @Transactional
     public void delete(Object entity) {
         getSession().delete(entity);
     }
