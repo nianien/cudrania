@@ -1,10 +1,8 @@
 package com.cudrania.hibernate.transformer;
 
 import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.transform.BasicTransformerAdapter;
 
-import javax.persistence.Column;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -56,7 +54,7 @@ public class BeanResultTransFormer<T> extends BasicTransformerAdapter implements
         //根据setter方法机获取属性名称
         for (Method method : methods) {
             if (filter(method)) {
-                String name = method.getName().toLowerCase().substring(3);
+                String name = columnName(method);
                 if (!setters.containsKey(name)) {
                     setters.put(name, new ArrayList<Setter>());
                 }
@@ -73,7 +71,7 @@ public class BeanResultTransFormer<T> extends BasicTransformerAdapter implements
      * @return
      */
     protected boolean filter(Method method) {
-        if (/*!method.isAnnotationPresent(Transient.class) &&*/ method.getReturnType() == Void.TYPE && method.getParameterTypes().length == 1) {
+        if (method.getReturnType() == Void.TYPE && method.getParameterTypes().length == 1) {
             String methodName = method.getName();
             return methodName.startsWith("set") && methodName.length() > 3;
         }
@@ -87,11 +85,7 @@ public class BeanResultTransFormer<T> extends BasicTransformerAdapter implements
      * @return
      */
     protected String columnName(Method method) {
-        String name = null;
-        Column column = method.getAnnotation(Column.class);
-        if (column != null)
-            name = column.name();
-        return StringUtils.isNotEmpty(name) ? name : method.getName().toLowerCase().substring(3);
+        return method.getName().toLowerCase().substring(3);
     }
 
     /**
