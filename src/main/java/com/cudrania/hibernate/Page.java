@@ -3,179 +3,120 @@ package com.cudrania.hibernate;
 import java.util.List;
 
 /**
- * 分页查询对象接口定义
+ * 分页接口定义
  *
  * @author skyfalling
  */
-
-
-import java.util.Collections;
-
-/**
- * 分页查询对象接口定义
- *
- * @author skyfalling
- */
-
-public class Page<T> {
-
-    protected int pageNo = 1;
-    protected int pageSize = 20;
-    protected long totalCount = 0;
-    protected boolean autoCount = false;
-    protected List<T> result = Collections.emptyList();
-
-    public Page() {
-    }
-
+public interface Page<T> {
     /**
-     * 构造方法
-     *
-     * @param pageSize
-     * @param pageNo
-     */
-    public Page(int pageSize, int pageNo) {
-        this(pageSize, pageNo, 0L);
-    }
-
-    /**
-     * 构造方法
-     *
-     * @param pageSize
-     * @param pageNo
-     * @param totalCount
-     */
-    public Page(int pageSize, int pageNo, long totalCount) {
-        setPageSize(pageSize);
-        setPageNo(pageNo);
-        setTotalCount(totalCount);
-    }
-
-    /**
-     * 获得当前页的页号
-     */
-    public int getPageNo() {
-        return pageNo;
-    }
-
-    /**
-     * 设置当前页的页号,只能设置正数
-     */
-    public void setPageNo(int pageNo) {
-        if (pageNo > 0) {
-            this.pageNo = pageNo;
-        }
-    }
-
-    /**
-     * 获得每页的记录数量.
-     */
-    public int getPageSize() {
-        return pageSize;
-    }
-
-    /**
-     * 设置每页的记录数量
-     */
-    public void setPageSize(int pageSize) {
-        if (pageSize > 0) {
-            this.pageSize = pageSize;
-        }
-    }
-
-    /**
-     * 获取当前页的数据
-     */
-    public List<T> getResult() {
-        return result;
-    }
-
-    /**
-     * 设置当前页的数据
-     */
-    public void setResult(List<T> result) {
-        this.result = result;
-    }
-
-    /**
-     * 取得总记录数
-     */
-    public long getTotalCount() {
-        return totalCount;
-    }
-
-    /**
-     * 设置总记录数
-     */
-    public void setTotalCount(long totalCount) {
-        if (totalCount > 0)
-            this.totalCount = totalCount;
-    }
-
-
-    /**
-     * 是否自动计算总数
+     * 获取当前页码
      *
      * @return
      */
-    public boolean isAutoCount() {
-        return autoCount;
-    }
+    int getPageNo();
 
     /**
-     * 设置自动计算总数
+     * 设置当前页码
+     *
+     * @param pageNo
+     */
+    void setPageNo(int pageNo);
+
+    /**
+     * 获取当前页记录数
+     *
+     * @return
+     */
+    int getPageSize();
+
+    /**
+     * 设置当前页记录数
+     *
+     * @param pageSize
+     */
+    void setPageSize(int pageSize);
+
+    /**
+     * 获取当前页对象内容
+     *
+     * @return
+     */
+    List<T> getResult();
+
+    /**
+     * 设置当前页对象内容
+     *
+     * @param result
+     */
+    void setResult(List<T> result);
+
+    /**
+     * 获取记录总数
+     *
+     * @return
+     */
+    long getTotalCount();
+
+    /**
+     * 设置记录总数
+     *
+     * @param totalCount
+     */
+    void setTotalCount(long totalCount);
+
+    /**
+     * 标记是否计算总数
+     *
+     * @return
+     */
+    boolean isAutoCount();
+
+    /**
+     * 标记是否计算总数
      *
      * @param autoCount
      */
-    public void setAutoCount(boolean autoCount) {
-        this.autoCount = autoCount;
-    }
+    void setAutoCount(boolean autoCount);
 
     /**
-     * 根据pageNo和pageSize计算当前页第一条记录在总结果集中的位置
+     * 获取当前页第一条记录在总计录中的位置
+     *
+     * @return
      */
-    public int getFirstRecord() {
-        return (pageNo - 1) * pageSize + 1;
-    }
+    int getFirst();
 
     /**
-     * 根据pageSize与totalCount计算总页数
+     * 获取页面总数
+     *
+     * @return
      */
-    public long getTotalPages() {
-        long count = totalCount / pageSize;
-        if (totalCount % pageSize > 0) {
-            count++;
-        }
-        return count;
-    }
+    long getTotalPages();
 
     /**
-     * 是否有下一页.
+     * 是否有下一页
+     *
+     * @return
      */
-    public boolean isHasNext() {
-        return pageNo < getTotalPages();
-    }
+    boolean isHasNext();
 
     /**
-     * 取得下页的页号, 序号从1开始.
-     * 当前页为尾页时仍返回尾页序号.
+     * 下一页页码
+     *
+     * @return
      */
-    public int getNextPage() {
-        return isHasNext() ? pageNo + 1 : pageNo;
-    }
+    int getNextPage();
 
     /**
-     * 是否有上一页.
+     * 是否有上一页
+     *
+     * @return
      */
-    public boolean isHasPrevious() {
-        return (pageNo - 1 >= 1);
-    }
+    boolean isHasPre();
 
     /**
-     * 取得上页的页号, 序号从1开始.
-     * 当前页为首页时返回首页序号.
+     * 上一页页码
+     *
+     * @return
      */
-    public int getPreviousPage() {
-        return isHasPrevious() ? pageNo - 1 : pageNo;
-    }
+    int getPrePage();
 }
