@@ -1,6 +1,6 @@
 package com.cudrania.hibernate;
 
-import com.cudrania.common.utils.Page;
+import com.cudrania.hibernate.Page;
 import com.cudrania.hibernate.transformer.BeanResultTransFormer;
 import com.cudrania.hibernate.transformer.MapResultTransFormer;
 import org.hibernate.*;
@@ -126,7 +126,7 @@ public class HibernateDao {
      * @param <T>
      * @return
      */
-    public <T> List<T> findAll(Class<T> entityClass) {
+    public <T> List<T> getAll(Class<T> entityClass) {
         entityClass = getEntityClass(entityClass);
         return createCriteria(entityClass).list();
     }
@@ -141,7 +141,7 @@ public class HibernateDao {
      * @param <K>
      * @return
      */
-    public <T, K extends Serializable> List<T> findByIds(Class<T> entityClass, List<K> ids) {
+    public <T, K extends Serializable> List<T> getByIds(Class<T> entityClass, List<K> ids) {
         entityClass = getEntityClass(entityClass);
         String idName = getClassMetadata(entityClass).getIdentifierPropertyName();
         return createCriteria(entityClass).add(Restrictions.in(idName, ids)).list();
@@ -156,7 +156,7 @@ public class HibernateDao {
      * @param <T>
      * @return
      */
-    public <T> List<T> findByProperties(Class<T> entityClass, Map<String, Object> properties) {
+    public <T> List<T> getByProperties(Class<T> entityClass, Map<String, Object> properties) {
         entityClass = getEntityClass(entityClass);
         return createCriteria(entityClass).add(Restrictions.allEq(properties)).list();
     }

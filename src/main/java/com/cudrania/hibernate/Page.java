@@ -1,16 +1,23 @@
-package com.cudrania.common.utils;
+package com.cudrania.hibernate;
 
-
-import java.util.Collections;
 import java.util.List;
 
 /**
- * 简单分页对象
+ * 分页查询对象接口定义
  *
  * @author skyfalling
  */
 
-public class SimplePage<T> implements Page<T> {
+
+import java.util.Collections;
+
+/**
+ * 分页查询对象接口定义
+ *
+ * @author skyfalling
+ */
+
+public class Page<T> {
 
     protected int pageNo = 1;
     protected int pageSize = 20;
@@ -18,19 +25,31 @@ public class SimplePage<T> implements Page<T> {
     protected boolean autoCount = false;
     protected List<T> result = Collections.emptyList();
 
-    public SimplePage() {
+    public Page() {
     }
 
-    public SimplePage(int pageSize, int pageNo) {
+    /**
+     * 构造方法
+     *
+     * @param pageSize
+     * @param pageNo
+     */
+    public Page(int pageSize, int pageNo) {
         this(pageSize, pageNo, 0L);
     }
 
-    public SimplePage(int pageSize, int pageNo, long totalCount) {
+    /**
+     * 构造方法
+     *
+     * @param pageSize
+     * @param pageNo
+     * @param totalCount
+     */
+    public Page(int pageSize, int pageNo, long totalCount) {
         setPageSize(pageSize);
         setPageNo(pageNo);
         setTotalCount(totalCount);
     }
-
 
     /**
      * 获得当前页的页号
@@ -65,13 +84,6 @@ public class SimplePage<T> implements Page<T> {
     }
 
     /**
-     * 根据pageNo和pageSize计算当前页第一条记录在总结果集中的位置
-     */
-    public int getFirstIndex() {
-        return (pageNo - 1) * pageSize + 1;
-    }
-
-    /**
      * 获取当前页的数据
      */
     public List<T> getResult() {
@@ -96,8 +108,10 @@ public class SimplePage<T> implements Page<T> {
      * 设置总记录数
      */
     public void setTotalCount(long totalCount) {
-        this.totalCount = totalCount;
+        if (totalCount > 0)
+            this.totalCount = totalCount;
     }
+
 
     /**
      * 是否自动计算总数
@@ -118,6 +132,13 @@ public class SimplePage<T> implements Page<T> {
     }
 
     /**
+     * 根据pageNo和pageSize计算当前页第一条记录在总结果集中的位置
+     */
+    public int getFirstRecord() {
+        return (pageNo - 1) * pageSize + 1;
+    }
+
+    /**
      * 根据pageSize与totalCount计算总页数
      */
     public long getTotalPages() {
@@ -128,4 +149,33 @@ public class SimplePage<T> implements Page<T> {
         return count;
     }
 
+    /**
+     * 是否有下一页.
+     */
+    public boolean isHasNext() {
+        return pageNo < getTotalPages();
+    }
+
+    /**
+     * 取得下页的页号, 序号从1开始.
+     * 当前页为尾页时仍返回尾页序号.
+     */
+    public int getNextPage() {
+        return isHasNext() ? pageNo + 1 : pageNo;
+    }
+
+    /**
+     * 是否有上一页.
+     */
+    public boolean isHasPrevious() {
+        return (pageNo - 1 >= 1);
+    }
+
+    /**
+     * 取得上页的页号, 序号从1开始.
+     * 当前页为首页时返回首页序号.
+     */
+    public int getPreviousPage() {
+        return isHasPrevious() ? pageNo - 1 : pageNo;
+    }
 }
