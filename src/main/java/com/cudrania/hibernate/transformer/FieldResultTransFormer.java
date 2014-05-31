@@ -26,6 +26,20 @@ public class FieldResultTransFormer extends BasicTransformerAdapter implements S
      */
     private Class fieldType;
 
+    /**
+     * 默认取第一个字段,不进行类型转换
+     */
+    public FieldResultTransFormer() {
+    }
+
+    /**
+     * 默认取第一个字段,并进行类型转换
+     *
+     * @param fieldType 字段类型,若为null则不进行类型转换
+     */
+    public FieldResultTransFormer(Class fieldType) {
+        this(0, null, fieldType);
+    }
 
     /**
      * 取指定索引位置的字段,并进行类型转换
