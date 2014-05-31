@@ -265,7 +265,7 @@ public class HibernateDao {
      */
     public Page<Map<String, ?>> sqlPageQuery(Page page, String sql, Object... parameters) {
         Query query = createSQLQuery(sql, parameters).setResultTransformer(new MapResultTransFormer());
-        return pageQuery(page, query);
+        return pageQuery(query, page);
     }
 
 
@@ -282,7 +282,7 @@ public class HibernateDao {
      */
     public <T> Page<T> sqlPageQuery(Page<T> page, Class<T> beanClass, String sql, Object... parameters) {
         SQLQuery query = setQueryType(createSQLQuery(sql, parameters), beanClass);
-        return pageQuery(page, query);
+        return pageQuery(query, page);
     }
 
     /**
@@ -295,18 +295,19 @@ public class HibernateDao {
      */
     public Page hqlPageQuery(Page page, String hql, Object... parameters) {
         Query query = createQuery(hql, parameters);
-        return pageQuery(page, query);
+        return pageQuery(query, page);
     }
 
 
     /**
      * 分页查询
      *
+     *
      * @param query
      * @param page  分页对象
      * @return
      */
-    public static <T> Page<T> pageQuery(Page<T> page, Query query) {
+    public static <T> Page<T> pageQuery(Query query, Page<T> page) {
         query.setFirstResult(
                 (page.getPageNo() - 1) * page.getPageSize()
         ).setMaxResults(page.getPageSize());
