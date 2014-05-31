@@ -1,6 +1,5 @@
 package com.cudrania.hibernate;
 
-import com.cudrania.hibernate.Page;
 import com.cudrania.hibernate.transformer.BeanResultTransFormer;
 import com.cudrania.hibernate.transformer.MapResultTransFormer;
 import org.hibernate.*;
@@ -266,10 +265,7 @@ public class HibernateDao {
      */
     public Page<Map<String, ?>> sqlPageQuery(Page page, String sql, Object... parameters) {
         Query query = createSQLQuery(sql, parameters).setResultTransformer(new MapResultTransFormer());
-        page.setResult(
-                pageQuery(query, page.getPageNo(), page.getPageSize())
-        );
-        return page;
+        return pageQuery(page, query);
     }
 
 
@@ -286,8 +282,7 @@ public class HibernateDao {
      */
     public <T> Page<T> sqlPageQuery(Page<T> page, Class<T> beanClass, String sql, Object... parameters) {
         SQLQuery query = setQueryType(createSQLQuery(sql, parameters), beanClass);
-        page.setResult(pageQuery(query, page.getPageNo(), page.getPageSize()));
-        return page;
+        return pageQuery(page, query);
     }
 
     /**
@@ -300,8 +295,7 @@ public class HibernateDao {
      */
     public Page hqlPageQuery(Page page, String hql, Object... parameters) {
         Query query = createQuery(hql, parameters);
-        page.setResult(pageQuery(query, page.getPageNo(), page.getPageSize()));
-        return page;
+        return pageQuery(page, query);
     }
 
 
@@ -309,13 +303,17 @@ public class HibernateDao {
      * 分页查询
      *
      * @param query
-     * @param pageNo   页码
-     * @param pageSize 每页数据大小
+     * @param page  分页对象
      * @return
      */
-    public static List pageQuery(Query query, int pageNo, int pageSize) {
-        return query.setFirstResult((pageNo - 1) * pageSize).setMaxResults(pageSize).list();
+    public static <T> Page<T> pageQuery(Page<T> page, Query query) {
+        query.setFirstResult(
+                (page.getPageNo() - 1) * page.getPageSize()
+        ).setMaxResults(page.getPageSize());
+        page.setResult(query.list());
+        return page;
     }
+
 
     /**
      * 创建{@link SQLQuery}对象

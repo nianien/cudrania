@@ -79,7 +79,7 @@ public interface Page<T> {
     void setAutoCount(boolean autoCount);
 
     /**
-     * 获取当前页第一条记录在总计录中的位置
+     * 获取当前页第一条记录在总计录中的位置,从1开始
      *
      * @return
      */
