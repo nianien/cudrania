@@ -174,7 +174,7 @@ public class BeanResultTransFormer<T> extends BasicTransformerAdapter implements
             return;
         }
         if (compatibleList.size() > 0 || numericList.size() > 0) {
-            throw new Exception("ambiguous setter methods to call");
+            throw new Exception("ambiguous setter methods to call:[" + name + "]");
         }
     }
 
