@@ -6,7 +6,7 @@
 
     <groupId>com.cudrania</groupId>
     <artifactId>cudrania</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.1-SNAPSHOT</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>3.2.8.RELEASE</spring.version>
@@ -123,7 +123,7 @@
         <dependency>
             <groupId>commons-collections</groupId>
             <artifactId>commons-collections</artifactId>
-            <version>3.2.1.SAE</version>
+            <version>3.2.1</version>
         </dependency>
 
         <!-- for test -->
@@ -186,5 +186,10 @@
             <name>scm's Releases</name>
             <url>http://maven.scm.baidu.com:8081/nexus/content/repositories/Baidu_Local</url>
         </repository>
+        <snapshotRepository>
+            <id>baidu_local_snapshot</id>
+            <name>baidu_local_snapshot</name>
+            <url>http://maven.scm.baidu.com:8081/nexus/content/repositories/Baidu_Local_Snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
 </project>
