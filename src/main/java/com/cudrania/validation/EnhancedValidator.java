@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 /**
- * 基于{@link ConstraintValidator}接口增加实现,可动态修改注解的属性值,仅支持基于{@link ConstraintValidatorContextImpl}的实现
+ * {@link ConstraintValidator}接口的增强实现,针对基于{@link ConstraintValidatorContextImpl}的实现,支持动态修改注解的属性值
  *
  * @author skyfalling
  */
