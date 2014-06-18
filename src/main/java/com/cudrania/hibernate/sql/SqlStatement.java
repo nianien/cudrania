@@ -16,7 +16,7 @@ import java.util.*;
  *     SqlStatement sqlStatement2 = new SqlStatement("select * from users where (userName,password) in ?",
  *     new Object[][][]{{{"userName1", "password1"}, {"userName2", "password2"}}});
  *
- *     the result of expandSql() invocation:
+ *     the result of sql:
  *     select * from users where (userName,password) in (('userName1','password1'),('userName2','password2'))
  *     </code>
  * </pre>
