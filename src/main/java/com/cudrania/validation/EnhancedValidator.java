@@ -5,6 +5,7 @@ import org.hibernate.validator.internal.engine.ConstraintValidatorContextImpl;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Map;
 
@@ -15,6 +16,9 @@ import java.util.Map;
  */
 public abstract class EnhancedValidator<A extends Annotation, T> implements ConstraintValidator<A, T> {
 
+    /**
+     * {@link ConstraintValidatorContext}对象内置的属性Map实例
+     */
     private Map<String, Object> attributesMap;
 
     public abstract void initialize(A constraintAnnotation);
@@ -28,9 +32,23 @@ public abstract class EnhancedValidator<A extends Annotation, T> implements Cons
      * @param name
      * @param value
      */
-    public void addAttribute(ConstraintValidatorContext context, String name, Object value) {
-        getAttributesMap(context).put(name, value);
+    protected void addAttribute(ConstraintValidatorContext context, String name, Object value) {
+        //由于Hibernate Validation的bug,这里需要封装primitive类型数组
+        getAttributesMap(context).put(name, wrapper(value));
     }
+
+    /**
+     * 添加属性集合
+     *
+     * @param context
+     * @param attributesMap
+     */
+    protected void addAttributes(ConstraintValidatorContext context, Map<String, Object> attributesMap) {
+        for (String name : attributesMap.keySet()) {
+            addAttribute(context, name, attributesMap.get(name));
+        }
+    }
+
 
     /**
      * 删除属性
@@ -38,33 +56,26 @@ public abstract class EnhancedValidator<A extends Annotation, T> implements Cons
      * @param context
      * @param name
      */
-    public void removeAttribute(ConstraintValidatorContext context, String name) {
+    protected void removeAttribute(ConstraintValidatorContext context, String name) {
         getAttributesMap(context).remove(name);
     }
 
 
     /**
-     * 添加属性
-     *
-     * @param context
-     * @param attributesMap
-     */
-    public void addAttributes(ConstraintValidatorContext context, Map<String, Object> attributesMap) {
-        getAttributesMap(context).putAll(attributesMap);
-    }
-
-    /**
-     * 包装注解,以提供友好的消息提示
+     * 包装注解,用于消息提示
      *
      * @param annotations
-     * @param type
      * @return
      */
-    public AnnotationWrapper[] wrapper(Object[] annotations, Class type) {
+    protected Object wrapper(Object[] annotations) {
+        if (annotations.length == 0)
+            return annotations;
+        if (annotations.length == 1)
+            return new AnnotationWrapper(annotations[0]);
         AnnotationWrapper[] wrappers = new AnnotationWrapper[annotations.length];
         int i = 0;
         for (Object annotation : annotations) {
-            wrappers[i++] = new AnnotationWrapper(annotation, type);
+            wrappers[i++] = new AnnotationWrapper(annotation);
         }
         return wrappers;
     }
@@ -94,17 +105,45 @@ public abstract class EnhancedValidator<A extends Annotation, T> implements Cons
         return this.attributesMap;
     }
 
+    /**
+     * 包装primitive数组
+     *
+     * @param source
+     * @return
+     */
+    private static Object wrapper(Object source) {
+        if (source == null)
+            return "";
+        if (source instanceof Object[]) {
+            return source;
+        }
+        if (source.getClass().isArray()) {
+            int length = Array.getLength(source);
+            if (length == 0) {
+                return new Object[0];
+            }
+            Class<?> wrapperType = Array.get(source, 0).getClass();
+            Object[] newArray = (Object[]) Array.newInstance(wrapperType, length);
+            for (int i = 0; i < length; i++) {
+                newArray[i] = Array.get(source, i);
+            }
+            return newArray;
+        }
+        return source;
+    }
+
+    /**
+     * 封装注解实例,重写toString()
+     */
     private static class AnnotationWrapper {
         Object object;
-        Class type;
 
-        AnnotationWrapper(Object object, Class type) {
+        AnnotationWrapper(Object object) {
             this.object = object;
-            this.type = type;
         }
 
         public String toString() {
-            return object.toString().substring(type.getName().length() + 1);
+            return object.toString().substring(object.getClass().getInterfaces()[0].getName().length() + 1);
         }
     }
 
