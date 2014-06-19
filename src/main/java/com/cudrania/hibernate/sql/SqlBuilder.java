@@ -146,7 +146,7 @@ public class SqlBuilder {
     }
 
     /**
-     * 若number正数,则追加SQL
+     * 若number非正数,则追加SQL
      *
      * @param sql
      * @param number
