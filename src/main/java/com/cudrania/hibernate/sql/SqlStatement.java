@@ -20,6 +20,8 @@ import java.util.*;
  *     select * from users where (userName,password) in (('userName1','password1'),('userName2','password2'))
  *     </code>
  * </pre>
+ *
+ * @author skyfalling
  */
 public class SqlStatement {
 

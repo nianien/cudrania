@@ -62,25 +62,6 @@ public abstract class EnhancedValidator<A extends Annotation, T> implements Cons
 
 
     /**
-     * 包装注解,用于消息提示
-     *
-     * @param annotations
-     * @return
-     */
-    protected Object wrapper(Object[] annotations) {
-        if (annotations.length == 0)
-            return annotations;
-        if (annotations.length == 1)
-            return new AnnotationWrapper(annotations[0]);
-        AnnotationWrapper[] wrappers = new AnnotationWrapper[annotations.length];
-        int i = 0;
-        for (Object annotation : annotations) {
-            wrappers[i++] = new AnnotationWrapper(annotation);
-        }
-        return wrappers;
-    }
-
-    /**
      * 获取属性映射表
      *
      * @param context
@@ -132,19 +113,5 @@ public abstract class EnhancedValidator<A extends Annotation, T> implements Cons
         return source;
     }
 
-    /**
-     * 封装注解实例,重写toString()
-     */
-    private static class AnnotationWrapper {
-        Object object;
-
-        AnnotationWrapper(Object object) {
-            this.object = object;
-        }
-
-        public String toString() {
-            return object.toString().substring(object.getClass().getInterfaces()[0].getName().length() + 1);
-        }
-    }
 
 }
