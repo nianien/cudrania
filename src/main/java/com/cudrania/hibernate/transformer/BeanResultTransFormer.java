@@ -89,15 +89,17 @@ public class BeanResultTransFormer<T> extends BasicTransformerAdapter implements
     }
 
     /**
-     * 或者指定类型的转换对象
+     * 获取beanClass的转换对象
      *
      * @param beanClass
      * @return
      */
     public static BeanResultTransFormer get(Class beanClass) {
-        synchronized (beanClass) {
-            if (!instanceRegistered.containsKey(beanClass)) {
-                instanceRegistered.put(beanClass, new BeanResultTransFormer(beanClass));
+        if (!instanceRegistered.containsKey(beanClass)) {
+            synchronized (beanClass) {
+                if (!instanceRegistered.containsKey(beanClass)) {
+                    instanceRegistered.put(beanClass, new BeanResultTransFormer(beanClass));
+                }
             }
         }
         return instanceRegistered.get(beanClass);
