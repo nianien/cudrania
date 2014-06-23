@@ -3,12 +3,8 @@ package com.cudrania.spring.handlermapping;
 import org.springframework.util.StringValueResolver;
 
 /**
- * 驼峰命名法转连字符命名法
- * <ul>
- * <li>
- * <li>当使用默认类映射规则时，可指定配置路径是否自动转为小写，方法{@link #useLowerCase(boolean)}</li>
- * </li>
- * </ul>
+ * 驼峰命名法转连字符命名法<br/>
+ * 当使用默认类映射规则时，可指定配置路径是否自动转为小写，方法{@link #useLowerCase(boolean)}
  *
  * @author skyfalling
  */
