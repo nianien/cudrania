@@ -159,6 +159,8 @@ public class HibernateDao {
      * @return
      */
     public <T> List<T> getByProperties(Class<T> entityClass, Map<String, Object> properties) {
+        if (properties == null || properties.isEmpty())
+            return Collections.EMPTY_LIST;
         entityClass = getEntityClass(entityClass);
         return createCriteria(entityClass).add(Restrictions.allEq(properties)).list();
     }
