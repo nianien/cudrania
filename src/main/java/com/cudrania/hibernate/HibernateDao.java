@@ -2,6 +2,7 @@ package com.cudrania.hibernate;
 
 import com.cudrania.hibernate.transformer.BeanResultTransFormer;
 import com.cudrania.hibernate.transformer.MapResultTransFormer;
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.*;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.jdbc.Work;
@@ -141,6 +142,8 @@ public class HibernateDao {
      * @return
      */
     public <T, K extends Serializable> List<T> getByIds(Class<T> entityClass, List<K> ids) {
+        if (CollectionUtils.isEmpty(ids))
+            return Collections.EMPTY_LIST;
         entityClass = getEntityClass(entityClass);
         String idName = getClassMetadata(entityClass).getIdentifierPropertyName();
         return createCriteria(entityClass).add(Restrictions.in(idName, ids)).list();
@@ -301,7 +304,6 @@ public class HibernateDao {
 
     /**
      * 分页查询
-     *
      *
      * @param query
      * @param page  分页对象
