@@ -21,22 +21,29 @@ public class CaseInsensitiveMap<K, V> extends HashMap<K, V> {
     }
 
     /**
-     * @param initialCapacity
+     * 构造方法,指定初始容量
+     *
+     * @param initialCapacity 初始容量
      */
     public CaseInsensitiveMap(int initialCapacity) {
         super(initialCapacity);
     }
 
     /**
-     * @param initialCapacity
-     * @param loadFactor
+     * 构造方法,指定初始容量和负载因子
+     *
+     * @param initialCapacity 初始容量
+     * @param loadFactor      负载因子
      */
     public CaseInsensitiveMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
     }
 
     /**
-     * @param map
+     * 构造方法
+     *
+     * @param map 初始数据拷贝对象,将其映射数据按照默认遍历顺序拷贝到当前对象中<br/>
+     *            需要注意的是:如果Map的key有重复（不区分大小写）,无法保证覆盖顺序.此时建议使用{@link java.util.LinkedHashMap}或{@link java.util.TreeMap}以保证覆盖顺序.
      */
     public CaseInsensitiveMap(Map<K, V> map) {
         super(Math.max((int) (map.size() / 0.75f) + 1,
