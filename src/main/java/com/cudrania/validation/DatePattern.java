@@ -38,7 +38,7 @@ public @interface DatePattern {
      *
      * @return
      */
-    String[] pattern();
+    String[] value();
 
     /**
      * 不进行格式校验的例外情况
@@ -77,8 +77,8 @@ public @interface DatePattern {
             }
             try {
                 //双重校验
-                Date date = DateUtils.parseDate(value, constraint.pattern());
-                for (String pattern : constraint.pattern()) {
+                Date date = DateUtils.parseDate(value, constraint.value());
+                for (String pattern : constraint.value()) {
                     if (DateFormatUtils.format(date, pattern).equals(value))
                         return true;
                 }
