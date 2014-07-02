@@ -31,19 +31,19 @@ import java.util.*;
 public class GlobalHandlerExceptionResolver extends AbstractHandlerExceptionResolver {
 
     {
-        //默认优先级
+        //设置优先级
         this.setOrder(0);
     }
 
     /**
      * 忽略的异常
      */
-    private Set<Class<? extends Exception>> ignoreExceptions = new HashSet();
+    private Set<Class<? extends Exception>> ignoreExceptions = Collections.EMPTY_SET;
 
     /**
      * 预定义异常
      */
-    private Set<Class<? extends Exception>> definedExceptions = new HashSet();
+    private Set<Class<? extends Exception>> definedExceptions = Collections.EMPTY_SET;
 
 
     /**
@@ -52,7 +52,7 @@ public class GlobalHandlerExceptionResolver extends AbstractHandlerExceptionReso
      * @param ignoreExceptions
      */
     public void setIgnoreExceptions(Set<Class<? extends Exception>> ignoreExceptions) {
-        this.ignoreExceptions.addAll(ignoreExceptions);
+        this.ignoreExceptions = ignoreExceptions;
     }
 
     /**
@@ -61,7 +61,7 @@ public class GlobalHandlerExceptionResolver extends AbstractHandlerExceptionReso
      * @param definedExceptions
      */
     public void setDefinedExceptions(Set<Class<? extends Exception>> definedExceptions) {
-        this.definedExceptions.addAll(definedExceptions);
+        this.definedExceptions = definedExceptions;
     }
 
     /**

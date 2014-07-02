@@ -106,8 +106,11 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
 
     @Override
     protected void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
-        GlobalHandlerExceptionResolver resolver = getNullableBean(GlobalHandlerExceptionResolver.class);
-        exceptionResolvers.add(resolver != null ? resolver : new GlobalHandlerExceptionResolver());
+        HandlerExceptionResolver resolver = getNullableBean(HandlerExceptionResolver.class);
+        //如果未定义,则加载默认异常处理
+        if (resolver == null) {
+            exceptionResolvers.add(new GlobalHandlerExceptionResolver());
+        }
     }
 
 
