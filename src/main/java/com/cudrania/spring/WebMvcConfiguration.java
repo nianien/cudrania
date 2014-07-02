@@ -1,14 +1,12 @@
 package com.cudrania.spring;
 
-import com.cudrania.spring.handlermapping.RequestMappingConfiguration;
-import com.cudrania.validation.ResourceBundleMessageInterpolator;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.cudrania.spring.handlermapping.IdealRequestMappingHandlerMapping;
 import com.cudrania.spring.handlermapping.RequestMappingConfiguration;
 import com.cudrania.spring.resolver.GlobalHandlerExceptionResolver;
 import com.cudrania.spring.resolver.ScopeAttributeMethodProcessor;
 import com.cudrania.validation.ResourceBundleMessageInterpolator;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -44,23 +42,21 @@ import java.util.List;
 @Configuration
 public class WebMvcConfiguration extends WebMvcConfigurationSupport {
 
-    private RequestMappingConfiguration requestMappingConfiguration;
+
+    private ApplicationContext applicationContext;
     @Resource
     private MessageSource messageSource;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
         super.setApplicationContext(applicationContext);
-        try {
-            this.requestMappingConfiguration = applicationContext.getBean(RequestMappingConfiguration.class);
-        } catch (BeansException e) {
-            System.out.println("warning: No RequestMappingConfiguration instance defined,use default.");
-        }
+        this.applicationContext = applicationContext;
     }
 
     @Bean
     @Override
     public RequestMappingHandlerMapping requestMappingHandlerMapping() {
+        RequestMappingConfiguration requestMappingConfiguration = getNullableBean(RequestMappingConfiguration.class);
         IdealRequestMappingHandlerMapping handlerMapping = new IdealRequestMappingHandlerMapping(requestMappingConfiguration);
         handlerMapping.setOrder(0);
         handlerMapping.setInterceptors(getInterceptors());
@@ -110,9 +106,8 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
 
     @Override
     protected void configureHandlerExceptionResolvers(List<HandlerExceptionResolver> exceptionResolvers) {
-        exceptionResolvers.add(new GlobalHandlerExceptionResolver());
-        /*取消注释,添加默认异常处理
-        addDefaultHandlerExceptionResolvers(exceptionResolvers);*/
+        GlobalHandlerExceptionResolver resolver = getNullableBean(GlobalHandlerExceptionResolver.class);
+        exceptionResolvers.add(resolver != null ? resolver : new GlobalHandlerExceptionResolver());
     }
 
 
@@ -153,4 +148,12 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         return messageSource;
     }
 
+
+    private <T> T getNullableBean(Class<T> type) {
+        try {
+            return applicationContext.getBean(type);
+        } catch (BeansException e) {
+            return null;
+        }
+    }
 }

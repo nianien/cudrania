@@ -2,8 +2,6 @@ package com.cudrania.spring.resolver;
 
 import com.cudrania.common.exception.DefinedException;
 import com.cudrania.spring.resolver.ErrorResponse.ErrorField;
-import com.cudrania.common.exception.DefinedException;
-import com.cudrania.spring.resolver.ErrorResponse.ErrorField;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSourceResolvable;
@@ -23,9 +21,7 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * 全局异常统一处理类,将错误信息转换成合适的JSON格式返回。
@@ -34,12 +30,48 @@ import java.util.Locale;
  */
 public class GlobalHandlerExceptionResolver extends AbstractHandlerExceptionResolver {
 
+    {
+        //默认优先级
+        this.setOrder(0);
+    }
+
+    /**
+     * 忽略的异常
+     */
+    private Set<Class<? extends Exception>> ignoreExceptions = new HashSet();
+
+    /**
+     * 预定义异常
+     */
+    private Set<Class<? extends Exception>> definedExceptions = new HashSet();
+
+
+    /**
+     * 设置忽略的异常,由其他异常处理器处理
+     *
+     * @param ignoreExceptions
+     */
+    public void setIgnoreExceptions(Set<Class<? extends Exception>> ignoreExceptions) {
+        this.ignoreExceptions.addAll(ignoreExceptions);
+    }
+
+    /**
+     * 设置预定义的异常,将包装异常消息
+     *
+     * @param definedExceptions
+     */
+    public void setDefinedExceptions(Set<Class<? extends Exception>> definedExceptions) {
+        this.definedExceptions.addAll(definedExceptions);
+    }
 
     /**
      * 处理异常，返回null则不进行处理
      */
     @Override
     protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+        //忽略的异常,被其他程序处理
+        if (isIgnoreException(ex))
+            return null;
         ex.printStackTrace();
         Locale locale = RequestContextUtils.getLocaleResolver(request).resolveLocale(request);
         WebApplicationContext context = RequestContextUtils.getWebApplicationContext(request);
@@ -55,26 +87,26 @@ public class GlobalHandlerExceptionResolver extends AbstractHandlerExceptionReso
      * 绑定错误信息
      *
      * @param context
-     * @param e
+     * @param ex
      * @param locale
      * @return
      */
-    protected ErrorResponse bindError(HttpServletResponse httpResponse, ApplicationContext context, Exception e, Locale locale) {
+    protected ErrorResponse bindError(HttpServletResponse httpResponse, ApplicationContext context, Exception ex, Locale locale) {
         ErrorResponse errorResponse = new ErrorResponse();
-        Errors errors = getErrors(e);
+        Errors errors = getErrors(ex);
         errorResponse.setFields(renderErrors(context, errors, locale));
-        boolean defined = AnnotationUtils.findAnnotation(e.getClass(), DefinedException.class) != null;
-        if (e instanceof ErrorCoded) {
-            errorResponse.setErrorCode(((ErrorCoded) e).getErrorCode());
+
+        if (ex instanceof ErrorCoded) {
+            errorResponse.setErrorCode(((ErrorCoded) ex).getErrorCode());
         }
-        if (e instanceof MessageSourceResolvable) {
-            errorResponse.setMessage(context.getMessage((MessageSourceResolvable) e, locale));
-        } else if (defined) {
-            errorResponse.setMessage(context.getMessage(e.getMessage(), new Object[0], locale));
+        if (ex instanceof MessageSourceResolvable) {
+            errorResponse.setMessage(context.getMessage((MessageSourceResolvable) ex, locale));
+        } else if (isDefinedException(ex)) {
+            errorResponse.setMessage(context.getMessage(ex.getMessage(), new Object[0], ex.getMessage(), locale));
         }
         HttpStatus status =
-                (e instanceof MessageSourceResolvable
-                        || e instanceof DefinedException
+                (ex instanceof MessageSourceResolvable
+                        || ex instanceof DefinedException
                         || errors != null)
                         ? HttpStatus.CONFLICT :
                         HttpStatus.INTERNAL_SERVER_ERROR;
@@ -121,5 +153,40 @@ public class GlobalHandlerExceptionResolver extends AbstractHandlerExceptionReso
             return (Errors) ReflectionUtils.invokeMethod(method, e);
         }
         return null;
+    }
+
+    /**
+     * 是否为忽略的异常
+     *
+     * @param ex
+     * @return
+     */
+    protected boolean isIgnoreException(Exception ex) {
+        return contains(ignoreExceptions, ex);
+    }
+
+    /**
+     * 是否为预定义异常
+     *
+     * @param ex
+     * @return
+     */
+    protected boolean isDefinedException(Exception ex) {
+        return AnnotationUtils.findAnnotation(ex.getClass(), DefinedException.class) != null || contains(definedExceptions, ex);
+    }
+
+    /**
+     * 是否包含异常或子类
+     *
+     * @param set
+     * @param ex
+     * @return
+     */
+    private boolean contains(Set<Class<? extends Exception>> set, Exception ex) {
+        for (Class<? extends Exception> clazz : set) {
+            if (clazz.isInstance(ex))
+                return true;
+        }
+        return false;
     }
 }

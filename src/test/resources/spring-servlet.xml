@@ -27,6 +27,14 @@
             <bean class="com.cudrania.spring.handlermapping.NamingResolver"/>
         </property>
     </bean>
+    <bean class="com.cudrania.spring.resolver.GlobalHandlerExceptionResolver">
+        <property name="definedExceptions">
+            <set>
+                <value>java.lang.Exception</value>
+            </set>
+        </property>
+        <property name="order" value="-1"/>
+    </bean>
     <!--容器默认的DefaultServletHandler处理 所有静态内容与无RequestMapping处理的URL -->
     <mvc:resources mapping="/resources/**" location="/META-INF"/>
 
