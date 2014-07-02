@@ -9,7 +9,8 @@ import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.lang.reflect.Modifier;
+import java.util.LinkedHashMap;
 
 /**
  * 扩展基于注解的请求映射处理类,实现自动映射功能和统一配置，具体配置项参考{@link RequestMappingConfiguration}<br/>
@@ -92,7 +93,11 @@ public class IdealRequestMappingHandlerMapping extends
      */
     @Override
     protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
-        if (AnnotationUtils.findAnnotation(handlerType, NotMapping.class) != null || AnnotationUtils.findAnnotation(method, NotMapping.class) != null)
+        int mod = method.getModifiers();
+        if (!Modifier.isPublic(mod) //必须是public方法
+                || Modifier.isStatic(mod) //必须是成员方法
+                || AnnotationUtils.findAnnotation(handlerType, NotMapping.class) != null //方法上不能添加@NotMapping注解
+                || AnnotationUtils.findAnnotation(method, NotMapping.class) != null) //方法上不能添加@NotMapping注解
             return null;
         return createRequestMappingInfo(createRequestMappingConfig(handlerType)).combine(createRequestMappingInfo(createRequestMappingConfig(method)));
     }
