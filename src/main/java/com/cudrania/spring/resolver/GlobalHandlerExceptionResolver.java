@@ -102,7 +102,11 @@ public class GlobalHandlerExceptionResolver extends AbstractHandlerExceptionReso
         if (ex instanceof MessageSourceResolvable) {
             errorResponse.setMessage(context.getMessage((MessageSourceResolvable) ex, locale));
         } else if (isDefinedException(ex)) {
-            errorResponse.setMessage(context.getMessage(ex.getMessage(), new Object[0], ex.getMessage(), locale));
+            try {
+                errorResponse.setMessage(context.getMessage(ex.getMessage(), new Object[0], ex.getMessage(), locale));
+            } catch (Exception e) {
+                errorResponse.setMessage(ex.getMessage());
+            }
         }
         HttpStatus status =
                 (ex instanceof MessageSourceResolvable
