@@ -443,7 +443,7 @@ public class HibernateDao {
         Map<String, Object> jpaMap = new HashMap<String, Object>();
         for (int i = 0; i < parameters.length; i++) {
             Object param = parameters[i];
-            if (param == null || param instanceof Collection || isSimple(param) || param.getClass().isArray()) {
+            if (param instanceof Collection || isSimple(param) || param.getClass().isArray()) {
                 jpaMap.put(String.valueOf(i), handle(param));
             } else if (param instanceof Map) {
                 query.setProperties(namedParameters((Map) param));
