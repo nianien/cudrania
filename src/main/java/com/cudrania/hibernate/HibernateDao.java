@@ -358,6 +358,18 @@ public class HibernateDao {
 
 
     /**
+     * 执行SQL语句
+     *
+     * @param sql
+     * @param parameters
+     * @return The number of entities updated or deleted.
+     */
+    @Transactional
+    public int execute(String sql, Object... parameters) {
+        return createSQLQuery(sql, parameters).executeUpdate();
+    }
+
+    /**
      * 批量执行多条SQL语句
      *
      * @param sqlList
