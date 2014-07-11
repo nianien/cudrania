@@ -179,17 +179,4 @@
             </snapshots>
         </pluginRepository>
     </pluginRepositories>
-    <!-- 发布jar包至Maven私服 -->
-    <distributionManagement>
-        <repository>
-            <id>baidu_local</id>
-            <name>scm's Releases</name>
-            <url>http://maven.scm.baidu.com:8081/nexus/content/repositories/Baidu_Local</url>
-        </repository>
-        <snapshotRepository>
-            <id>baidu_local_snapshot</id>
-            <name>baidu_local_snapshot</name>
-            <url>http://maven.scm.baidu.com:8081/nexus/content/repositories/Baidu_Local_Snapshots</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>
