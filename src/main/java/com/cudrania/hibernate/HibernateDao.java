@@ -321,6 +321,57 @@ public class HibernateDao {
 
 
     /**
+     * SQL查询,返回单个Map对象,其中key为字段别名,value为字段值.如果查询结果不存在,则返回null;如果查询结果存在多条,则抛出异常.<br/>
+     * 参数赋值参考{@link #setParameters(org.hibernate.Query, Object...)}方法
+     *
+     * @param sql
+     * @param parameters
+     * @return
+     * @see #setParameters(org.hibernate.Query, Object...)
+     */
+    public Map<String, ?> sqlUniqueQuery(String sql, Object... parameters) {
+        List<Map<String, ?>> list = sqlQuery(sql, parameters);
+        if (list.size() > 1)
+            throw new RuntimeException("more than one results occurs!");
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+
+    /**
+     * SQL查询,返回单个对象.如果查询结果不存在,则返回null;如果查询结果存在多条,则抛出异常.<br/>
+     * 参数赋值参考{@link #setParameters(org.hibernate.Query, Object...)}方法
+     *
+     * @param sql
+     * @param parameters
+     * @return
+     * @see #setParameters(org.hibernate.Query, Object...)
+     */
+    public <T> T sqlUniqueQuery(Class<T> beanClass, String sql, Object... parameters) {
+        List<T> list = sqlQuery(beanClass, sql, parameters);
+        if (list.size() > 1)
+            throw new RuntimeException("more than one results occurs!");
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+
+    /**
+     * 执行HQL查询,返回单个结果.如果查询结果不存在,则返回null;如果查询结果存在多条,则抛出异常.<br/>
+     * 参数赋值参考{@link #setParameters(org.hibernate.Query, Object...)}方法
+     *
+     * @param hql
+     * @param parameters
+     * @return
+     * @see #setParameters(org.hibernate.Query, Object...)
+     */
+    public Object hqlUniqueQuery(String hql, Object... parameters) {
+        List list = hqlQuery(hql, parameters);
+        if (list.size() > 1)
+            throw new RuntimeException("more than one results occurs!");
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+
+    /**
      * 创建{@link SQLQuery}对象
      *
      * @param sql
