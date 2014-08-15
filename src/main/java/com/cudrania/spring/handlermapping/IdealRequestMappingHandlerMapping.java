@@ -113,16 +113,20 @@ public class IdealRequestMappingHandlerMapping extends
         RequestMappingAnnotationConfiguration config = new RequestMappingAnnotationConfiguration();
         RequestMapping annotation = AnnotationUtils.findAnnotation(method, RequestMapping.class);
         String methodName = method.getName();
-        config.value(annotation != null && annotation.value().length != 0 ?
-                annotation.value() :
-                new String[]{nameResolver.resolveStringValue(methodName)});
-        //默认RequestMethod
-        config.method(defaultRequestMethods);
-        for (String key : requestMethodMapping.keySet()) {
-            if (methodName.matches(key)) {
-                //配置RequestMethod
-                config.method(requestMethodMapping.get(key));
-                break;
+        String defaultName = nameResolver.resolveStringValue(methodName);
+        config.value(combineURL("", defaultName, annotation != null ? annotation.value() : null));
+
+        if (annotation != null && annotation.method().length > 0) {
+            config.method(annotation.method());
+        } else {
+            //默认RequestMethod
+            config.method(defaultRequestMethods);
+            for (String key : requestMethodMapping.keySet()) {
+                if (methodName.matches(key)) {
+                    //配置RequestMethod
+                    config.method(requestMethodMapping.get(key));
+                    break;
+                }
             }
         }
         config.requestCondition(getCustomMethodCondition(method));
@@ -140,14 +144,8 @@ public class IdealRequestMappingHandlerMapping extends
         RequestMapping annotation = AnnotationUtils.findAnnotation(handlerType, RequestMapping.class);
         Package aPackage = handlerType.getPackage();
         String baseName = (aPackage != null ? aPackage.getName() : "").replaceAll(packagePattern, packageReplacement);
-        String[] values = annotation != null && annotation.value().length != 0 ?
-                annotation.value() :
-                new String[]{nameResolver.resolveStringValue(handlerType.getSimpleName().replaceAll(classPattern, classReplacement))};
-        int i = 0;
-        for (String value : values) {
-            values[i++] = (baseName + "/" + value).replace('.', '/').replaceAll("/+", "/");
-        }
-        config.value(values);
+        String defaultName = nameResolver.resolveStringValue(handlerType.getSimpleName().replaceAll(classPattern, classReplacement));
+        config.value(combineURL(baseName, defaultName, annotation != null ? annotation.value() : null));
         config.requestCondition(getCustomTypeCondition(handlerType));
         return config;
     }
@@ -169,6 +167,29 @@ public class IdealRequestMappingHandlerMapping extends
                 new ConsumesRequestCondition(config.consumes(), config.headers()),
                 new ProducesRequestCondition(config.produces(), config.headers(), getContentNegotiationManager()),
                 config.requestCondition());
+    }
+
+    /**
+     * 组合URL
+     *
+     * @param baseUrl    基本路径
+     * @param defaultUrl 默认路径
+     * @param urls       URL组
+     * @return
+     */
+    private String[] combineURL(String baseUrl, String defaultUrl, String[] urls) {
+        defaultUrl = "/" + defaultUrl;
+        if (urls == null || urls.length == 0)
+            urls = new String[]{defaultUrl};
+        int i = 0;
+        for (String value : urls) {
+            //不是绝对路径,自动添加类路径
+            if (!value.startsWith("/")) {
+                value = defaultUrl + "/" + value;
+            }
+            urls[i++] = (baseUrl + "/" + value).replace('.', '/').replaceAll("/+", "/");
+        }
+        return urls;
     }
 
 
