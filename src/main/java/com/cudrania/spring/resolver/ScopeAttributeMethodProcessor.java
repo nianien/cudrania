@@ -33,17 +33,6 @@ public class ScopeAttributeMethodProcessor implements HandlerMethodArgumentResol
         }
     };
 
-    /**
-     * 绑定对象到当前线程
-     * 键值为type#name
-     *
-     * @param name  对象名称,作为键值
-     * @param value
-     * @return
-     */
-    public static Object bind(String name, Object value) {
-        return localMap.get().put(name, value);
-    }
 
     /**
      * 绑定对象到当前线程<br/>
@@ -54,10 +43,25 @@ public class ScopeAttributeMethodProcessor implements HandlerMethodArgumentResol
      * @param value
      * @return
      */
-    public static Object bind(String name, Class type, Object value) {
-        return localMap.get().put(nameWithType(name, type), value);
+    public static <T> void bind(String name, Class<T> type, T value) {
+        bind(nameWithType(name, type), value);
     }
 
+    /**
+     * 绑定对象到当前线程
+     * 键值为: name
+     *
+     * @param name  对象名称,作为键值
+     * @param value
+     * @return
+     */
+    protected static void bind(String name, Object value) {
+        localMap.get().put(name, value);
+    }
+
+    /**
+     * 清空当前线程绑定的数据
+     */
     public static void clear() {
         localMap.get().clear();
     }
@@ -192,7 +196,7 @@ public class ScopeAttributeMethodProcessor implements HandlerMethodArgumentResol
     protected String getNameForParameter(MethodParameter parameter) {
         ScopeAttribute scopeAttribute = parameter.getParameterAnnotation(ScopeAttribute.class);
         String attrName = (scopeAttribute != null) ? scopeAttribute.value() : null;
-        return StringUtils.hasText(attrName) ? attrName : nameWithType(Conventions.getVariableNameForParameter(parameter), parameter.getParameterType());
+        return StringUtils.hasText(attrName) ? attrName : nameWithType(parameter.getParameterName(), parameter.getParameterType());
     }
 
 
