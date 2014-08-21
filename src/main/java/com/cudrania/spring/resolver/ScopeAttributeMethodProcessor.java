@@ -1,5 +1,6 @@
 package com.cudrania.spring.resolver;
 
+import com.cudrania.spring.resolver.ScopeAttribute.Scope;
 import org.springframework.core.Conventions;
 import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.MethodParameter;
@@ -80,28 +81,21 @@ public class ScopeAttributeMethodProcessor implements HandlerMethodArgumentResol
             return null;
         String name = getNameForParameter(parameter);
         Object attribute = null;
-        switch (scopeAttribute.scope()) {
-            case REQUEST:
-                attribute = request.getAttribute(name, NativeWebRequest.SCOPE_REQUEST);
-                break;
-            case SESSION:
-                attribute = request.getAttribute(name, NativeWebRequest.SCOPE_SESSION);
-                break;
-            case THREAD:
-                attribute = localMap.get().get(name);
-                break;
-            case DEFAULT:
-                attribute = localMap.get().get(name);
-                if (attribute != null && parameter.getParameterType().isInstance(attribute))
+        for (Scope scope : scopeAttribute.scope()) {
+            switch (scope) {
+                case REQUEST:
+                    attribute = request.getAttribute(name, NativeWebRequest.SCOPE_REQUEST);
                     break;
-                attribute = request.getAttribute(name, NativeWebRequest.SCOPE_REQUEST);
-                if (attribute != null && parameter.getParameterType().isInstance(attribute))
+                case SESSION:
+                    attribute = request.getAttribute(name, NativeWebRequest.SCOPE_SESSION);
                     break;
-                attribute = request.getAttribute(name, NativeWebRequest.SCOPE_SESSION);
+                case THREAD:
+                    attribute = localMap.get().get(name);
+                    break;
+            }
+            if (wrapClass(parameter.getParameterType()).isInstance(attribute))
                 break;
         }
-        if (!parameter.getParameterType().isInstance(attribute))
-            return null;
         WebDataBinder binder = binderFactory.createBinder(request, attribute, name);
         if (binder.getTarget() != null) {
             validateIfApplicable(binder, parameter);
@@ -129,8 +123,9 @@ public class ScopeAttributeMethodProcessor implements HandlerMethodArgumentResol
                 return;
             String name = getNameForReturnValue(returnValue, returnType);
             Object attribute = null;
-            if (attribute != null) {
-                switch (scopeAttribute.scope()) {
+            if (attribute != null && scopeAttribute.scope().length > 0) {
+                Scope scope = scopeAttribute.scope()[0];
+                switch (scope) {
                     case REQUEST:
                         request.setAttribute(name, attribute, NativeWebRequest.SCOPE_REQUEST);
                         break;
@@ -139,9 +134,6 @@ public class ScopeAttributeMethodProcessor implements HandlerMethodArgumentResol
                         break;
                     case THREAD:
                         localMap.get().put(name, attribute);
-                        break;
-                    case DEFAULT:
-                        request.setAttribute(name, attribute, NativeWebRequest.SCOPE_REQUEST);
                         break;
                 }
             }
@@ -224,7 +216,41 @@ public class ScopeAttributeMethodProcessor implements HandlerMethodArgumentResol
     }
 
 
+    /**
+     * 返回形式: type#name
+     *
+     * @param name
+     * @param type
+     * @return
+     */
     private static String nameWithType(String name, Class type) {
-        return type.getName() + "#" + name;
+        return wrapClass(type).getName() + "#" + name;
     }
+
+    /**
+     * 获取包装类
+     *
+     * @param type
+     * @return
+     */
+    private static Class wrapClass(Class type) {
+        if (type == Boolean.TYPE)
+            return Boolean.class;
+        if (type == Byte.TYPE)
+            return Byte.class;
+        if (type == Short.TYPE)
+            return Short.class;
+        if (type == Integer.TYPE)
+            return Integer.class;
+        if (type == Long.TYPE)
+            return Long.class;
+        if (type == Float.TYPE)
+            return Float.class;
+        if (type == Double.TYPE)
+            return Double.class;
+        if (type == Character.TYPE)
+            return Character.class;
+        return type;
+    }
+
 }

@@ -24,7 +24,7 @@ public @interface ScopeAttribute {
      *
      * @return
      */
-    Scope scope() default Scope.DEFAULT;
+    Scope[] scope() default {Scope.THREAD, Scope.REQUEST, Scope.SESSION};
 
     /**
      * 定义数据的生命周期
@@ -32,6 +32,6 @@ public @interface ScopeAttribute {
      * @author skyfalling
      */
     public enum Scope {
-        REQUEST, SESSION, THREAD, DEFAULT;
+        THREAD, REQUEST, SESSION;
     }
 }
