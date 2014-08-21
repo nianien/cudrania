@@ -3,29 +3,58 @@ package com.cudrania.spring.handlermapping;
 import org.springframework.util.StringValueResolver;
 
 /**
- * 驼峰命名法转连字符命名法<br/>
- * 当使用默认类映射规则时，可指定配置路径是否自动转为小写，方法{@link #useLowerCase(boolean)}
+ * 命名处理类<br/>
+ * 当使用默认类映射规则时，可指定配置路径是否自动转为小写，方法{@link #setUseLowerCase(boolean)}
  *
  * @author skyfalling
  */
 public class NamingResolver implements StringValueResolver {
 
-    /**
-     * 是否启用小写模式
-     */
     private boolean useLowerCase = true;
+    private boolean nameConvert = true;
 
-    public boolean useLowerCase() {
+    /**
+     * 是否进行命名转换
+     */
+    public boolean isUseLowerCase() {
         return useLowerCase;
     }
 
     /**
-     * 设置是否启用小写模式
-     *
-     * @param useLowerCase
+     * 是否进行命名转换
      */
-    public void useLowerCase(boolean useLowerCase) {
+    public void setUseLowerCase(boolean useLowerCase) {
         this.useLowerCase = useLowerCase;
+    }
+
+    /**
+     * 是否进行命名转换
+     *
+     * @return
+     */
+    public boolean isNameConvert() {
+        return nameConvert;
+    }
+
+    /**
+     * 是否进行命名转换
+     *
+     * @param nameConvert
+     */
+    public void setNameConvert(boolean nameConvert) {
+        this.nameConvert = nameConvert;
+    }
+
+
+    @Override
+    public String resolveStringValue(String strVal) {
+        if (nameConvert) {
+            strVal = convert(strVal);
+        }
+        if (useLowerCase) {
+            strVal = strVal.toLowerCase();
+        }
+        return strVal;
     }
 
 
@@ -35,7 +64,7 @@ public class NamingResolver implements StringValueResolver {
      * @param name
      * @return
      */
-    private static String convert(String name) {
+    protected String convert(String name) {
         StringBuilder sb = new StringBuilder();
         int length = name.length();
         char[] chars = name.toCharArray();
@@ -56,9 +85,4 @@ public class NamingResolver implements StringValueResolver {
         return sb.toString();
     }
 
-    @Override
-    public String resolveStringValue(String strVal) {
-        strVal = convert(strVal);
-        return useLowerCase ? strVal.toLowerCase() : strVal;
-    }
 }
