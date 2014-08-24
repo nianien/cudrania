@@ -107,6 +107,8 @@ public class GlobalHandlerExceptionResolver extends AbstractHandlerExceptionReso
             } catch (Exception e) {
                 errorResponse.setMessage(ex.getMessage());
             }
+        } else {
+            errorResponse.setMessage("Internal Unknown Error");
         }
         HttpStatus status =
                 (ex instanceof MessageSourceResolvable
