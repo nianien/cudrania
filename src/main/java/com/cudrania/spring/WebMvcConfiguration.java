@@ -6,6 +6,8 @@ import com.cudrania.spring.resolver.GlobalHandlerExceptionResolver;
 import com.cudrania.spring.resolver.ScopeAttributeMethodProcessor;
 import com.cudrania.validation.ResourceBundleMessageInterpolator;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
@@ -97,7 +99,19 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
             } else if (it instanceof MappingJackson2HttpMessageConverter) {
                 MappingJackson2HttpMessageConverter converter = (MappingJackson2HttpMessageConverter) it;
                 //JSON序列化忽略空值
-                converter.getObjectMapper().configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false).setSerializationInclusion(Include.NON_NULL);
+                converter.getObjectMapper()
+                        .configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false).setSerializationInclusion(Include.NON_NULL)
+                        // 允许字段名不用引号
+                        .configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
+                                // 允许使用单引号
+                        .configure(Feature.ALLOW_SINGLE_QUOTES, true)
+                                // 允许数字含有前导0
+                        .configure(Feature.ALLOW_NUMERIC_LEADING_ZEROS, true)
+                        .configure(Feature.STRICT_DUPLICATE_DETECTION, true)
+                                // 允许未知的属性
+                        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                                //允许空对象
+                        .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
             }
         }
         //添加编码UTF-8
