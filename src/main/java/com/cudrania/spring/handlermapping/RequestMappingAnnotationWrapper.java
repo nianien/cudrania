@@ -1,14 +1,14 @@
 package com.cudrania.spring.handlermapping;
 
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.mvc.condition.RequestCondition;
 
 /**
- * 由于注解类型无法实例化,因此这里定义用于存储{@link org.springframework.web.bind.annotation.RequestMapping}配置的对象,
+ * {@link org.springframework.web.bind.annotation.RequestMapping}的包装类,用于存储注解对象的属性设置
  *
  * @author skyfalling
  */
-public class RequestMappingAnnotationConfiguration {
+public class RequestMappingAnnotationWrapper {
 
     private String[] value = new String[0];
 
@@ -22,7 +22,21 @@ public class RequestMappingAnnotationConfiguration {
 
     private String[] produces = new String[0];
 
-    private RequestCondition<?> requestCondition;
+
+    public RequestMappingAnnotationWrapper() {
+    }
+
+    public RequestMappingAnnotationWrapper(RequestMapping annotation) {
+        if (annotation != null) {
+            this.value = value();
+            this.method = annotation.method();
+            this.params = annotation.params();
+            this.headers = annotation.headers();
+            this.consumes = annotation.consumes();
+            this.produces = annotation.produces();
+        }
+    }
+
 
     public String[] value() {
         return value;
@@ -72,11 +86,4 @@ public class RequestMappingAnnotationConfiguration {
         this.produces = produces;
     }
 
-    public RequestCondition<?> requestCondition() {
-        return requestCondition;
-    }
-
-    public void requestCondition(RequestCondition<?> requestCondition) {
-        this.requestCondition = requestCondition;
-    }
 }
