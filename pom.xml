@@ -6,7 +6,7 @@
 
     <groupId>com.cudrania</groupId>
     <artifactId>cudrania</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.1.0</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.version>3.2.8.RELEASE</spring.version>
@@ -125,6 +125,12 @@
             <artifactId>commons-collections</artifactId>
             <version>3.2.1</version>
         </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- for test -->
         <dependency>
@@ -132,12 +138,6 @@
             <artifactId>junit</artifactId>
             <version>4.9</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>mysql</groupId>

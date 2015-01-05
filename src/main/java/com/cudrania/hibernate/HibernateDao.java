@@ -26,33 +26,10 @@ import java.util.Date;
 import java.util.Map.Entry;
 
 /**
- * 基于Hibernate的数据库访问实现<br/>
- * 在进行SQL(HQL)查询时,针对不同类型参数对象,处理逻辑如下:
- * <ul>
- * <li>简单类型<br/>
- * 参数是否为简单类型由{@link #isSimple(Object)}方法判定,默认简单类型列表由{@link #simpleTypes}字段表示, 针对简单类型的参数,根据索引位置将其赋值给形如"?n"的JPA参数</li>
- * <li>Map对象<br/>
- * 根据键值key值将其对应的value值赋值给形如":key"同名命名参数</li>
- * <li>POJO对象<br/>
- * 类型Map对象,根据属性名称将属性值赋值给同名命名参数</li>
- * <li>数组或集合<br/>
- * 对于简单类型参数数组或集合,支持in操作<br/>
- * 对于Map对象的value值或者POJO对象的属性值,如果为数组或集合类型,同样支持in操作</li>
- * </ul>
- * 此外,如果SQL(HQL)语句中只包含JDBC占位符?,则要求占位符与参数个数一致,然后依次赋值,需要注意的是,此时不支持in操作
- * <p/>
- * 示例:
- * <pre>
- * <code>Map<String, Object> map = new HashMap<String, Object>();
- * map.put("idList", new Long[]{1L, 2L, 3L});
- * map.put("title", "%测试2%");
- * EventAlias event = new EventAlias();
- * event.setTitle("%测试%");
- * sql = "select e1.event_id ID,e1.event_date Date,e1.title,e1.type from event e1 where e1.title like :title or e1.title like ?1 and e1.event_id in :idList";
- * list = hibernateDao.sqlQuery(EventAlias.class, sql,event, "%中国%", map);</code>
- * </pre>
+ * 基于Hibernate 4.x的数据库访问实现<br/>
  *
  * @author skyfalling
+ * @see #setParameters(org.hibernate.Query, Object...)
  */
 @Repository
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -218,7 +195,6 @@ public class HibernateDao {
 
     /**
      * SQL查询,返回Map对象列表,其中key为字段别名,value为字段值<br/>
-     * 参数赋值参考{@link #setParameters(org.hibernate.Query, Object...)}方法
      *
      * @param sql
      * @param parameters
@@ -232,7 +208,6 @@ public class HibernateDao {
 
     /**
      * SQL查询,返回指定类型对象列表<br/>
-     * 参数赋值参考{@link #setParameters(org.hibernate.Query, Object...)}方法
      *
      * @param beanClass
      * @param sql
@@ -248,7 +223,6 @@ public class HibernateDao {
 
     /**
      * 执行HQL查询<br/>
-     * 参数赋值参考{@link #setParameters(org.hibernate.Query, Object...)}方法
      *
      * @param hql
      * @param parameters
@@ -261,22 +235,31 @@ public class HibernateDao {
 
     /**
      * 分页SQL查询,返回Map对象列表,其中key为字段别名,value为字段值<br/>
-     * 参数赋值参考{@link #setParameters(org.hibernate.Query, Object...)}方法
+     * 如果page对象满足
+     * <blockquote><code>page.isAutoCount() && page.getTotalCount() == 0</code></blockquote>
+     * 则进行自动计算总页数
      *
      * @param page
      * @param sql
      * @param parameters
      * @return
+     * @see #setParameters(org.hibernate.Query, Object...)
      */
     public Page<Map<String, ?>> sqlPageQuery(Page page, String sql, Object... parameters) {
         Query query = createSQLQuery(sql, parameters).setResultTransformer(new MapResultTransFormer());
-        return pageQuery(query, page);
+        pageQuery(query, page);
+        if (page.isAutoCount() && page.getTotalCount() == 0) {
+            page.setTotalCount(countSql(sql, parameters));
+        }
+        return page;
     }
 
 
     /**
      * 分页SQL查询,返回指定类型对象列表<br/>
-     * 参数赋值参考{@link #setParameters(org.hibernate.Query, Object...)}方法
+     * 如果page对象满足
+     * <blockquote><code>page.isAutoCount() && page.getTotalCount() == 0</code></blockquote>
+     * 则进行自动计算总页数
      *
      * @param page
      * @param beanClass
@@ -284,23 +267,36 @@ public class HibernateDao {
      * @param parameters
      * @param <T>
      * @return
+     * @see #setParameters(org.hibernate.Query, Object...)
      */
     public <T> Page<T> sqlPageQuery(Page<T> page, Class<T> beanClass, String sql, Object... parameters) {
         SQLQuery query = setQueryType(createSQLQuery(sql, parameters), beanClass);
-        return pageQuery(query, page);
+        pageQuery(query, page);
+        if (page.isAutoCount() && page.getTotalCount() == 0) {
+            page.setTotalCount(countSql(sql, parameters));
+        }
+        return page;
     }
 
     /**
-     * 执行HQL分页查询
+     * 执行HQL分页查询<br/>
+     * 如果page对象满足
+     * <blockquote><code>page.isAutoCount() && page.getTotalCount() == 0</code></blockquote>
+     * 则进行自动计算总页数
      *
      * @param page
      * @param hql
      * @param parameters
      * @return
+     * @see #setParameters(org.hibernate.Query, Object...)
      */
     public Page hqlPageQuery(Page page, String hql, Object... parameters) {
         Query query = createQuery(hql, parameters);
-        return pageQuery(query, page);
+        pageQuery(query, page);
+        if (page.isAutoCount() && page.getTotalCount() == 0) {
+            page.setTotalCount(countHql(hql, parameters));
+        }
+        return page;
     }
 
 
@@ -322,7 +318,6 @@ public class HibernateDao {
 
     /**
      * SQL查询,返回单个Map对象,其中key为字段别名,value为字段值.如果查询结果不存在,则返回null;如果查询结果存在多条,则抛出异常.<br/>
-     * 参数赋值参考{@link #setParameters(org.hibernate.Query, Object...)}方法
      *
      * @param sql
      * @param parameters
@@ -339,7 +334,6 @@ public class HibernateDao {
 
     /**
      * SQL查询,返回单个对象.如果查询结果不存在,则返回null;如果查询结果存在多条,则抛出异常.<br/>
-     * 参数赋值参考{@link #setParameters(org.hibernate.Query, Object...)}方法
      *
      * @param sql
      * @param parameters
@@ -356,7 +350,6 @@ public class HibernateDao {
 
     /**
      * 执行HQL查询,返回单个结果.如果查询结果不存在,则返回null;如果查询结果存在多条,则抛出异常.<br/>
-     * 参数赋值参考{@link #setParameters(org.hibernate.Query, Object...)}方法
      *
      * @param hql
      * @param parameters
@@ -368,6 +361,32 @@ public class HibernateDao {
         if (list.size() > 1)
             throw new RuntimeException("more than one results occurs!");
         return list.isEmpty() ? null : list.get(0);
+    }
+
+
+    /**
+     * 统计SQL查询总数<br/>
+     * 这里的SQL不含limit关键字
+     *
+     * @param sql
+     * @param parameters
+     * @return
+     */
+    public long countSql(String sql, Object... parameters) {
+        String countSql = "SELECT COUNT(1) count FROM (" + sql + ") tmp__";
+        Map map = sqlUniqueQuery(countSql, parameters);
+        Number number = (Number) map.get("count");
+        return number.longValue();
+    }
+
+    /**
+     * 统计HQL总数<br/>
+     * 这里的HQL不含limit关键字
+     */
+    public long countHql(String hql, Object... parameters) {
+        String countHql = "SELECT COUNT(1) " + hql;
+        Number number = (Number) hqlUniqueQuery(countHql, parameters);
+        return number.longValue();
     }
 
 
@@ -413,7 +432,8 @@ public class HibernateDao {
      *
      * @param sql
      * @param parameters
-     * @return The number of entities updated or deleted.
+     * @return the number of entities updated or deleted.
+     * @see #setParameters(org.hibernate.Query, Object...)
      */
     @Transactional
     public int execute(String sql, Object... parameters) {
@@ -465,8 +485,8 @@ public class HibernateDao {
     }
 
     /**
-     * 根据SQL(HQL)语句和参数类列表创建SQLQuery对象,这里SQL(HQL)参数可以是任意类型<br/>
-     * 针对不同类型参数对象,处理逻辑如下:
+     * 根据SQL(HQL)语句和参数类列表创建SQLQuery对象<br/>
+     * 参数可以是任意类型,针对不同类型参数,处理逻辑不同
      * <ul>
      * <li>简单类型<br/>
      * 参数是否为简单类型由{@link #isSimple(Object)}方法判定,默认简单类型列表由{@link #simpleTypes}字段表示, 针对简单类型的参数,根据索引位置将其赋值给形如"?n"的JPA参数</li>
@@ -478,23 +498,37 @@ public class HibernateDao {
      * 对于简单类型参数数组或集合,支持in操作<br/>
      * 对于Map对象的value值或者POJO对象的属性值,如果为数组或集合类型,同样支持in操作</li>
      * </ul>
-     * 此外,如果SQL(HQL)语句中只包含JDBC占位符?,则要求占位符与参数个数一致,然后依次赋值,需要注意的是,此时不支持in操作
+     * 注意
+     * <ol>
+     * <li>
+     * 如果SQL(HQL)语句中只包含JDBC占位符?,则要求占位符与参数个数一致,并按索引位置依次赋值.此时不支持in操作
+     * </li>
+     * <li>
+     * 如果存在同名JPA参数,则占位符优先级高于Map和POJO对象
+     * </li>
+     * <li>
+     * 对于Map和POJO对象,如果存在相同命名参数,则按照参数位置顺序,后面的参数会覆盖前面的参数
+     * </li>
+     * </ol>
      * <p/>
      * 示例:
      * <pre>
      * <code>Map<String, Object> map = new HashMap<String, Object>();
      * map.put("idList", new Long[]{1L, 2L, 3L});
-     * map.put("title", "%测试2%");
+     * map.put("title", "title1%");
      * EventAlias event = new EventAlias();
-     * event.setTitle("%测试%");
-     * sql = "select e1.event_id ID,e1.event_date Date,e1.title,e1.type from event e1 where e1.title like :title or e1.title like ?1 and e1.event_id in :idList";
-     * list = hibernateDao.sqlQuery(EventAlias.class, sql,event, "%中国%", map);</code>
+     * event.setTitle("title2%");
+     * String sql = "select e1.event_id ID,e1.event_date Date,e1.title,e1.type from event e1 where e1.title like :title or e1.title like ?2 and e1.event_id in :idList";
+     * List&lt;EventAlias> list = hibernateDao.sqlQuery(EventAlias.class, sql,map,event,"title3%");
+     * //select e1.event_id ID,e1.event_date Date,e1.title,e1.type from event e1 where e1.title like 'title2%' or e1.title like 'title3%' and e1.event_id in (1,2,3)</code>
      * </pre>
      *
      * @param query
      * @param parameters
      * @param <T>
      * @return
+     * @see #isSimple(java.lang.Object)
+     * @see #simpleTypes
      */
     public <T extends Query> T setParameters(T query, Object... parameters) {
         if (query.getNamedParameters().length == 0) {
@@ -518,6 +552,22 @@ public class HibernateDao {
         return query;
     }
 
+    /**
+     * 判断参数是否为简单类型
+     *
+     * @param value
+     * @return
+     */
+    protected boolean isSimple(Object value) {
+        Class type = value.getClass();
+        if (type.isArray() || simpleTypes.contains(type))
+            return true;
+        for (Class clazz : simpleTypes) {
+            if (clazz.isInstance(value))
+                return true;
+        }
+        return false;
+    }
 
     /**
      * 设置Query对象类型
@@ -572,73 +622,61 @@ public class HibernateDao {
         return getSessionFactory().getClassMetadata(entityClass);
     }
 
+    /**
+     * 转换primitive数组
+     *
+     * @param value
+     * @return
+     */
     private static Object handle(Object value) {
-        if (value != null && value.getClass().isArray()) {
+        if (value.getClass().isArray()) {
             return ObjectUtils.toObjectArray(value);
         }
         return value;
     }
 
-    /**
-     * 判断参数是否为简单类型
-     *
-     * @param value
-     * @return
-     */
-    protected boolean isSimple(Object value) {
-        Class type = value.getClass();
-        if (type.isArray() || simpleTypes.contains(type))
-            return true;
-        for (Class clazz : simpleTypes) {
-            if (clazz.isInstance(value))
-                return true;
-        }
-        return false;
-    }
 
     /**
      * 简单类型列表
      */
-    protected static final Set<Class> simpleTypes = new HashSet<Class>();
+    protected static final Set<Class> simpleTypes = new HashSet<Class>(Arrays.asList(
+            //primitive和包装类
+            boolean.class,
+            byte.class,
+            double.class,
+            float.class,
+            int.class,
+            long.class,
+            short.class,
+            Boolean.class,
+            Byte.class,
+            Double.class,
+            Float.class,
+            Integer.class,
+            Long.class,
+            Short.class,
 
-    {
-        //primitive和包装类
-        simpleTypes.add(boolean.class);
-        simpleTypes.add(byte.class);
-        simpleTypes.add(byte[].class);
-        simpleTypes.add(double.class);
-        simpleTypes.add(float.class);
-        simpleTypes.add(int.class);
-        simpleTypes.add(long.class);
-        simpleTypes.add(short.class);
-        simpleTypes.add(Boolean.class);
-        simpleTypes.add(Byte.class);
-        simpleTypes.add(Double.class);
-        simpleTypes.add(Float.class);
-        simpleTypes.add(Integer.class);
-        simpleTypes.add(Long.class);
-        simpleTypes.add(Short.class);
-
-        //常用简单类型
-        simpleTypes.add(String.class);
-        simpleTypes.add(BigDecimal.class);
-        simpleTypes.add(BigInteger.class);
-        simpleTypes.add(Number.class);
-        simpleTypes.add(Date.class);
-        simpleTypes.add(Time.class);
-        simpleTypes.add(Timestamp.class);
+            //常用简单类型
+            String.class,
+            BigDecimal.class,
+            BigInteger.class,
+            Number.class,
+            Date.class,
+            Time.class,
+            Timestamp.class,
 
 
-        //数据对象类型
-        simpleTypes.add(Blob.class);
-        simpleTypes.add(Clob.class);
-        simpleTypes.add(InputStream.class);
-        simpleTypes.add(Reader.class);
-        simpleTypes.add(Ref.class);
-        simpleTypes.add(SQLXML.class);
-        simpleTypes.add(URL.class);
+            //数据对象类型
+            Blob.class,
+            Clob.class,
+            InputStream.class,
+            Reader.class,
+            Ref.class,
+            SQLXML.class,
+            URL.class,
 
-        //class类型
-        simpleTypes.add(Class.class);
-    }
+            //class类型
+            Class.class
+    ));
+
 }
