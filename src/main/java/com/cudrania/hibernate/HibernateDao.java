@@ -7,6 +7,7 @@ import org.hibernate.*;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.jdbc.Work;
 import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -373,9 +374,7 @@ public class HibernateDao {
      * @return
      */
     public long countSql(String sql, Object... parameters) {
-        String countSql = "SELECT COUNT(1) count FROM (" + sql + ") tmp__";
-        Map map = sqlUniqueQuery(countSql, parameters);
-        Number number = (Number) map.get("count");
+        Number number = (Number)createSQLQuery( "SELECT COUNT(1) count FROM (" + sql + ") tmp__",parameters).addScalar("count", StandardBasicTypes.LONG).uniqueResult();
         return number.longValue();
     }
 
