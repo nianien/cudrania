@@ -383,7 +383,7 @@ public class HibernateDao {
      * 这里的HQL不含limit关键字
      */
     public long countHql(String hql, Object... parameters) {
-        String countHql = "SELECT COUNT(1) " + hql;
+        String countHql = "SELECT COUNT(*) " + hql;
         Number number = (Number) hqlUniqueQuery(countHql, parameters);
         return number.longValue();
     }
