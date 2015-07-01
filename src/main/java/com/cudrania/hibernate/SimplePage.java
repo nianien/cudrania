@@ -1,5 +1,6 @@
 package com.cudrania.hibernate;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -7,9 +8,6 @@ import java.util.List;
  *
  * @author skyfalling
  */
-
-
-import java.util.Collections;
 
 /**
  * 分页查询对象接口定义
@@ -19,8 +17,8 @@ import java.util.Collections;
 
 public class SimplePage<T> implements Page<T> {
 
-    protected int pageNo = 1;
-    protected int pageSize = 20;
+    protected long pageNo = 1;
+    protected long pageSize = 20;
     protected long totalCount = 0;
     protected boolean autoCount = false;
     protected List<T> result = Collections.emptyList();
@@ -34,7 +32,7 @@ public class SimplePage<T> implements Page<T> {
      * @param pageSize
      * @param pageNo
      */
-    public SimplePage(int pageSize, int pageNo) {
+    public SimplePage(long pageSize, long pageNo) {
         this(pageSize, pageNo, 0L);
     }
 
@@ -45,7 +43,7 @@ public class SimplePage<T> implements Page<T> {
      * @param pageNo
      * @param totalCount
      */
-    public SimplePage(int pageSize, int pageNo, long totalCount) {
+    public SimplePage(long pageSize, long pageNo, long totalCount) {
         setPageSize(pageSize);
         setPageNo(pageNo);
         setTotalCount(totalCount);
@@ -55,15 +53,16 @@ public class SimplePage<T> implements Page<T> {
      * 获得当前页的页号
      */
     @Override
-    public int getPageNo() {
-        return pageNo;
+    public long getPageNo() {
+        long totalPages = getTotalPages();
+        return pageNo < totalPages ? pageNo : totalPages;
     }
 
     /**
      * 设置当前页的页号,只能设置正数
      */
     @Override
-    public void setPageNo(int pageNo) {
+    public void setPageNo(long pageNo) {
         if (pageNo > 0) {
             this.pageNo = pageNo;
         }
@@ -73,7 +72,7 @@ public class SimplePage<T> implements Page<T> {
      * 获得每页的记录数量.
      */
     @Override
-    public int getPageSize() {
+    public long getPageSize() {
         return pageSize;
     }
 
@@ -81,7 +80,7 @@ public class SimplePage<T> implements Page<T> {
      * 设置每页的记录数量
      */
     @Override
-    public void setPageSize(int pageSize) {
+    public void setPageSize(long pageSize) {
         if (pageSize > 0) {
             this.pageSize = pageSize;
         }
@@ -145,7 +144,7 @@ public class SimplePage<T> implements Page<T> {
      * 根据pageNo和pageSize计算当前页第一条记录在总结果集中的位置
      */
     @Override
-    public int getFirst() {
+    public long getFirst() {
         return (pageNo - 1) * pageSize + 1;
     }
 
@@ -174,7 +173,7 @@ public class SimplePage<T> implements Page<T> {
      * 当前页为尾页时仍返回尾页序号.
      */
     @Override
-    public int getNextPage() {
+    public long getNextPage() {
         return isHasNext() ? pageNo + 1 : pageNo;
     }
 
@@ -191,7 +190,7 @@ public class SimplePage<T> implements Page<T> {
      * 当前页为首页时返回首页序号.
      */
     @Override
-    public int getPrePage() {
+    public long getPrePage() {
         return isHasPre() ? pageNo - 1 : pageNo;
     }
 }
