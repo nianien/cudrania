@@ -90,7 +90,7 @@ public interface Page<T> {
      *
      * @return
      */
-    long getTotalPages();
+    int getTotalPages();
 
     /**
      * 是否有下一页

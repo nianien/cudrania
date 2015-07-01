@@ -54,8 +54,7 @@ public class SimplePage<T> implements Page<T> {
      */
     @Override
     public int getPageNo() {
-        int totalPages = (int) getTotalPages();
-        return pageNo < totalPages ? pageNo : totalPages;
+        return pageNo;
     }
 
     /**
@@ -115,8 +114,9 @@ public class SimplePage<T> implements Page<T> {
      */
     @Override
     public void setTotalCount(long totalCount) {
-        if (totalCount > 0)
+        if (totalCount > 0) {
             this.totalCount = totalCount;
+        }
     }
 
 
@@ -152,8 +152,8 @@ public class SimplePage<T> implements Page<T> {
      * 根据pageSize与totalCount计算总页数
      */
     @Override
-    public long getTotalPages() {
-        long count = totalCount / pageSize;
+    public int getTotalPages() {
+        int count = (int) (totalCount / pageSize);
         if (totalCount % pageSize > 0) {
             count++;
         }
