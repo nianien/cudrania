@@ -13,28 +13,28 @@ public interface Page<T> {
      *
      * @return
      */
-    long getPageNo();
+    int getPageNo();
 
     /**
      * 设置当前页码
      *
      * @param pageNo
      */
-    void setPageNo(long pageNo);
+    void setPageNo(int pageNo);
 
     /**
      * 获取当前页记录数
      *
      * @return
      */
-    long getPageSize();
+    int getPageSize();
 
     /**
      * 设置当前页记录数
      *
      * @param pageSize
      */
-    void setPageSize(long pageSize);
+    void setPageSize(int pageSize);
 
     /**
      * 获取当前页对象内容
@@ -83,7 +83,7 @@ public interface Page<T> {
      *
      * @return
      */
-    long getFirst();
+    int getFirst();
 
     /**
      * 获取页面总数
@@ -104,7 +104,7 @@ public interface Page<T> {
      *
      * @return
      */
-    long getNextPage();
+    int getNextPage();
 
     /**
      * 是否有上一页
@@ -118,5 +118,5 @@ public interface Page<T> {
      *
      * @return
      */
-    long getPrePage();
+    int getPrePage();
 }
