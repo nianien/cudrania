@@ -41,13 +41,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  *         }
  * &nbsp;}
  * </code>
- *  NOTE: @ContextConfiguration需和@RunWith一起使用才能生效,即标注在同一个类上
  * </pre>
  *
  * @author skyfalling .
  */
 @RunWith (SpringJUnit4ClassRunner.class)
-@ContextConfiguration (locations = {"classpath:applicationContext*.xml"})
+@ContextConfiguration (locations = {"classpath*:applicationContext*.xml"})
 public abstract class DBUnit4SpringContextTests extends AbstractTransactionalJUnit4SpringContextTests {
 
     @Rule
