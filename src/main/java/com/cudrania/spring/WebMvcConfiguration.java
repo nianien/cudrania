@@ -1,14 +1,12 @@
 package com.cudrania.spring;
 
-import com.cudrania.spring.handlermapping.IdealRequestMappingHandlerMapping;
-import com.cudrania.spring.handlermapping.RequestMappingConfiguration;
-import com.cudrania.spring.resolver.GlobalHandlerExceptionResolver;
-import com.cudrania.spring.resolver.ScopeAttributeMethodProcessor;
-import com.cudrania.validation.ResourceBundleMessageInterpolator;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonParser.Feature;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import java.lang.reflect.Method;
+import java.nio.charset.Charset;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -32,11 +30,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import javax.annotation.Resource;
-import java.lang.reflect.Method;
-import java.nio.charset.Charset;
-import java.util.Iterator;
-import java.util.List;
+import com.cudrania.spring.handlermapping.IdealRequestMappingHandlerMapping;
+import com.cudrania.spring.handlermapping.RequestMappingConfiguration;
+import com.cudrania.spring.resolver.GlobalHandlerExceptionResolver;
+import com.cudrania.spring.resolver.ScopeAttributeMethodProcessor;
+import com.cudrania.validation.ResourceBundleMessageInterpolator;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * REST风格配置对象
@@ -44,48 +46,46 @@ import java.util.List;
 @Configuration
 public class WebMvcConfiguration extends WebMvcConfigurationSupport {
 
-
-    private ApplicationContext applicationContext;
     @Resource
     private MessageSource messageSource;
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
         super.setApplicationContext(applicationContext);
-        this.applicationContext = applicationContext;
     }
 
     @Bean
     @Override
     public RequestMappingHandlerMapping requestMappingHandlerMapping() {
         RequestMappingConfiguration requestMappingConfiguration = getNullableBean(RequestMappingConfiguration.class);
-        IdealRequestMappingHandlerMapping handlerMapping = new IdealRequestMappingHandlerMapping(requestMappingConfiguration);
+        IdealRequestMappingHandlerMapping handlerMapping =
+                new IdealRequestMappingHandlerMapping(requestMappingConfiguration);
         handlerMapping.setOrder(0);
         handlerMapping.setInterceptors(getInterceptors());
         handlerMapping.setContentNegotiationManager(mvcContentNegotiationManager());
         return handlerMapping;
     }
 
-
     @Override
     public RequestMappingHandlerAdapter requestMappingHandlerAdapter() {
         RequestMappingHandlerAdapter adapter = super.requestMappingHandlerAdapter();
         Method method = ReflectionUtils.findMethod(RequestMappingHandlerAdapter.class, "getDefaultArgumentResolvers");
         ReflectionUtils.makeAccessible(method);
-        List<HandlerMethodArgumentResolver> argumentResolvers = (List<HandlerMethodArgumentResolver>) ReflectionUtils.invokeMethod(method, adapter);
+        List<HandlerMethodArgumentResolver> argumentResolvers =
+                (List<HandlerMethodArgumentResolver>) ReflectionUtils.invokeMethod(method, adapter);
         //优先调用自定义的ArgumentResolver
         argumentResolvers.add(0, new ScopeAttributeMethodProcessor());
         adapter.setArgumentResolvers(argumentResolvers);
 
         method = ReflectionUtils.findMethod(RequestMappingHandlerAdapter.class, "getDefaultReturnValueHandlers");
         ReflectionUtils.makeAccessible(method);
-        List<HandlerMethodReturnValueHandler> returnValueHandlers = (List<HandlerMethodReturnValueHandler>) ReflectionUtils.invokeMethod(method, adapter);
+        List<HandlerMethodReturnValueHandler> returnValueHandlers =
+                (List<HandlerMethodReturnValueHandler>) ReflectionUtils.invokeMethod(method, adapter);
         //优先调用自定义的ReturnValueHandler
         returnValueHandlers.add(0, new ScopeAttributeMethodProcessor());
         adapter.setReturnValueHandlers(returnValueHandlers);
         return adapter;
     }
-
 
     @Override
     protected void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
@@ -100,7 +100,8 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 MappingJackson2HttpMessageConverter converter = (MappingJackson2HttpMessageConverter) it;
                 //JSON序列化忽略空值
                 converter.getObjectMapper()
-                        .configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false).setSerializationInclusion(Include.NON_NULL)
+                        .configure(SerializationFeature.WRITE_NULL_MAP_VALUES, false).setSerializationInclusion(
+                        Include.NON_NULL)
                         // 允许字段名不用引号
                         .configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
                                 // 允许使用单引号
@@ -127,7 +128,6 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         }
     }
 
-
     @Bean
     @Override
     public Validator mvcValidator() {
@@ -141,7 +141,6 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         }
         return validator;
     }
-
 
     @Bean
     @Override
@@ -165,10 +164,9 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
         return messageSource;
     }
 
-
     private <T> T getNullableBean(Class<T> type) {
         try {
-            return applicationContext.getBean(type);
+            return getApplicationContext().getBean(type);
         } catch (BeansException e) {
             return null;
         }

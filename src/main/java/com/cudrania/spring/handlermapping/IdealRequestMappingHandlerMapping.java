@@ -1,16 +1,22 @@
 package com.cudrania.spring.handlermapping;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.LinkedHashMap;
+
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringValueResolver;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.mvc.condition.*;
+import org.springframework.web.servlet.mvc.condition.ConsumesRequestCondition;
+import org.springframework.web.servlet.mvc.condition.HeadersRequestCondition;
+import org.springframework.web.servlet.mvc.condition.ParamsRequestCondition;
+import org.springframework.web.servlet.mvc.condition.PatternsRequestCondition;
+import org.springframework.web.servlet.mvc.condition.ProducesRequestCondition;
+import org.springframework.web.servlet.mvc.condition.RequestCondition;
+import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.LinkedHashMap;
 
 /**
  * 扩展基于注解的请求映射处理类,实现自动映射功能和统一配置，具体配置项参考{@link RequestMappingConfiguration}<br/>
@@ -57,7 +63,6 @@ public class IdealRequestMappingHandlerMapping extends
         }
     };
 
-
     /**
      * 默认构造方法
      */
@@ -81,33 +86,39 @@ public class IdealRequestMappingHandlerMapping extends
         }
     }
 
-
     /**
      * Uses method and type-level @{@link org.springframework.web.bind.annotation.RequestMapping} annotations to create
      * the RequestMappingInfo.
      *
      * @return the created RequestMappingInfo, or {@code null} if the method
      * does not have a {@code @RequestMapping} annotation.
+     *
      * @see #getCustomMethodCondition(java.lang.reflect.Method)
      * @see #getCustomTypeCondition(Class)
      */
     @Override
     protected RequestMappingInfo getMappingForMethod(Method method, Class<?> handlerType) {
+        RequestMappingInfo requestMappingInfo = null;
         int mod = method.getModifiers();
-        if (!Modifier.isPublic(mod) //必须是public方法
-                || Modifier.isStatic(mod) //必须是成员方法
-                || AnnotationUtils.findAnnotation(handlerType, NotMapping.class) != null //类型上未添加@NotMapping注解
-                || AnnotationUtils.findAnnotation(method, NotMapping.class) != null) //方法上未添加@NotMapping注解
-            return null;
-        RequestMappingInfo typeRequestMappingInfo = createRequestMappingInfo(createRequestMappingConfig(handlerType), getCustomTypeCondition(handlerType));
-        RequestMappingInfo methodRequestMappingInfo = createRequestMappingInfo(createRequestMappingConfig(method), getCustomMethodCondition(method));
-        return typeRequestMappingInfo.combine(methodRequestMappingInfo);
+        if (Modifier.isPublic(mod) /*必须是public方法*/
+                && !Modifier.isStatic(mod) /*必须是成员方法*/
+                && AnnotationUtils.findAnnotation(handlerType, NotMapping.class) == null /*类型上未添加@NotMapping注解*/
+                && AnnotationUtils.findAnnotation(method, NotMapping.class) == null /*方法上未添加@NotMapping注解*/) {
+            RequestMappingInfo typeRequestMappingInfo =
+                    createRequestMappingInfo(createRequestMappingConfig(handlerType),
+                            getCustomTypeCondition(handlerType));
+            RequestMappingInfo methodRequestMappingInfo =
+                    createRequestMappingInfo(createRequestMappingConfig(method), getCustomMethodCondition(method));
+            requestMappingInfo = typeRequestMappingInfo.combine(methodRequestMappingInfo);
+        }
+        return requestMappingInfo;
     }
 
     /**
      * 获取类上的RequestMapping配置
      *
      * @param handlerType
+     *
      * @return
      */
     protected RequestMappingAnnotationWrapper createRequestMappingConfig(Class handlerType) {
@@ -115,7 +126,8 @@ public class IdealRequestMappingHandlerMapping extends
         RequestMappingAnnotationWrapper config = new RequestMappingAnnotationWrapper(annotation);
         Package aPackage = handlerType.getPackage();
         String baseName = (aPackage != null ? aPackage.getName() : "").replaceAll(packagePattern, packageReplacement);
-        String defaultName = nameResolver.resolveStringValue(handlerType.getSimpleName().replaceAll(classPattern, classReplacement));
+        String defaultName =
+                nameResolver.resolveStringValue(handlerType.getSimpleName().replaceAll(classPattern, classReplacement));
         config.value(combineURL(baseName, defaultName, annotation != null ? annotation.value() : null));
         return config;
     }
@@ -124,6 +136,7 @@ public class IdealRequestMappingHandlerMapping extends
      * 获取方法上的RequestMapping配置
      *
      * @param method
+     *
      * @return
      */
     protected RequestMappingAnnotationWrapper createRequestMappingConfig(Method method) {
@@ -149,15 +162,16 @@ public class IdealRequestMappingHandlerMapping extends
         return config;
     }
 
-
     /**
      * 根据RequestMapping配置创建RequestMappingInfo对象
      *
      * @param annotation
      * @param customCondition
+     *
      * @return
      */
-    protected RequestMappingInfo createRequestMappingInfo(RequestMappingAnnotationWrapper annotation, RequestCondition<?> customCondition) {
+    protected RequestMappingInfo createRequestMappingInfo(RequestMappingAnnotationWrapper annotation,
+                                                          RequestCondition<?> customCondition) {
         String[] patterns = resolveEmbeddedValuesInPatterns(annotation.value());
         return new RequestMappingInfo(
                 new PatternsRequestCondition(patterns, getUrlPathHelper(), getPathMatcher(),
@@ -166,7 +180,8 @@ public class IdealRequestMappingHandlerMapping extends
                 new ParamsRequestCondition(annotation.params()),
                 new HeadersRequestCondition(annotation.headers()),
                 new ConsumesRequestCondition(annotation.consumes(), annotation.headers()),
-                new ProducesRequestCondition(annotation.produces(), annotation.headers(), getContentNegotiationManager()),
+                new ProducesRequestCondition(annotation.produces(), annotation.headers(),
+                        getContentNegotiationManager()),
                 customCondition);
     }
 
@@ -176,12 +191,14 @@ public class IdealRequestMappingHandlerMapping extends
      * @param baseUrl    基本路径
      * @param defaultUrl 默认路径
      * @param urls       URL组
+     *
      * @return
      */
     private String[] combineURL(String baseUrl, String defaultUrl, String[] urls) {
         defaultUrl = "/" + defaultUrl;
-        if (urls == null || urls.length == 0)
-            urls = new String[]{defaultUrl};
+        if (urls == null || urls.length == 0) {
+            urls = new String[] {defaultUrl};
+        }
         int i = 0;
         for (String value : urls) {
             //不是绝对路径,自动添加类路径
