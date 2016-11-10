@@ -126,6 +126,12 @@
             <version>3.2.1</version>
         </dependency>
         <dependency>
+            <groupId>org.jodd</groupId>
+            <artifactId>jodd-core</artifactId>
+            <version>3.7</version>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.5</version>
@@ -168,30 +174,14 @@
         </plugins>
     </build>
 
-    <repositories>
+    <distributionManagement>
         <repository>
-            <id>maven-cn</id>
-            <name>Maven China Mirror</name>
-            <url>http://search.maven.org/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
+            <id>shenma-nexus-releases</id>
+            <url>http://10.101.171.43:8081/nexus/content/repositories/releases</url>
         </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>maven-net</id>
-            <name>Maven China Mirror</name>
-            <url>http://search.maven.org/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
+        <snapshotRepository>
+            <id>shenma-nexus-snapshots</id>
+            <url>http://10.101.171.43:8081/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
