@@ -177,11 +177,11 @@
     <distributionManagement>
         <repository>
             <id>shenma-nexus-releases</id>
-            <url>http://10.101.171.43:8081/nexus/content/repositories/releases</url>
+            <url>http://myrepository.com:8081/nexus/content/repositories/releases</url>
         </repository>
         <snapshotRepository>
             <id>shenma-nexus-snapshots</id>
-            <url>http://10.101.171.43:8081/nexus/content/repositories/snapshots</url>
+            <url>http://myrepository.com:8081/nexus/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
