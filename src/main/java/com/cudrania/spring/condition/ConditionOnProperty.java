@@ -13,7 +13,7 @@ import java.util.Map;
 import jodd.util.Wildcard;
 
 /**
- * 基于{@link ConditionalOnProperty}的条件判断
+ * 根据{@link ConditionalOnProperty}注解进行条件判断
  *
  * @author scorpio
  * @version 1.0.0
@@ -21,24 +21,37 @@ import jodd.util.Wildcard;
 public class ConditionOnProperty implements Condition {
   @Override
   public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-
     Map<String, Object> attributes = metadata.getAnnotationAttributes(ConditionalOnProperty.class.getName());
     if (attributes == null) {
       return false;
     }
+    return matches(context, attributes);
+  }
 
+
+  /**
+   * 判断是否匹配注解条件
+   *
+   * @param context
+   * @param attributes
+   * @return
+   */
+  public static boolean matches(ConditionContext context, Map<String, Object> attributes) {
+    if (attributes == null) {
+      return false;
+    }
     String name = (String) attributes.get("name");
     String value = (String) attributes.get("value");
     MatchMode match = (MatchMode) attributes.get("match");
     boolean inverse = (Boolean) attributes.get("inverse");
     boolean caseIgnore = (Boolean) attributes.get("caseIgnore");
+    boolean matched = false;
 
-    String property = System.getProperty(name, "");
+    String property = context.getEnvironment().getProperty(name, "");
     if (caseIgnore) {
       value = value.toLowerCase();
       property = property.toLowerCase();
     }
-    boolean matched = false;
     if (StringUtils.isNotEmpty(property)) {
       switch (match) {
         case EQUALS:
@@ -57,5 +70,4 @@ public class ConditionOnProperty implements Condition {
     }
     return inverse ? !matched : matched;
   }
-
 }

@@ -17,48 +17,27 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Documented
-@Conditional(ConditionOnProperty.class)
-public @interface ConditionalOnProperty {
-
+@Conditional(ConditionOnProperties.class)
+public @interface ConditionalOnProperties {
   /**
-   * 属性名称
+   * 条件组合
    *
    * @return
    */
-  String name();
+  ConditionalOnProperty[] value();
 
   /**
-   * 属性值
+   * 逻辑组合
    *
    * @return
    */
-  String value();
+  Logical conjunction() default Logical.AND;
 
   /**
-   * 匹配类型
-   *
-   * @return
+   * 逻辑判断
    */
-  MatchMode match() default MatchMode.EQUALS;
+  enum Logical {
 
-  /**
-   * 是否取反
-   *
-   * @return
-   */
-  boolean inverse() default false;
-
-  /**
-   * 是否忽略大小写
-   *
-   * @return
-   */
-  boolean caseIgnore() default false;
-
-  /**
-   * 匹配模式
-   */
-  enum MatchMode {
-    EQUALS, CONTAINS, WILDCARD, REGEX
+    AND, OR
   }
 }
