@@ -1,7 +1,7 @@
 package com.cudrania.spring.condition;
 
 
-import com.cudrania.spring.condition.ConditionalOnProperty.Matches;
+import com.cudrania.spring.condition.ConditionalOnProperty.MatchMode;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Condition;
@@ -29,7 +29,7 @@ public class ConditionOnProperty implements Condition {
 
     String name = (String) attributes.get("name");
     String value = (String) attributes.get("value");
-    Matches match = (Matches) attributes.get("match");
+    MatchMode match = (MatchMode) attributes.get("match");
     boolean inverse = (Boolean) attributes.get("inverse");
     boolean caseIgnore = (Boolean) attributes.get("caseIgnore");
 

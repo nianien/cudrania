@@ -39,7 +39,7 @@ public @interface ConditionalOnProperty {
    *
    * @return
    */
-  Matches match() default Matches.EQUALS;
+  MatchMode match() default MatchMode.EQUALS;
 
   /**
    * 是否取反
@@ -58,7 +58,7 @@ public @interface ConditionalOnProperty {
   /**
    * 匹配模式
    */
-  enum Matches {
+  enum MatchMode {
     EQUALS, CONTAINS, WILDCARD, REGEX
   }
 }
