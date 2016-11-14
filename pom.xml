@@ -15,6 +15,11 @@
         <jackson.version>2.3.2</jackson.version>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>com.nianien</groupId>
+            <artifactId>nianien</artifactId>
+            <version>3.0.2</version>
+        </dependency>
         <!-- Spring -->
         <dependency>
             <groupId>org.springframework</groupId>

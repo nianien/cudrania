@@ -1,6 +1,7 @@
 package com.cudrania.hibernate.transformer;
 
-import com.cudrania.common.utils.CaseInsensitiveMap;
+import com.nianien.core.collection.map.CaseInsensitiveMap;
+
 import org.apache.commons.beanutils.ConvertUtils;
 import org.hibernate.transform.BasicTransformerAdapter;
 
@@ -16,7 +17,7 @@ import java.util.Map;
  *
  * @author skyfalling
  * @see com.cudrania.hibernate.transformer.MapResultTransFormer.FieldHandler
- * @see com.cudrania.common.utils.CaseInsensitiveMap
+ * @see com.nianien.core.collection.map.CaseInsensitiveMap
  */
 public class MapResultTransFormer extends BasicTransformerAdapter implements Serializable {
     /**
