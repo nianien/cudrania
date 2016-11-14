@@ -58,7 +58,7 @@ public class BeanRunner {
         if (bean instanceof SpringBean) {
             bean = ((SpringBean) bean).init();
         }
-        Reflections.invoke(bean, method, params);
+        Reflections.invoke(method, bean, params);
     }
 
 
