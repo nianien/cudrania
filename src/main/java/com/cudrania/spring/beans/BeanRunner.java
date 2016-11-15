@@ -7,7 +7,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Arrays;
 
 /**
- * 基于类定义的注解加载Spring上下文，执行Bean对象指定的方法<br/> for example:
+ * 基于类定义的注解加载Spring上下文，执行Bean对象指定的方法<br/>
+ * for example:
  * <pre>
  * package com.my.bean
  * &#064;ImportResource("classpath:spring-root.xml")
@@ -32,34 +33,30 @@ import java.util.Arrays;
  * </ol>
  *
  * @author skyfalling
- * @date 16/11/15
- * @see SpringBean
+ * @see ContextBean
  */
 public class BeanRunner {
 
-    /**
-     * bean对象方法执行入口
-     *
-     * @param args beanClass#methodName [args...]
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-        String beanClass = StringUtils.substringBeforeLast(args[0], "#");
-        String method = StringUtils.substringAfterLast(args[0], "#");
-        String[] params;
-        if (StringUtils.isEmpty(method)) {
-            method = args[1];
-            params = Arrays.copyOfRange(args, 2, args.length);
-        } else {
-            params = Arrays.copyOfRange(args, 1, args.length);
-        }
-        Class<?> clazz = Class.forName(beanClass);
-
-        Object bean = SpringBean.class.isAssignableFrom(clazz) ?
-                SpringBean.class.cast(clazz.newInstance()).init() :
-                BeanLoader.loadBean(clazz);
-        Reflections.invoke(method, bean, params);
+  /**
+   * bean对象方法执行入口
+   *
+   * @param args beanClass#methodName [args...]
+   * @throws Exception
+   */
+  public static void main(String[] args) throws Exception {
+    String beanClass = StringUtils.substringBeforeLast(args[0], "#");
+    String method = StringUtils.substringAfterLast(args[0], "#");
+    String[] params;
+    if (StringUtils.isEmpty(method)) {
+      method = args[1];
+      params = Arrays.copyOfRange(args, 2, args.length);
+    } else {
+      params = Arrays.copyOfRange(args, 1, args.length);
     }
+    Class<?> clazz = Class.forName(beanClass);
+    Object bean = ContextBean.loadContext(clazz).getBean(clazz);
+    Reflections.invoke(method, bean, params);
+  }
 
 
 }
