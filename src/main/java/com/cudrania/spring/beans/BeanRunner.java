@@ -7,11 +7,11 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Arrays;
 
 /**
- * {@link SpringBean}对象的调度类<br/> for example:
+ * 基于类定义的注解加载Spring上下文，执行Bean对象指定的方法<br/> for example:
  * <pre>
  * package com.my.bean
  * &#064;ImportResource("classpath:spring-root.xml")
- * public class MyBean extends {@link SpringBean} {
+ * public class MyBean {
  *
  *    &#064;AutoWired
  *    private Service service;
@@ -53,11 +53,11 @@ public class BeanRunner {
         } else {
             params = Arrays.copyOfRange(args, 1, args.length);
         }
+        Class<?> clazz = Class.forName(beanClass);
 
-        Object bean = Class.forName(beanClass).newInstance();
-        if (bean instanceof SpringBean) {
-            bean = ((SpringBean) bean).init();
-        }
+        Object bean = SpringBean.class.isAssignableFrom(clazz) ?
+                SpringBean.class.cast(clazz.newInstance()).init() :
+                BeanLoader.loadBean(clazz);
         Reflections.invoke(method, bean, params);
     }
 

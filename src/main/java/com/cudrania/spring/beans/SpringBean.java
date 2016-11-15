@@ -1,10 +1,6 @@
 package com.cudrania.spring.beans;
 
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.context.ApplicationContext;
 
 
 /**
@@ -34,22 +30,26 @@ import java.util.List;
  */
 public class SpringBean<T extends SpringBean> {
 
-    private ConfigurableApplicationContext context;
+    private ApplicationContext context;
 
     /**
      * 返回Spring托管对象
      */
     public synchronized final T init() {
         if (context == null) {
-            List<Class> classes = new ArrayList<>();
-            Class clazz = this.getClass();
-            while (SpringBean.class.isAssignableFrom(clazz)) {
-                classes.add(clazz);
-                clazz = clazz.getSuperclass();
-            }
-            context = new AnnotationConfigApplicationContext(classes.toArray(new Class[0]));
+            context = BeanLoader.loadContext(this.getClass(), SpringBean.class, SpringBean.class);
         }
         return (T) context.getBean(this.getClass());
+    }
+
+
+    /**
+     * 获取Spring上下文
+     *
+     * @return
+     */
+    public ApplicationContext getContext() {
+        return context;
     }
 
 
