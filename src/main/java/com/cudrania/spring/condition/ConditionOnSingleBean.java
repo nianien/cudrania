@@ -21,8 +21,6 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.ConfigurationCondition;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.MethodMetadata;
@@ -33,14 +31,10 @@ import java.util.List;
 /**
  * {@link Condition} that checks for the presence or absence of specific beans.
  *
- * @author Phillip Webb
- * @author Dave Syer
- * @author Jakub Kubrynski
- * @author Stephane Nicoll
- * @author Andy Wilkinson
+ * @author scorpio
  */
-@Order(Ordered.LOWEST_PRECEDENCE)
-class ConditionOnSingleBean extends ConditionOnBean implements ConfigurationCondition {
+//@Order(Ordered.LOWEST_PRECEDENCE)
+public class ConditionOnSingleBean extends ConditionOnBean implements ConfigurationCondition {
 
 
   /**

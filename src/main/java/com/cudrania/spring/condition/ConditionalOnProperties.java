@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 属性条件判断
+ * {@link Conditional} that checks if the specified properties matches in logic combination.
  *
  * @author scorpio
  * @version 1.0.0

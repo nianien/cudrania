@@ -10,8 +10,7 @@ import java.lang.annotation.Target;
 
 
 /**
- * {@link Conditional} that checks if the specified properties have a specific value.
- * The condition matches in the following circumstances
+ * {@link Conditional} that checks if the specified property have a specific value.
  *
  * @author scorpio
  * @since 1.1.0

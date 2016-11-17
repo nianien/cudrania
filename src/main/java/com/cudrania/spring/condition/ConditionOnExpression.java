@@ -6,6 +6,8 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.expression.StandardBeanExpressionResolver;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.MethodMetadata;
@@ -17,7 +19,7 @@ import org.springframework.core.type.MethodMetadata;
  * @version 1.0.0
  * @see ConditionalOnExpression
  */
-
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class ConditionOnExpression implements Condition {
   /**
    * Determine if the condition matches.

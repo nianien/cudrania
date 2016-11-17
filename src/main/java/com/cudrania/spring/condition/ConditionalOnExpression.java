@@ -8,7 +8,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
+/*
+ * Configuration annotation for a conditional element that depends on the value of a SpEL
+ * expression.
+ *
  * @author scorpio
  * @version 1.0.0
  */

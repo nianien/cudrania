@@ -6,7 +6,10 @@ import com.sm.audit.commons.condition.ConditionalOnProperties.Logic;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationAttributes;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.env.PropertyResolver;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.util.MultiValueMap;
@@ -20,11 +23,12 @@ import java.util.Map.Entry;
 import jodd.util.Wildcard;
 
 /**
- * 根据{@link ConditionalOnProperty}注解进行条件判断
+ * {@link Conditional} that checks if the specified property have a specific value.
  *
  * @author scorpio
  * @version 1.0.0
  */
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class ConditionOnProperty implements Condition {
   @Override
   public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {

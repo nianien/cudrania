@@ -36,8 +36,7 @@ import java.lang.annotation.Target;
  * condition on auto-configuration classes only. If a candidate bean may be created by
  * another auto-configuration, make sure that the one using this condition runs after.
  *
- * @author Phillip Webb
- * @author Andy Wilkinson
+ * @author scorpio
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
