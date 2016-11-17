@@ -1,7 +1,7 @@
 package com.cudrania.spring.condition;
 
 
-import com.cudrania.spring.condition.ConditionalOnProperties.Logical;
+import com.sm.audit.commons.condition.ConditionalOnProperties.Logic;
 
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
@@ -11,38 +11,22 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import java.util.Map;
 
 /**
- * 根据{@link ConditionalOnProperties}注解进行条件判断
+ * 根据{@link ConditionalOnProperty}注解进行条件判断
  *
  * @author scorpio
  * @version 1.0.0
  */
-public class ConditionOnProperties implements Condition {
+public class ConditionOnProperties extends ConditionOnProperty implements Condition {
   @Override
   public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-    Map<String, Object> attributes = metadata.getAnnotationAttributes(ConditionalOnProperties.class.getName());
-    if (attributes == null) {
-      return false;
-    }
-    AnnotationAttributes[] conditionalOnProperties = (AnnotationAttributes[]) attributes.get("value");
-    Logical logic = (Logical) attributes.get("conjunction");
-    boolean matched = logic == Logical.AND ? true : false;
-    for (AnnotationAttributes conditionalOnProperty : conditionalOnProperties) {
-      boolean matchOne = ConditionOnProperty.matches(context, conditionalOnProperty);
-      if (logic == Logical.AND) {
-        matched &= matchOne;
-        if (!matched) {
-          break;
-        }
-      } else {
-        matched |= matchOne;
-        if (matched) {
-          break;
-        }
-      }
-    }
-    return matched;
 
-
+    if (metadata.isAnnotated(ConditionalOnProperties.class.getName())) {
+      Map<String, Object> attributes = metadata.getAnnotationAttributes(ConditionalOnProperties.class.getName());
+      AnnotationAttributes[] conditionalOnProperties = (AnnotationAttributes[]) attributes.get("value");
+      Logic logic = (Logic) attributes.get("logic");
+      return matches(context, conditionalOnProperties, logic);
+    }
+    return false;
   }
 
 

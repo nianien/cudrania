@@ -9,35 +9,19 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 属性条件判断
- *
  * @author scorpio
  * @version 1.0.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Documented
-@Conditional(ConditionOnProperties.class)
-public @interface ConditionalOnProperties {
+@Conditional(ConditionOnExpression.class)
+public @interface ConditionalOnExpression {
   /**
-   * 条件组合
+   * The SpEL expression to evaluate. Expression should return {@code true} if the
+   * condition passes or {@code false} if it fails.
    *
-   * @return
+   * @return the SpEL expression
    */
-  ConditionalOnProperty[] value();
-
-  /**
-   * 逻辑组合
-   *
-   * @return
-   */
-  Logic logic() default Logic.AND;
-
-  /**
-   * 逻辑判断
-   */
-  enum Logic {
-
-    AND, OR
-  }
+  String value() default "true";
 }

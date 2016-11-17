@@ -8,11 +8,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+
 /**
- * 属性条件判断
+ * {@link Conditional} that checks if the specified properties have a specific value.
+ * The condition matches in the following circumstances
  *
  * @author scorpio
- * @version 1.0.0
+ * @since 1.1.0
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
@@ -21,44 +23,53 @@ import java.lang.annotation.Target;
 public @interface ConditionalOnProperty {
 
   /**
-   * 属性名称
+   * The name of the properties to test
    *
    * @return
    */
   String name();
 
   /**
-   * 属性值
+   * The expected value for the properties<br/>
+   * value must equalsIgnoreCase property if not empty
    *
    * @return
    */
-  String value();
+  String value() default "";
+
 
   /**
-   * 匹配类型
+   * The expected wildcard for the properties<br/>
+   * the wildcard must match property by wildcard if not empty
    *
    * @return
    */
-  MatchMode match() default MatchMode.EQUALS;
+  String wildcard() default "";
+
 
   /**
-   * 是否取反
+   * The expected regex for the properties<br/>
+   * regex must match property by regex if not empty
    *
    * @return
+   */
+  String regex() default "";
+
+
+  /**
+   * Specify if property must be set. Defaults to
+   * {@code true}.
+   *
+   * @return
+   */
+  boolean required() default true;
+
+
+  /**
+   * Specify if inverse the result of matching. Defaults to
+   * {@code false}.
+   *
+   * @return if should match if the property is missing
    */
   boolean inverse() default false;
-
-  /**
-   * 是否忽略大小写
-   *
-   * @return
-   */
-  boolean caseIgnore() default false;
-
-  /**
-   * 匹配模式
-   */
-  enum MatchMode {
-    EQUALS, CONTAINS, WILDCARD, REGEX
-  }
 }
