@@ -1,7 +1,7 @@
 package com.cudrania.spring.condition;
 
 
-import com.sm.audit.commons.condition.ConditionalOnProperties.Logic;
+import com.cudrania.spring.condition.ConditionalOnProperties.LogicalConj;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Condition;
@@ -39,20 +39,20 @@ public class ConditionOnProperty implements Condition {
               ConditionalOnProperty.class.getName());
       List<AnnotationAttributes> annotationAttributesList = annotationAttributesFromMultiValueMap(
               allAnnotationAttributesMap);
-      return matches(context, annotationAttributesList.toArray(new AnnotationAttributes[0]), Logic.AND);
+      return matches(context, annotationAttributesList.toArray(new AnnotationAttributes[0]), LogicalConj.AND);
     }
     return false;
   }
 
 
-  protected boolean matches(ConditionContext context, AnnotationAttributes[] conditionalOnProperties, Logic logic) {
+  protected boolean matches(ConditionContext context, AnnotationAttributes[] conditionalOnProperties, LogicalConj logicalConj) {
     if (conditionalOnProperties.length == 0) {
       return true;
     }
-    boolean matched = logic == Logic.AND ? true : false;
+    boolean matched = logicalConj == LogicalConj.AND ? true : false;
     for (AnnotationAttributes conditionalOnProperty : conditionalOnProperties) {
       boolean matchOne = new PropertySpec(context.getEnvironment(), conditionalOnProperty).matches();
-      if (logic == Logic.AND) {
+      if (logicalConj == LogicalConj.AND) {
         matched &= matchOne;
         if (!matched) {
           break;
@@ -107,7 +107,7 @@ public class ConditionOnProperty implements Condition {
       wildcard = propertyResolver.resolvePlaceholders((String) attributes.get("wildcard"));
       regex = propertyResolver.resolvePlaceholders((String) attributes.get("regex"));
       required = (Boolean) attributes.get("required");
-      inverse = (Boolean) attributes.get("inverse");
+      inverse = (Boolean) attributes.get("reverse");
     }
 
 

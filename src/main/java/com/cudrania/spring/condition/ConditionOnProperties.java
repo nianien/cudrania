@@ -1,7 +1,7 @@
 package com.cudrania.spring.condition;
 
 
-import com.sm.audit.commons.condition.ConditionalOnProperties.Logic;
+import com.cudrania.spring.condition.ConditionalOnProperties.LogicalConj;
 
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
@@ -27,8 +27,8 @@ public class ConditionOnProperties extends ConditionOnProperty implements Condit
     if (metadata.isAnnotated(ConditionalOnProperties.class.getName())) {
       Map<String, Object> attributes = metadata.getAnnotationAttributes(ConditionalOnProperties.class.getName());
       AnnotationAttributes[] conditionalOnProperties = (AnnotationAttributes[]) attributes.get("value");
-      Logic logic = (Logic) attributes.get("logic");
-      return matches(context, conditionalOnProperties, logic);
+      LogicalConj logicalConj = (LogicalConj) attributes.get("conj");
+      return matches(context, conditionalOnProperties, logicalConj);
     }
     return false;
   }
