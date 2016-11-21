@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 @Conditional(ConditionOnProperties.class)
 public @interface ConditionalOnProperties {
   /**
-   * combination {@link ConditionalOnProperty}s with {@link com.cudrania.spring.condition.ConditionalOnProperties.LogicalConj}
+   * combination {@link ConditionalOnProperty}s with {@link LogicalConj}
    *
    * @return
    */
