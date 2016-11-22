@@ -3,11 +3,6 @@ package com.cudrania.spring.beans;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 
 /**
  * Spring托管对象,通过{@link org.springframework.context.annotation.Import}和{@link
@@ -37,67 +32,40 @@ import java.util.Set;
 public class ContextBean<T extends ContextBean> {
 
 
-  private ApplicationContext context;
+    private ApplicationContext context;
 
 
-  /**
-   * 初始化Spring配置
-   *
-   * @return Spring托管对象, 不是当前对象
-   */
-  public final T init() {
-    return (T) getContext().getBean(this.getClass());
-  }
-
-  /**
-   * 获取Spring上下文
-   *
-   * @return
-   */
-  public ApplicationContext getContext() {
-    if (context == null) {
-      synchronized (this) {
-        this.context = loadContext(this.getClass(), ContextBean.class, ContextBean.class);
-      }
+    /**
+     * 初始化Spring配置
+     *
+     * @return Spring托管对象, 不是当前对象
+     */
+    public final T init() {
+        return (T) getContext().getBean(this.getClass());
     }
-    return this.context;
-  }
 
-  /**
-   * 根据类定义加载{@link ApplicationContext}对象<br/>
-   * 等价于 loadContext(clazz, clazz)
-   *
-   * @param clazz 配置类
-   * @return
-   * @see #loadContext(Class, Class, Class[])
-   */
-  public static ApplicationContext loadContext(Class<?> clazz) {
-    return loadContext(clazz, clazz, clazz);
-  }
-
-
-  /**
-   * 根据类定义加载{@link ApplicationContext}对象<br/>
-   * 默认会加载继承类
-   *
-   * @param clazz          配置类
-   * @param limitClass     继承类的上限
-   * @param excludeClasses 排除加载的类
-   * @return
-   */
-  public static ApplicationContext loadContext(Class<?> clazz, Class limitClass, Class... excludeClasses) {
-    Set<Class> includes = new LinkedHashSet<>();
-    Set<Class> excludes = new HashSet<>(Arrays.asList(excludeClasses));
-    includes.add(clazz);
-    excludes.add(Object.class);
-    Class curClass = clazz;
-    while (curClass != null && limitClass.isAssignableFrom(curClass)) {
-      if (!excludes.contains(curClass)) {
-        includes.add(curClass);
-      }
-      curClass = curClass.getSuperclass();
+    /**
+     * 获取Spring上下文
+     *
+     * @return
+     */
+    public ApplicationContext getContext() {
+        if (context == null) {
+            synchronized (this) {
+                this.context = loadContext(this.getClass());
+            }
+        }
+        return this.context;
     }
-    return new AnnotationConfigApplicationContext(includes.toArray(new Class[0]));
-  }
+
+
+    /**
+     * 根据类定义加载{@link ApplicationContext}对象<br/>
+     *
+     * @return
+     */
+    public static ApplicationContext loadContext(Class<?>... classes) {
+        return new AnnotationConfigApplicationContext(classes);
+    }
 
 }
