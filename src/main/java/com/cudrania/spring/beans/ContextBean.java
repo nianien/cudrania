@@ -32,40 +32,42 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 public class ContextBean<T extends ContextBean> {
 
 
-    private ApplicationContext context;
+  protected ApplicationContext context;
 
 
-    /**
-     * 初始化Spring配置
-     *
-     * @return Spring托管对象, 不是当前对象
-     */
-    public final T init() {
-        return (T) getContext().getBean(this.getClass());
+  /**
+   * 初始化托管对象
+   *
+   * @return 当前类对象的托管对象
+   */
+  public final T init() {
+    T bean = (T) getContext().getBean(this.getClass());
+    bean.context = context;
+    return bean;
+  }
+
+  /**
+   * 获取Spring上下文
+   *
+   * @return
+   */
+  public ApplicationContext getContext() {
+    if (context == null) {
+      synchronized (this) {
+        this.context = loadContext(this.getClass());
+      }
     }
-
-    /**
-     * 获取Spring上下文
-     *
-     * @return
-     */
-    public ApplicationContext getContext() {
-        if (context == null) {
-            synchronized (this) {
-                this.context = loadContext(this.getClass());
-            }
-        }
-        return this.context;
-    }
+    return this.context;
+  }
 
 
-    /**
-     * 根据类定义加载{@link ApplicationContext}对象<br/>
-     *
-     * @return
-     */
-    public static ApplicationContext loadContext(Class<?>... classes) {
-        return new AnnotationConfigApplicationContext(classes);
-    }
+  /**
+   * 根据类定义加载{@link ApplicationContext}对象<br/>
+   *
+   * @return
+   */
+  public static ApplicationContext loadContext(Class<?>... classes) {
+    return new AnnotationConfigApplicationContext(classes);
+  }
 
 }
