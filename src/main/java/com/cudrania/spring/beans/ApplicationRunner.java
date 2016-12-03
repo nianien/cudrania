@@ -28,14 +28,14 @@ import java.util.Arrays;
  * </pre>
  * 调用命令如下:
  * <ol>
- * <li>java com.cudrania.spring.beans.BeanRunner com.my.bean.MyBean#doSomething</li>
- * <li>java com.cudrania.spring.beans.BeanRunner com.my.bean.MyBean#doOtherThing 1 test</li>
+ * <li>java com.cudrania.spring.beans.ApplicationRunner com.my.bean.MyBean#doSomething</li>
+ * <li>java com.cudrania.spring.beans.ApplicationRunner com.my.bean.MyBean#doOtherThing 1 test</li>
  * </ol>
  *
  * @author skyfalling
- * @see ContextBean
+ * @see ApplicationBean
  */
-public class BeanRunner {
+public class ApplicationRunner {
 
   /**
    * bean对象方法执行入口
@@ -54,7 +54,7 @@ public class BeanRunner {
       params = Arrays.copyOfRange(args, 1, args.length);
     }
     Class<?> clazz = Class.forName(beanClass);
-    Object bean = ContextBean.loadContext(clazz).getBean(clazz);
+    Object bean = ApplicationBean.loadContext(clazz).getBean(clazz);
     Reflections.invoke(method, bean, params);
   }
 

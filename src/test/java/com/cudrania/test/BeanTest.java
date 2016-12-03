@@ -1,6 +1,6 @@
 package com.cudrania.test;
 
-import com.cudrania.spring.beans.ContextBean;
+import com.cudrania.spring.beans.ApplicationBean;
 
 import org.springframework.context.ApplicationContext;
 
@@ -13,8 +13,8 @@ public class BeanTest {
   public static void main(String[] args) {
 
 
-    ApplicationContext context = ContextBean.loadContext(TestBean.class);
-    System.out.println(context.getBeansOfType(ContextBean.class));
+    ApplicationContext context = ApplicationBean.loadContext(TestBean.class);
+    System.out.println(context.getBeansOfType(ApplicationBean.class));
     context.getBean(TestBean.class).doService();
     new TestBean().init().doService();
   }

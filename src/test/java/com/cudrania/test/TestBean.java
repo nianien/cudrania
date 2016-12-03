@@ -1,6 +1,6 @@
 package com.cudrania.test;
 
-import com.cudrania.spring.beans.ContextBean;
+import com.cudrania.spring.beans.ApplicationBean;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -10,8 +10,8 @@ import org.springframework.context.annotation.ComponentScan;
  * @version 1.0.0
  */
 @ComponentScan
-//@Import(ContextBean.class)
-public class TestBean extends ContextBean<TestBean> {
+//@Import(ApplicationBean.class)
+public class TestBean extends ApplicationBean<TestBean> {
 
 
   @Autowired
