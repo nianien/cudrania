@@ -10,7 +10,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
  * for example:
  * <pre>
  * &#064;ImportResource("classpath:spring-root.xml")
- * public class MyBean extends ContextBean&lt;MyBean> {
+ * public class MyBean extends ApplicationBean&lt;MyBean> {
  *
  *    &#064;AutoWired
  *    private Service service;
@@ -29,7 +29,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
  * @author skyfalling
  * @version 1.0.0
  */
-public class ContextBean<T extends ContextBean> {
+public class ApplicationBean<T extends ApplicationBean> {
 
 
   protected ApplicationContext context;
