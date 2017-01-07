@@ -1,7 +1,7 @@
 package com.cudrania.spring.condition;
 
 
-import com.cudrania.spring.condition.ConditionalOnProperties.LogicalConj;
+import com.cudrania.spring.condition.ConditionOnProperty.PropertySpec;
 
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
@@ -9,9 +9,6 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.type.AnnotatedTypeMetadata;
-
-import java.util.Map;
 
 /**
  * {@link Conditional} that checks if the specified properties matches in logic combination.
@@ -20,18 +17,18 @@ import java.util.Map;
  * @version 1.0.0
  */
 @Order(Ordered.LOWEST_PRECEDENCE)
-public class ConditionOnProperties extends ConditionOnProperty implements Condition {
-  @Override
-  public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+public class ConditionOnProperties extends LogicCondition<ConditionalOnProperties, ConditionContext, AnnotationAttributes> implements Condition {
 
-    if (metadata.isAnnotated(ConditionalOnProperties.class.getName())) {
-      Map<String, Object> attributes = metadata.getAnnotationAttributes(ConditionalOnProperties.class.getName());
-      AnnotationAttributes[] conditionalOnProperties = (AnnotationAttributes[]) attributes.get("value");
-      LogicalConj logicalConj = (LogicalConj) attributes.get("conj");
-      return matches(context, conditionalOnProperties, logicalConj);
-    }
-    return false;
+  @Override
+  public boolean matches(ConditionContext context, AnnotationAttributes attributes) {
+    AnnotationAttributes[] values = (AnnotationAttributes[]) attributes.get("value");
+    Logic logic = (Logic) attributes.get("logic");
+    return matches(context, values, logic);
   }
 
 
+  @Override
+  protected boolean matchOne(ConditionContext context, AnnotationAttributes attributes) {
+    return new PropertySpec(context, attributes).matches();
+  }
 }

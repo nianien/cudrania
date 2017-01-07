@@ -1,5 +1,7 @@
 package com.cudrania.spring.condition;
 
+import com.cudrania.spring.condition.ConditionOnExpression.ExpressionSpec;
+
 import org.springframework.beans.factory.config.BeanExpressionContext;
 import org.springframework.beans.factory.config.BeanExpressionResolver;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -7,10 +9,8 @@ import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.expression.StandardBeanExpressionResolver;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.core.type.MethodMetadata;
 
 /**
  * A Condition that evaluates a SpEL expression.
@@ -20,44 +20,48 @@ import org.springframework.core.type.MethodMetadata;
  * @see ConditionalOnExpression
  */
 @Order(Ordered.LOWEST_PRECEDENCE)
-public class ConditionOnExpression implements Condition {
-  /**
-   * Determine if the condition matches.
-   *
-   * @param context  the condition context
-   * @param metadata metadata of the {@link AnnotationMetadata class}
-   *                 or {@link MethodMetadata method} being checked.
-   * @return {@code true} if the condition matches and the component can be registered
-   * or {@code false} to veto registration.
-   */
+public class ConditionOnExpression extends LogicCondition<ConditionalOnExpression, ExpressionSpec, String> implements Condition {
+
+
   @Override
-  public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-    String expression = (String) metadata
-            .getAnnotationAttributes(ConditionalOnExpression.class.getName())
-            .get("value");
-    expression = wrapIfNecessary(expression);
-    expression = context.getEnvironment().resolvePlaceholders(expression);
-    ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
-    BeanExpressionResolver resolver = (beanFactory != null)
-            ? beanFactory.getBeanExpressionResolver() : null;
-    BeanExpressionContext expressionContext = (beanFactory != null)
-            ? new BeanExpressionContext(beanFactory, null) : null;
-    if (resolver == null) {
-      resolver = new StandardBeanExpressionResolver();
-    }
-    return (Boolean) resolver.evaluate(expression, expressionContext);
+  public boolean matches(ConditionContext context, AnnotationAttributes attributes) {
+    String[] expression = (String[]) attributes.get("value");
+    Logic logic = (Logic) attributes.get("logic");
+    ExpressionSpec spec = new ExpressionSpec(context);
+    return matches(spec, expression, logic);
   }
 
-  /**
-   * Allow user to provide bare expression with no '#{}' wrapper.
-   *
-   * @param expression source expression
-   * @return wrapped expression
-   */
-  private String wrapIfNecessary(String expression) {
-    if (!expression.startsWith("#{")) {
-      return "#{" + expression + "}";
-    }
-    return expression;
+  @Override
+  protected boolean matchOne(ExpressionSpec context, String attributes) {
+    return context.evaluate(attributes);
   }
+
+  static class ExpressionSpec {
+    ConditionContext context;
+    BeanExpressionResolver resolver;
+    BeanExpressionContext expressionContext;
+
+    public ExpressionSpec(ConditionContext context) {
+      this.context = context;
+      ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+      this.resolver = (beanFactory != null)
+              ? beanFactory.getBeanExpressionResolver() : null;
+      this.expressionContext = (beanFactory != null)
+              ? new BeanExpressionContext(beanFactory, null) : null;
+      if (resolver == null) {
+        this.resolver = new StandardBeanExpressionResolver();
+      }
+    }
+
+    public Boolean evaluate(String value) {
+      if (!value.startsWith("#{")) {
+        value = "#{" + value + "}";
+      }
+      value = context.getEnvironment().resolvePlaceholders(value);
+      return (Boolean) resolver.evaluate(value, expressionContext);
+    }
+
+
+  }
+
 }

@@ -65,10 +65,10 @@ public @interface ConditionalOnProperty {
 
 
   /**
-   * Specify if reverse the result of matching. Defaults to
+   * Specify if invert the result of matching. Defaults to
    * {@code false}.
    *
    * @return if should match if the property is missing
    */
-  boolean reverse() default false;
+  boolean invert() default false;  //AND-OR-INVERT
 }

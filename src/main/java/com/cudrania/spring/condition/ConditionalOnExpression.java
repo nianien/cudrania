@@ -1,5 +1,7 @@
 package com.cudrania.spring.condition;
 
+import com.cudrania.spring.condition.LogicCondition.Logic;
+
 import org.springframework.context.annotation.Conditional;
 
 import java.lang.annotation.Documented;
@@ -26,5 +28,13 @@ public @interface ConditionalOnExpression {
    *
    * @return the SpEL expression
    */
-  String value() default "true";
+  String[] value() default "true";
+
+  /**
+   * logic operator
+   *
+   * @return
+   */
+  Logic logic() default Logic.AND;
+
 }

@@ -1,5 +1,7 @@
 package com.cudrania.spring.condition;
 
+import com.cudrania.spring.condition.LogicCondition.Logic;
+
 import org.springframework.context.annotation.Conditional;
 
 import java.lang.annotation.Documented;
@@ -23,7 +25,7 @@ import java.lang.annotation.Target;
 @Conditional(ConditionOnProperties.class)
 public @interface ConditionalOnProperties {
   /**
-   * combination {@link ConditionalOnProperty}s with {@link LogicalConj}
+   * combination {@link ConditionalOnProperty}s with {@link Logic}
    *
    * @return
    */
@@ -34,13 +36,6 @@ public @interface ConditionalOnProperties {
    *
    * @return
    */
-  LogicalConj conj() default LogicalConj.AND;
+  Logic logic() default Logic.AND;
 
-  /**
-   * Logical Connectives
-   */
-  enum LogicalConj {
-
-    AND, OR
-  }
 }
