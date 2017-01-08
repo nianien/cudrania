@@ -26,7 +26,6 @@
             <groupId>com.nianien</groupId>
             <artifactId>nianien</artifactId>
             <version>${nianien.version}</version>
-            <optional>true</optional>
         </dependency>
 
         <dependency>
