@@ -56,7 +56,7 @@ public class ConditionOnProperty extends BaseCondition<ConditionalOnProperty> im
           matched &= value.equalsIgnoreCase(property);
         }
         if (StringUtils.isNotEmpty(wildcard)) {
-          matched &= RegexUtils.matchWildcard(property, wildcard);
+          matched &= RegexUtils.matchWildcard(wildcard,property);
         }
         if (StringUtils.isNotEmpty(regex)) {
           matched &= property.matches(regex);
