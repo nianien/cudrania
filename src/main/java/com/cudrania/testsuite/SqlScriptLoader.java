@@ -1,15 +1,16 @@
 package com.cudrania.testsuite;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import com.nianien.core.util.ArrayUtils;
+import com.nianien.core.util.StringUtils;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 import org.springframework.core.annotation.AnnotationUtils;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 定义SQL加载规则,在UT启动前自动加载SQL文件<br/>

@@ -2,7 +2,8 @@ package com.cudrania.spring.resolver;
 
 import com.cudrania.common.exception.DefinedException;
 import com.cudrania.spring.resolver.ErrorResponse.ErrorField;
-import org.apache.commons.lang3.StringUtils;
+import com.nianien.core.util.StringUtils;
+
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.core.ErrorCoded;
@@ -18,10 +19,15 @@ import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver;
 import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Method;
-import java.util.*;
 
 /**
  * 全局异常统一处理类,将错误信息转换成合适的JSON格式返回。

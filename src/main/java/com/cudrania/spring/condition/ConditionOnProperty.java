@@ -1,7 +1,9 @@
 package com.cudrania.spring.condition;
 
 
-import org.apache.commons.lang3.StringUtils;
+import com.nianien.core.text.RegexUtils;
+import com.nianien.core.util.StringUtils;
+
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
@@ -9,8 +11,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.env.PropertyResolver;
-
-import jodd.util.Wildcard;
 
 /**
  * {@link Conditional} that checks if the specified property have a specific value.
@@ -56,7 +56,7 @@ public class ConditionOnProperty extends BaseCondition<ConditionalOnProperty> im
           matched &= value.equalsIgnoreCase(property);
         }
         if (StringUtils.isNotEmpty(wildcard)) {
-          matched &= Wildcard.match(property, wildcard);
+          matched &= RegexUtils.matchWildcard(property, wildcard);
         }
         if (StringUtils.isNotEmpty(regex)) {
           matched &= property.matches(regex);

@@ -1,8 +1,7 @@
 package com.cudrania.spring.beans;
 
 import com.nianien.core.reflect.Reflections;
-
-import org.apache.commons.lang3.StringUtils;
+import com.nianien.core.util.StringUtils;
 
 import java.util.Arrays;
 

@@ -1,20 +1,24 @@
 package com.cudrania.validation;
 
 import com.cudrania.validation.DatePattern.DatePatternValidator;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
-import org.apache.commons.lang3.time.DateUtils;
+import com.nianien.core.date.DateFormatter;
+import com.nianien.core.util.StringUtils;
 
-import javax.validation.Constraint;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
-import javax.validation.Payload;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Date;
 
-import static java.lang.annotation.ElementType.*;
+import javax.validation.Constraint;
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import javax.validation.Payload;
+
+import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
+import static java.lang.annotation.ElementType.CONSTRUCTOR;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
@@ -77,9 +81,9 @@ public @interface DatePattern {
             }
             try {
                 //双重校验
-                Date date = DateUtils.parseDate(value, constraint.value());
+                Date date = DateFormatter.parseDate(value, constraint.value());
                 for (String pattern : constraint.value()) {
-                    if (DateFormatUtils.format(date, pattern).equals(value))
+                    if (DateFormatter.format(date, pattern).equals(value))
                         return true;
                 }
             } catch (Exception e) {

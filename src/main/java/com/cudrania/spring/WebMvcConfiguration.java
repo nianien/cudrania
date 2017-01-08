@@ -1,13 +1,16 @@
 package com.cudrania.spring;
 
-import java.lang.reflect.Method;
-import java.nio.charset.Charset;
-import java.util.Iterator;
-import java.util.List;
+import com.cudrania.spring.handlermapping.IdealRequestMappingHandlerMapping;
+import com.cudrania.spring.handlermapping.RequestMappingConfiguration;
+import com.cudrania.spring.resolver.GlobalHandlerExceptionResolver;
+import com.cudrania.spring.resolver.ScopeAttributeMethodProcessor;
+import com.cudrania.validation.ResourceBundleMessageInterpolator;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.nianien.core.util.StringUtils;
 
-import javax.annotation.Resource;
-
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
@@ -30,15 +33,12 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
-import com.cudrania.spring.handlermapping.IdealRequestMappingHandlerMapping;
-import com.cudrania.spring.handlermapping.RequestMappingConfiguration;
-import com.cudrania.spring.resolver.GlobalHandlerExceptionResolver;
-import com.cudrania.spring.resolver.ScopeAttributeMethodProcessor;
-import com.cudrania.validation.ResourceBundleMessageInterpolator;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonParser.Feature;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import java.lang.reflect.Method;
+import java.nio.charset.Charset;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.annotation.Resource;
 
 /**
  * REST风格配置对象

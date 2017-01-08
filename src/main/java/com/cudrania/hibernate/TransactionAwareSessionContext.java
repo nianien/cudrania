@@ -1,6 +1,7 @@
 package com.cudrania.hibernate;
 
-import org.apache.commons.lang3.Validate;
+import com.nianien.core.exception.ExceptionHandler;
+
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -14,9 +15,10 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import javax.transaction.Synchronization;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.transaction.Synchronization;
 
 /**
  * Session context that determines whether there exist a transaction in
@@ -65,8 +67,8 @@ public class TransactionAwareSessionContext implements CurrentSessionContext {
      */
     public TransactionAwareSessionContext(
             final SessionFactoryImplementor theSessionFactory) {
-        Validate.notNull(theSessionFactory, "The session factory cannot be null.");
 
+        ExceptionHandler.throwIfNull(theSessionFactory, "The session factory cannot be null.");
         defaultSessionContext = new SpringSessionContext(theSessionFactory);
         localSessionContext = new ManagedSessionContext(theSessionFactory);
         sessionFactory = theSessionFactory;
@@ -77,7 +79,7 @@ public class TransactionAwareSessionContext implements CurrentSessionContext {
      * if there's no session.
      *
      * @return Returns the configured session, or the one managed by Spring.
-     *         Never returns null.
+     * Never returns null.
      */
     public Session currentSession() {
         try {
@@ -116,7 +118,7 @@ public class TransactionAwareSessionContext implements CurrentSessionContext {
      * @param session Session to register into transaction synchronization.
      *                Cannot be null.
      * @return Returns <code>true</code> if the session was register into any
-     *         available synchronization strategy, <code>false</code> otherwise.
+     * available synchronization strategy, <code>false</code> otherwise.
      */
     private boolean registerSynchronization(final Session session) {
         // Tries Spring's transaction manager synchronization.

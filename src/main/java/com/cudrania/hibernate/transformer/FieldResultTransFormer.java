@@ -1,7 +1,8 @@
 package com.cudrania.hibernate.transformer;
 
+import com.nianien.core.util.StringUtils;
+
 import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.hibernate.transform.BasicTransformerAdapter;
 
 import java.io.Serializable;
