@@ -1,5 +1,6 @@
 package com.cudrania.spring;
 
+import com.nianien.core.exception.ExceptionHandler;
 import com.nianien.core.reflect.Reflections;
 import com.nianien.core.util.StringUtils;
 
@@ -31,14 +32,14 @@ import java.util.Arrays;
  * </pre>
  * 调用命令如下:
  * <ol>
- * <li>java com.cudrania.spring.AppRunner com.my.bean.MyBean#doSomething</li>
- * <li>java com.cudrania.spring.AppRunner com.my.bean.MyBean#doOtherThing 1 test</li>
- * <li>java com.cudrania.spring.AppRunner com.my.bean.MyBean doOtherThing 1 test</li>
+ * <li>java com.cudrania.spring.ApplicationLoader com.my.bean.MyBean#doSomething</li>
+ * <li>java com.cudrania.spring.ApplicationLoader com.my.bean.MyBean#doOtherThing 1 test</li>
+ * <li>java com.cudrania.spring.ApplicationLoader com.my.bean.MyBean doOtherThing 1 test</li>
  * </ol>
  *
  * @author skyfalling
  */
-public class AppRunner {
+public class ApplicationLoader {
 
 
   /**
@@ -74,10 +75,13 @@ public class AppRunner {
    * @param args
    * @throws Exception
    */
-  public static void run(String beanClass, String method, Object... args) throws Exception {
-    Class<?> clazz = Class.forName(beanClass);
-    Object bean = loadContext(clazz);
-    Reflections.invoke(method, bean, args);
+  public static void run(Class<?> beanClass, String method, Object... args) {
+    try {
+      Object bean = get(beanClass);
+      Reflections.invoke(method, bean, args);
+    } catch (Exception e) {
+      ExceptionHandler.throwException(e);
+    }
   }
 
   /**
@@ -97,7 +101,7 @@ public class AppRunner {
     } else {
       params = Arrays.copyOfRange(args, 1, args.length);
     }
-    run(beanClass, method, params);
+    run(Class.forName(beanClass), method, params);
   }
 
 
