@@ -32,14 +32,14 @@ import java.util.Arrays;
  * </pre>
  * 调用命令如下:
  * <ol>
- * <li>java com.cudrania.spring.ApplicationLoader com.my.bean.MyBean#doSomething</li>
- * <li>java com.cudrania.spring.ApplicationLoader com.my.bean.MyBean#doOtherThing 1 test</li>
- * <li>java com.cudrania.spring.ApplicationLoader com.my.bean.MyBean doOtherThing 1 test</li>
+ * <li>java com.cudrania.spring.SpringLauncher com.my.bean.MyBean#doSomething</li>
+ * <li>java com.cudrania.spring.SpringLauncher com.my.bean.MyBean#doOtherThing 1 test</li>
+ * <li>java com.cudrania.spring.SpringLauncher com.my.bean.MyBean doOtherThing 1 test</li>
  * </ol>
  *
  * @author skyfalling
  */
-public class ApplicationLoader {
+public class SpringLauncher {
 
 
   /**
@@ -47,8 +47,8 @@ public class ApplicationLoader {
    *
    * @return 当前类的托管对象
    */
-  public static final <T> T get(Class<T> beanClass) {
-    ApplicationContext context = loadContext(beanClass);
+  public static final <T> T asBean(Class<T> beanClass) {
+    ApplicationContext context = asContext(beanClass);
     T t = context.getBean(beanClass);
     if (t instanceof ApplicationContextAware) {
       ((ApplicationContextAware) t).setApplicationContext(context);
@@ -62,7 +62,7 @@ public class ApplicationLoader {
    *
    * @return
    */
-  public static ApplicationContext loadContext(Class<?>... classes) {
+  public static ApplicationContext asContext(Class<?>... classes) {
     return new AnnotationConfigApplicationContext(classes);
   }
 
@@ -77,7 +77,7 @@ public class ApplicationLoader {
    */
   public static void run(Class<?> beanClass, String method, Object... args) {
     try {
-      Object bean = get(beanClass);
+      Object bean = asBean(beanClass);
       Reflections.invoke(method, bean, args);
     } catch (Exception e) {
       ExceptionHandler.throwException(e);

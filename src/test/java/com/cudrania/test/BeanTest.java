@@ -1,6 +1,6 @@
 package com.cudrania.test;
 
-import com.cudrania.spring.ApplicationLoader;
+import com.cudrania.spring.SpringLauncher;
 
 import org.springframework.context.ApplicationContext;
 
@@ -15,10 +15,10 @@ public class BeanTest {
 
     System.setProperty("exp1","true");
     System.setProperty("exp2","true");
-    ApplicationLoader.get(TestBean.class).doService();
-    ApplicationContext context = ApplicationLoader.loadContext(TestBean.class);
+    SpringLauncher.asBean(TestBean.class).doService();
+    ApplicationContext context = SpringLauncher.asContext(TestBean.class);
     context.getBean(TestBean.class).doService();
-    ApplicationLoader.run(TestBean.class,"doService");
+    SpringLauncher.run(TestBean.class,"doService");
     System.out.println(context.getBean(BeanOnExpression.class));
     System.out.println(context.getBean(BeanOnProperty.class));
     System.out.println(context.getBean(BeanOnProperties.class));
