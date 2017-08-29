@@ -1,9 +1,7 @@
 package com.cudrania.hibernate.transformer;
 
-import com.nianien.core.date.DateFormatter;
-
 import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.beanutils.Converter;
+import org.apache.commons.beanutils.converters.DateTimeConverter;
 import org.hibernate.transform.BasicTransformerAdapter;
 
 import java.io.Serializable;
@@ -26,21 +24,21 @@ import java.util.concurrent.ConcurrentHashMap;
 public class BeanResultTransFormer<T> extends BasicTransformerAdapter implements Serializable {
 
     static {
-
         /**
          * 注解{@link Date}类型转换器
          */
-        ConvertUtils.register(new Converter() {
+        ConvertUtils.register(new DateTimeConverter() {
+            {
+                this.setPatterns(new String[]{"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd HH:mm:ss.SSSZ"});
+            }
+
             @Override
-            public <T> T convert(Class<T> type, Object value) {
-                if (value == null) {
-                    return null;
-                }
-                return (T) DateFormatter.parseDate(value.toString(),
-                        "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd", "yyyy-MM-dd HH:mm:ss.SSS", "yyyy-MM-dd HH:mm:ss.SSSZ");
+            protected Class<?> getDefaultType() {
+                return Date.class;
             }
         }, Date.class);
     }
+
 
     /**
      * 已注册实例
