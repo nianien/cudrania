@@ -9,7 +9,7 @@ import org.junit.runners.model.Statement;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -55,7 +55,7 @@ public class SqlScriptLoader implements TestRule {
 
     @Override
     public Statement apply(Statement base, Description description) {
-        Set<String> set = new HashSet<String>();
+        Set<String> set = new LinkedHashSet<>();
         SqlScripts scriptOnClass = AnnotationUtils.findAnnotation(description.getTestClass(), SqlScripts.class);
         if (scriptOnClass != null) {
             if (StringUtils.isNotEmpty(scriptOnClass.dir())) {
