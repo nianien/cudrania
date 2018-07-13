@@ -8,7 +8,6 @@ import org.springframework.context.annotation.ComponentScan;
  * @version 1.0.0
  */
 @ComponentScan
-//@Import(ApplicationBean.class)
 public class TestBean {
 
 
