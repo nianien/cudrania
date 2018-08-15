@@ -1,7 +1,7 @@
 package com.cudrania.test;
 
 import com.cudrania.spring.condition.ConditionalOnExpression;
-import com.cudrania.spring.condition.LogicCondition.Logic;
+import com.cudrania.spring.condition.Operator;
 
 import org.springframework.stereotype.Component;
 
@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnExpression(
-        value = {"${exp1} && ${exp2}","false"},
-        logic = Logic.OR
+        value = {"${exp1} && ${exp2}", "false"},
+        operator = Operator.OR
 )
 public class BeanOnExpression {
 }

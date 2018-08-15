@@ -45,7 +45,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Conditional(ConditionOnSingleBean.class)
+@Conditional(OnSingleBeanCondition.class)
 public @interface ConditionalOnSingleBean {
 
   /**

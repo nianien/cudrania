@@ -19,6 +19,8 @@ package com.cudrania.spring.condition;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.ConfigurationCondition;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.core.type.MethodMetadata;
@@ -30,8 +32,8 @@ import java.util.List;
  *
  * @author scorpio
  */
-//@Order(Ordered.LOWEST_PRECEDENCE)
-public class ConditionOnMissingBean extends ConditionOnBean implements ConfigurationCondition {
+@Order(Ordered.LOWEST_PRECEDENCE - 100)
+public class OnMissingBeanCondition extends OnBeanCondition implements ConfigurationCondition {
 
 
   /**

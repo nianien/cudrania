@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Documented
-@Conditional(ConditionOnProperty.class)
+@Conditional(OnPropertyCondition.class)
 public @interface ConditionalOnProperty {
 
   /**

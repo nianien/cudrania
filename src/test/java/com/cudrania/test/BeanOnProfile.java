@@ -1,5 +1,7 @@
 package com.cudrania.test;
 
+import com.cudrania.spring.condition.ConditionalOnProfile;
+
 import org.springframework.stereotype.Component;
 
 /**
@@ -7,5 +9,6 @@ import org.springframework.stereotype.Component;
  * @version 1.0.0
  */
 @Component
-public class BeanOnProperties {
+@ConditionalOnProfile("(all|task)& !~task")
+public class BeanOnProfile {
 }

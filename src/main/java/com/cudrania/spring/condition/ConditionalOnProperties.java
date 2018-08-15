@@ -1,7 +1,5 @@
 package com.cudrania.spring.condition;
 
-import com.cudrania.spring.condition.LogicCondition.Logic;
-
 import org.springframework.context.annotation.Conditional;
 
 import java.lang.annotation.Documented;
@@ -12,9 +10,7 @@ import java.lang.annotation.Target;
 
 /**
  * {@link Conditional} that checks if the specified properties matches in logic combination<br/>
- * when {@link #value()} is empty,
- * this {@link Conditional} is matched if conj is {@link LogicalConj#AND},
- * and not matched if conj is {@link LogicalConj#OR},
+ * when {@link #value()} is empty, the {@link Conditional} is not matched.
  *
  * @author scorpio
  * @version 1.0.0
@@ -22,20 +18,20 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Documented
-@Conditional(ConditionOnProperties.class)
+@Conditional(OnPropertiesCondition.class)
 public @interface ConditionalOnProperties {
-  /**
-   * combination {@link ConditionalOnProperty}s with {@link Logic}
-   *
-   * @return
-   */
-  ConditionalOnProperty[] value();
+    /**
+     * combination {@link ConditionalOnProperty}s with {@link Operator}
+     *
+     * @return
+     */
+    ConditionalOnProperty[] value();
 
-  /**
-   * conj of Logical Connectives
-   *
-   * @return
-   */
-  Logic logic() default Logic.AND;
+    /**
+     * Logic operator
+     *
+     * @return
+     */
+    Operator operator() default Operator.AND;
 
 }
