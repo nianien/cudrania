@@ -9,6 +9,6 @@ import org.springframework.stereotype.Component;
  * @version 1.0.0
  */
 @Component
-@ConditionalOnProfile(value = {"(all|task)& !~task", "all"})
+@ConditionalOnProfile(value = {"(all|task)& !~task"})
 public class BeanOnProfile {
 }
