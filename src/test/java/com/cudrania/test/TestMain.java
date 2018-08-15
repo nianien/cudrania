@@ -2,6 +2,8 @@ package com.cudrania.test;
 
 import com.cudrania.spring.SpringLauncher;
 
+import org.junit.Test;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -10,8 +12,9 @@ import org.springframework.context.ApplicationContext;
  */
 public class TestMain {
 
-    public static void main(String[] args) {
 
+    @Test(expected = NoSuchBeanDefinitionException.class)
+    public void main() {
 
         System.setProperty("exp1", "true");
         System.setProperty("exp2", "true");
