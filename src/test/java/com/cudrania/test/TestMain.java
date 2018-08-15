@@ -15,7 +15,7 @@ public class TestMain {
 
         System.setProperty("exp1", "true");
         System.setProperty("exp2", "true");
-        System.setProperty("spring.profiles.active", "~task");
+        System.setProperty("spring.profiles.active", "~task,all");
         SpringLauncher.asBean(TestBean.class).doService();
         ApplicationContext context = SpringLauncher.asContext(TestBean.class);
         context.getBean(TestBean.class).doService();

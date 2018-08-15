@@ -1,7 +1,5 @@
 package com.cudrania.spring.condition;
 
-import com.cudrania.spring.condition.ProfilesParser.Profiles;
-
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.Ordered;
@@ -26,15 +24,28 @@ public class OnProfileCondition extends OnBaseCondition<ConditionalOnProfile> im
 
     @Override
     public boolean matches(ConditionContext context, AnnotationAttributes attributes) {
-
-        Environment environment = context.getEnvironment();
-        Set<String> activeProfiles = new HashSet<>(Arrays.asList(environment.getActiveProfiles()));
-        Set<String> defaultProfiles = new HashSet<>(Arrays.asList(environment.getDefaultProfiles()));
-        String expression = (String) attributes.get("value");
-        Profiles profiles = ProfilesParser.parse(expression);
-        return profiles.matches(profile -> activeProfiles.contains(profile) || activeProfiles.isEmpty()
-                && defaultProfiles.contains(profile));
+        return ((Operator) attributes.get("operator"))
+                .matches((String[]) attributes.get("value"),
+                        new ProfilesSpec(context),
+                        (v, c) -> c.matches(v));
     }
 
 
+    static class ProfilesSpec {
+        Set<String> activeProfiles;
+        Set<String> defaultProfiles;
+
+        ProfilesSpec(ConditionContext context) {
+            Environment environment = context.getEnvironment();
+            activeProfiles = new HashSet<>(Arrays.asList(environment.getActiveProfiles()));
+            defaultProfiles = new HashSet<>(Arrays.asList(environment.getDefaultProfiles()));
+        }
+
+        boolean matches(String expression) {
+            return ProfilesParser.parse(expression)
+                    .matches(profile -> activeProfiles.contains(profile)
+                            || activeProfiles.isEmpty() && defaultProfiles.contains(profile));
+        }
+
+    }
 }
