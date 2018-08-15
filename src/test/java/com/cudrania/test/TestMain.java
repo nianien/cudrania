@@ -23,13 +23,13 @@ public class TestMain {
         System.setProperty("exp1", "true");
         System.setProperty("exp2", "true");
         System.setProperty("spring.profiles.active", "~task,all");
-        SpringLauncher.asBean(TestBean.class).doService();
         context = SpringLauncher.asContext(TestBean.class);
     }
 
 
     @Test//(expected = NoSuchBeanDefinitionException.class)
     public void testDoService() {
+        SpringLauncher.asBean(TestBean.class).doService();
         context.getBean(TestBean.class).doService();
         SpringLauncher.run(TestBean.class, "doService");
     }
