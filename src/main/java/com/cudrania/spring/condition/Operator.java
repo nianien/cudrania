@@ -12,6 +12,9 @@ public enum Operator {
          * @return
          */
         public <Value, Context> boolean matches(Value[] values, Context context, BiPredicate<Value, Context> predicate) {
+            if (values.length == 0) {
+                return false;
+            }
             boolean matched = true;
             for (Value value : values) {
                 matched &= predicate.test(value, context);
@@ -30,6 +33,9 @@ public enum Operator {
          * @return
          */
         public <Value, Context> boolean matches(Value[] values, Context context, BiPredicate<Value, Context> predicate) {
+            if (values.length == 0) {
+                return false;
+            }
             boolean matched = false;
             for (Value value : values) {
                 matched |= predicate.test(value, context);
