@@ -2,6 +2,7 @@ package com.cudrania.spring.condition;
 
 import org.springframework.context.annotation.Conditional;
 import org.springframework.core.annotation.AliasFor;
+import org.springframework.stereotype.Component;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -30,6 +31,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Documented
 @Conditional(TaskSelector.class)
+@Component
 public @interface Task {
 
     @AliasFor("value")
@@ -43,6 +45,6 @@ public @interface Task {
      *
      * @return
      */
-    String key() default "";
+    String key() default "task";
 
 }

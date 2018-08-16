@@ -1,22 +1,18 @@
 package com.cudrania.spring.condition;
 
+import com.nianien.core.text.Wildcard;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
-import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.classreading.AnnotationMetadataReadingVisitor;
 import org.springframework.core.type.classreading.MethodMetadataReadingVisitor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
-import static com.nianien.core.text.RegexUtils.matchWildcard;
 import static java.beans.Introspector.decapitalize;
 import static org.springframework.util.ClassUtils.getShortName;
 
@@ -30,78 +26,86 @@ public class TaskSelector implements Condition {
 
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        Environment environment = context.getEnvironment();
         Map<String, Object> attributes = metadata.getAnnotationAttributes(Task.class.getName());
-        String[] values = getTaskNames(metadata, new Class[]{
-                Task.class,
-                Component.class,
-                Bean.class
-        });
-
+        String value = (String) attributes.get("value");
+        if (StringUtils.isEmpty(value)) {
+            if (metadata instanceof AnnotationMetadataReadingVisitor) {
+                value = valueByComponent(metadata);
+            } else if (metadata instanceof MethodMetadataReadingVisitor) {
+                value = valueByBean(metadata);
+            }
+        }
+        if (StringUtils.isEmpty(value)) {
+            return false;
+        }
         String key = (String) attributes.get("key");
         if (StringUtils.isEmpty(key)) {
             key = "task";
         }
-        String[] tasks = environment.getProperty(key, "").split("[,;]");
-        return select(values, tasks);
+        String[] tasks = context.getEnvironment().getProperty(key, "").split("[,;]");
+        return select(value, tasks);
     }
 
     /**
-     * 获取任务名字列表
+     * 获取{@link Component}声明的beanName
      *
      * @param metadata
-     * @param classes
      * @return
      */
-    private String[] getTaskNames(AnnotatedTypeMetadata metadata, Class<? extends Annotation>[] classes) {
-        for (Class<? extends Annotation> clazz : classes) {
-            List<String> names = new ArrayList<>();
-            if (metadata.isAnnotated(clazz.getName())) {
-                Object value = metadata.getAnnotationAttributes(clazz
-                        .getName())
-                        .get("value");
-                if (value instanceof String) {
-                    names.add((String) value);
-                } else if (value instanceof String[]) {
-                    names.addAll(Arrays.asList((String[]) value));
+    private String valueByComponent(AnnotatedTypeMetadata metadata) {
+        String annotationName = Component.class.getName();
+        if (metadata.isAnnotated(annotationName)) {
+            String value = (String) metadata.getAnnotationAttributes(annotationName).get("value");
+            if (StringUtils.isEmpty(value)) {
+                return value;
+            }
+        }
+        String shortClassName = getShortName(((AnnotationMetadataReadingVisitor) metadata).getClassName());
+        return decapitalize(shortClassName);
+    }
+
+    /**
+     * 获取{@link Bean}声明的beanName<br/>
+     * 如果bean声明多个名称,则取第一个
+     *
+     * @param metadata
+     * @return
+     */
+    private String valueByBean(AnnotatedTypeMetadata metadata) {
+        String annotationName = Bean.class.getName();
+        if (metadata.isAnnotated(annotationName)) {
+            String[] values = (String[]) metadata.getAnnotationAttributes(annotationName).get("value");
+            for (String value : values) {
+                if (StringUtils.isEmpty(value)) {
+                    return value;
                 }
             }
-            names.remove("");
-            if (!names.isEmpty()) {
-                return names.toArray(new String[0]);
-            }
         }
-        if (metadata instanceof AnnotationMetadataReadingVisitor) {
-            String shortClassName = getShortName(((AnnotationMetadataReadingVisitor) metadata).getClassName());
-            return new String[]{decapitalize(shortClassName)};
-        } else if (metadata instanceof MethodMetadataReadingVisitor) {
-            return new String[]{decapitalize(((MethodMetadataReadingVisitor) metadata).getMethodName())};
-        }
-        return new String[0];
+        return decapitalize(((MethodMetadataReadingVisitor) metadata).getMethodName());
     }
 
-    private static boolean select(String[] strings, String... patterns) {
-        for (String string : strings) {
-            if (select(string, patterns)) {
-                return true;
-            }
-        }
-        return false;
-    }
 
+    /**
+     * 判断是否匹配指定字符串模式<br/>
+     * 这里字符串模式支持通配符,多个匹配模型以","或";"分割<br/>
+     * 匹配模式以"!"开始表示否定匹配
+     *
+     * @param string
+     * @param patterns
+     * @return
+     */
     private static boolean select(String string, String... patterns) {
         boolean match = false;
         for (String pattern : patterns) {
             if (pattern.startsWith("!")) {
-                if (matchWildcard(pattern.substring(1), string)) {
+                if (Wildcard.match(string, pattern.substring(1))) {
                     return false;
                 }
             } else {
-                match |= matchWildcard(pattern, string);
+                match |= Wildcard.match(string, pattern);
             }
         }
         return match;
-
     }
 
 }
