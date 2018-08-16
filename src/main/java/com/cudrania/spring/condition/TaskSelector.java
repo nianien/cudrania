@@ -56,7 +56,7 @@ public class TaskSelector implements Condition {
         String annotationName = Component.class.getName();
         if (metadata.isAnnotated(annotationName)) {
             String value = (String) metadata.getAnnotationAttributes(annotationName).get("value");
-            if (StringUtils.isEmpty(value)) {
+            if (!StringUtils.isEmpty(value)) {
                 return value;
             }
         }
@@ -76,7 +76,7 @@ public class TaskSelector implements Condition {
         if (metadata.isAnnotated(annotationName)) {
             String[] values = (String[]) metadata.getAnnotationAttributes(annotationName).get("value");
             for (String value : values) {
-                if (StringUtils.isEmpty(value)) {
+                if (!StringUtils.isEmpty(value)) {
                     return value;
                 }
             }
