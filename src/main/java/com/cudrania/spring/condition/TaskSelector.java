@@ -98,11 +98,11 @@ public class TaskSelector implements Condition {
         boolean match = false;
         for (String pattern : patterns) {
             if (pattern.startsWith("!")) {
-                if (Wildcard.match(string, pattern.substring(1))) {
+                if (Wildcard.match(pattern.substring(1),string)) {
                     return false;
                 }
             } else {
-                match |= Wildcard.match(string, pattern);
+                match |= Wildcard.match(pattern,string);
             }
         }
         return match;
