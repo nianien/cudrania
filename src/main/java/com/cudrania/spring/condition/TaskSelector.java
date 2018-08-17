@@ -12,6 +12,7 @@ import org.springframework.core.type.classreading.MethodMetadataReadingVisitor;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -137,9 +138,12 @@ public class TaskSelector implements Condition {
      */
     public static String showTasks() {
         StringBuilder sb = new StringBuilder("============================\n name | group | description \n============================\n");
-
+        String max = taskSpecs.keySet().stream().max(Comparator.comparingInt(String::length)).orElse("");
         for (TaskSpec spec : taskSpecs.values()) {
-            sb.append(StringUtils.rightPad(spec.name, 20)).append(" | ").append(spec.group).append(" | ").append(spec.desc)
+            sb.append(StringUtils.rightPad(spec.name, max.length())).append(" | ").append(spec.group).append
+                    (" | ")
+                    .append(spec
+                            .desc)
                     .append
                             ("\n");
         }
