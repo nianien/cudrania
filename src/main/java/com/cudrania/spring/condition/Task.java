@@ -34,6 +34,11 @@ import java.lang.annotation.Target;
 @Component
 public @interface Task {
 
+    /**
+     * 任务名称
+     *
+     * @return
+     */
     @AliasFor("value")
     String name() default "";
 
@@ -41,10 +46,18 @@ public @interface Task {
     String value() default "";
 
     /**
-     * 用于选择任务的系统属性
+     * 任务描述
      *
      * @return
      */
-    String key() default "task";
+    String desc() default "";
+
+    /**
+     * 分组名称,可通过该系统属性配置任务过滤表达式<br/>
+     * 默认值为task, 如: -Dtask="*,!test*",
+     *
+     * @return
+     */
+    String group() default "task";
 
 }

@@ -1,6 +1,7 @@
 package com.cudrania.spring.condition;
 
 import com.nianien.core.text.Wildcard;
+import com.nianien.core.util.StringUtils;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Condition;
@@ -9,8 +10,9 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.core.type.classreading.AnnotationMetadataReadingVisitor;
 import org.springframework.core.type.classreading.MethodMetadataReadingVisitor;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static java.beans.Introspector.decapitalize;
@@ -24,26 +26,35 @@ import static org.springframework.util.ClassUtils.getShortName;
  */
 public class TaskSelector implements Condition {
 
+    /**
+     * 任务列表
+     */
+    private static Map<String, TaskSpec> taskSpecs = new LinkedHashMap<>();
+
     @Override
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
-        Map<String, Object> attributes = metadata.getAnnotationAttributes(Task.class.getName());
-        String value = (String) attributes.get("value");
-        if (StringUtils.isEmpty(value)) {
-            if (metadata instanceof AnnotationMetadataReadingVisitor) {
-                value = valueByComponent(metadata);
-            } else if (metadata instanceof MethodMetadataReadingVisitor) {
-                value = valueByBean(metadata);
-            }
-        }
-        if (StringUtils.isEmpty(value)) {
+        if (!metadata.isAnnotated(Task.class.getName())) {
             return false;
         }
-        String key = (String) attributes.get("key");
-        if (StringUtils.isEmpty(key)) {
-            key = "task";
+        Map<String, Object> attributes = metadata.getAnnotationAttributes(Task.class.getName());
+        String name = (String) attributes.get("name");
+        if (StringUtils.isEmpty(name)) {
+            if (metadata instanceof AnnotationMetadataReadingVisitor) {
+                name = valueByComponent(metadata);
+            } else if (metadata instanceof MethodMetadataReadingVisitor) {
+                name = valueByBean(metadata);
+            }
         }
-        String[] tasks = context.getEnvironment().getProperty(key, "").split("[,;]");
-        return select(value, tasks);
+        if (StringUtils.isEmpty(name)) {
+            return false;
+        }
+        String desc = StringUtils.defaultIfEmpty((String) attributes.get("desc"), "");
+        String group = StringUtils.defaultIfEmpty((String) attributes.get("group"), "task");
+
+        String[] tasks = context.getEnvironment().getProperty(group, "").split("[,;]");
+        boolean selected = select(name, tasks);
+        taskSpecs.put(name, new TaskSpec(name, group, desc, selected));
+        return selected;
     }
 
     /**
@@ -98,14 +109,64 @@ public class TaskSelector implements Condition {
         boolean match = false;
         for (String pattern : patterns) {
             if (pattern.startsWith("!")) {
-                if (Wildcard.match(pattern.substring(1),string)) {
+                if (Wildcard.match(pattern.substring(1), string)) {
                     return false;
                 }
             } else {
-                match |= Wildcard.match(pattern,string);
+                match |= Wildcard.match(pattern, string);
             }
         }
         return match;
     }
 
+
+    /**
+     * 获取索引扫描到的任务
+     *
+     * @return
+     */
+    public static Collection<TaskSpec> getTasks() {
+        return taskSpecs.values();
+    }
+
+
+    /**
+     * 打印任务列表
+     *
+     * @return
+     */
+    public static String showTasks() {
+        StringBuilder sb = new StringBuilder("============================\n name | group | description \n============================\n");
+
+        for (TaskSpec spec : taskSpecs.values()) {
+            sb.append(StringUtils.rightPad(spec.name, 20)).append(" | ").append(spec.group).append(" | ").append(spec.desc)
+                    .append
+                            ("\n");
+        }
+        return sb.toString();
+    }
+
+    public class TaskSpec {
+        public final String name;
+        public final String group;
+        public final String desc;
+        public final boolean enabled;
+
+        TaskSpec(String name, String group, String desc, boolean enabled) {
+            this.name = name;
+            this.enabled = enabled;
+            this.group = group;
+            this.desc = desc;
+        }
+
+        @Override
+        public String toString() {
+            return "TaskSpec{" +
+                    "name='" + name + '\'' +
+                    ", group='" + group + '\'' +
+                    ", desc='" + desc + '\'' +
+                    ", enabled=" + enabled +
+                    '}';
+        }
+    }
 }
