@@ -137,8 +137,13 @@ public class TaskSelector implements Condition {
      * @return
      */
     public static String showTasks() {
-        StringBuilder sb = new StringBuilder("============================\n name | group | description \n============================\n");
+        StringBuilder sb = new StringBuilder("============================\n");
+
         String max = taskSpecs.keySet().stream().max(Comparator.comparingInt(String::length)).orElse("");
+        sb.append(StringUtils.rightPad("name", max.length()))
+                .append(" | ").append("group")
+                .append(" | ").append("description")
+                .append("\n============================\n");
         for (TaskSpec spec : taskSpecs.values()) {
             sb.append(StringUtils.rightPad(spec.name, max.length())).append(" | ").append(spec.group).append
                     (" | ")
