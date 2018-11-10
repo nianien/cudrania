@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
  * 如果上述注解也未指定,则默认取类名或方法名,并首字母小写
  * </li>
  * <li>
- * {@link #key()}用于选择任务的系统属性, 默认为task<br/>
+ * {@link #name()}用于选择任务的系统属性, 默认为task<br/>
  * 属性值支持通配符, 多个匹配模式以","分割, 反向选择使用"!"<br/>
  * 如: -Dtask="*Task,!*test*", 表示加载所有以Task结尾, 但不包含test的任务
  * </li>
