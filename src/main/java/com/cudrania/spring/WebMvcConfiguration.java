@@ -4,13 +4,13 @@ import com.cudrania.spring.handlermapping.IdealRequestMappingHandlerMapping;
 import com.cudrania.spring.handlermapping.RequestMappingConfiguration;
 import com.cudrania.spring.resolver.GlobalHandlerExceptionResolver;
 import com.cudrania.spring.resolver.ScopeAttributeMethodProcessor;
-import com.cudrania.validation.ResourceBundleMessageInterpolator;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.nianien.core.util.StringUtils;
 
+import org.hibernate.validator.messageinterpolation.ResourceBundleMessageInterpolator;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;

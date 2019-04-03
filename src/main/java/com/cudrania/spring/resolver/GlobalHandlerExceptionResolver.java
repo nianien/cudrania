@@ -6,7 +6,6 @@ import com.nianien.core.util.StringUtils;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSourceResolvable;
-import org.springframework.core.ErrorCoded;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.ReflectionUtils;
@@ -80,7 +79,7 @@ public class GlobalHandlerExceptionResolver extends AbstractHandlerExceptionReso
             return null;
         ex.printStackTrace();
         Locale locale = RequestContextUtils.getLocaleResolver(request).resolveLocale(request);
-        WebApplicationContext context = RequestContextUtils.getWebApplicationContext(request);
+        WebApplicationContext context = RequestContextUtils.findWebApplicationContext(request);
 
         MappingJackson2JsonView view = new MappingJackson2JsonView();
         view.setExtractValueFromSingleKeyModel(true);
@@ -102,9 +101,6 @@ public class GlobalHandlerExceptionResolver extends AbstractHandlerExceptionReso
         Errors errors = getErrors(ex);
         errorResponse.setFields(renderErrors(context, errors, locale));
 
-        if (ex instanceof ErrorCoded) {
-            errorResponse.setErrorCode(((ErrorCoded) ex).getErrorCode());
-        }
         if (ex instanceof MessageSourceResolvable) {
             errorResponse.setMessage(context.getMessage((MessageSourceResolvable) ex, locale));
         } else if (isDefinedException(ex)) {

@@ -1,13 +1,15 @@
 package com.cudrania.validation;
 
-import org.hibernate.validator.internal.engine.ConstraintValidatorContextImpl;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.Map;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
 
 /**
  * {@link ConstraintValidator}接口的增强实现,针对基于{@link ConstraintValidatorContextImpl}的实现,支持动态修改注解的属性值
