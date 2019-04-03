@@ -2,11 +2,17 @@ package com.cudrania.hibernate;
 
 import com.cudrania.hibernate.transformer.BeanResultTransFormer;
 import com.cudrania.hibernate.transformer.MapResultTransFormer;
+
 import org.apache.commons.collections.CollectionUtils;
-import org.hibernate.*;
+import org.hibernate.Criteria;
+import org.hibernate.SQLQuery;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.jdbc.Work;
 import org.hibernate.metadata.ClassMetadata;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.hibernate.type.StandardBasicTypes;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
@@ -14,23 +20,40 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 
-import javax.annotation.Resource;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URL;
-import java.sql.*;
-import java.util.*;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Ref;
+import java.sql.SQLException;
+import java.sql.SQLXML;
+import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+
+import javax.annotation.Resource;
 
 /**
- * 基于Hibernate 4.x的数据库访问实现<br/>
+ * 基于Hibernate 5.x的数据库访问实现<br/>
  *
  * @author skyfalling
- * @see #setParameters(org.hibernate.Query, Object...)
+ * @see #setParameters(Query, Object...)
  */
 @Repository
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -200,7 +223,7 @@ public class HibernateDao {
      * @param sql
      * @param parameters
      * @return
-     * @see #setParameters(org.hibernate.Query, Object...)
+     * @see #setParameters(Query, Object...)
      */
     public List<Map<String, ?>> sqlQuery(String sql, Object... parameters) {
         return createSQLQuery(sql, parameters).setResultTransformer(new MapResultTransFormer()).list();
@@ -215,7 +238,7 @@ public class HibernateDao {
      * @param parameters
      * @param <T>
      * @return
-     * @see #setParameters(org.hibernate.Query, Object...)
+     * @see #setParameters(Query, Object...)
      */
     public <T> List<T> sqlQuery(Class<T> beanClass, String sql, Object... parameters) {
         return setQueryType(createSQLQuery(sql, parameters), beanClass).list();
@@ -228,7 +251,7 @@ public class HibernateDao {
      * @param hql
      * @param parameters
      * @return
-     * @see #setParameters(org.hibernate.Query, Object...)
+     * @see #setParameters(Query, Object...)
      */
     public List hqlQuery(String hql, Object... parameters) {
         return createQuery(hql, parameters).list();
@@ -244,7 +267,7 @@ public class HibernateDao {
      * @param sql
      * @param parameters
      * @return
-     * @see #setParameters(org.hibernate.Query, Object...)
+     * @see #setParameters(Query, Object...)
      */
     public Page<Map<String, ?>> sqlPageQuery(Page page, String sql, Object... parameters) {
         Query query = createSQLQuery(sql, parameters).setResultTransformer(new MapResultTransFormer());
@@ -268,10 +291,10 @@ public class HibernateDao {
      * @param parameters
      * @param <T>
      * @return
-     * @see #setParameters(org.hibernate.Query, Object...)
+     * @see #setParameters(Query, Object...)
      */
     public <T> Page<T> sqlPageQuery(Page<T> page, Class<T> beanClass, String sql, Object... parameters) {
-        SQLQuery query = setQueryType(createSQLQuery(sql, parameters), beanClass);
+        NativeQuery query = setQueryType(createSQLQuery(sql, parameters), beanClass);
         pageQuery(query, page);
         if (page.isAutoCount() && page.getTotalCount() == 0) {
             page.setTotalCount(countSql(sql, parameters));
@@ -289,7 +312,7 @@ public class HibernateDao {
      * @param hql
      * @param parameters
      * @return
-     * @see #setParameters(org.hibernate.Query, Object...)
+     * @see #setParameters(Query, Object...)
      */
     public Page hqlPageQuery(Page page, String hql, Object... parameters) {
         Query query = createQuery(hql, parameters);
@@ -323,7 +346,7 @@ public class HibernateDao {
      * @param sql
      * @param parameters
      * @return
-     * @see #setParameters(org.hibernate.Query, Object...)
+     * @see #setParameters(Query, Object...)
      */
     public Map<String, ?> sqlUniqueQuery(String sql, Object... parameters) {
         List<Map<String, ?>> list = sqlQuery(sql, parameters);
@@ -339,7 +362,7 @@ public class HibernateDao {
      * @param sql
      * @param parameters
      * @return
-     * @see #setParameters(org.hibernate.Query, Object...)
+     * @see #setParameters(Query, Object...)
      */
     public <T> T sqlUniqueQuery(Class<T> beanClass, String sql, Object... parameters) {
         List<T> list = sqlQuery(beanClass, sql, parameters);
@@ -355,7 +378,7 @@ public class HibernateDao {
      * @param hql
      * @param parameters
      * @return
-     * @see #setParameters(org.hibernate.Query, Object...)
+     * @see #setParameters(Query, Object...)
      */
     public Object hqlUniqueQuery(String hql, Object... parameters) {
         List list = hqlQuery(hql, parameters);
@@ -374,7 +397,7 @@ public class HibernateDao {
      * @return
      */
     public long countSql(String sql, Object... parameters) {
-        Number number = (Number)createSQLQuery( "SELECT COUNT(1) count FROM (" + sql + ") tmp__",parameters).addScalar("count", StandardBasicTypes.LONG).uniqueResult();
+        Number number = (Number) createSQLQuery("SELECT COUNT(1) count FROM (" + sql + ") tmp__", parameters).addScalar("count", StandardBasicTypes.LONG).uniqueResult();
         return number.longValue();
     }
 
@@ -395,9 +418,9 @@ public class HibernateDao {
      * @param sql
      * @param parameters
      * @return
-     * @see #setParameters(org.hibernate.Query, Object...)
+     * @see #setParameters(Query, Object...)
      */
-    public SQLQuery createSQLQuery(String sql, Object... parameters) {
+    public NativeQuery createSQLQuery(String sql, Object... parameters) {
         return setParameters(getSession().createSQLQuery(sql), parameters);
     }
 
@@ -407,7 +430,7 @@ public class HibernateDao {
      * @param hql
      * @param parameters
      * @return
-     * @see #setParameters(org.hibernate.Query, Object...)
+     * @see #setParameters(Query, Object...)
      */
     public Query createQuery(String hql, Object... parameters) {
         return setParameters(getSession().createQuery(hql), parameters);
@@ -432,7 +455,7 @@ public class HibernateDao {
      * @param sql
      * @param parameters
      * @return the number of entities updated or deleted.
-     * @see #setParameters(org.hibernate.Query, Object...)
+     * @see #setParameters(Query, Object...)
      */
     @Transactional
     public int execute(String sql, Object... parameters) {
@@ -446,15 +469,12 @@ public class HibernateDao {
      */
     @Transactional
     public void executeBatch(final String... sqlList) {
-        getSession().doWork(new Work() {
-
-            public void execute(Connection connection) throws SQLException {
-                Statement stmt = connection.createStatement();
-                for (String sql : sqlList) {
-                    stmt.addBatch(sql);
-                }
-                stmt.executeBatch();
+        getSession().doWork(connection -> {
+            Statement stmt = connection.createStatement();
+            for (String sql : sqlList) {
+                stmt.addBatch(sql);
             }
+            stmt.executeBatch();
         });
     }
 
@@ -575,7 +595,7 @@ public class HibernateDao {
      * @param beanClass
      * @return
      */
-    private SQLQuery setQueryType(SQLQuery query, Class beanClass) {
+    private NativeQuery setQueryType(NativeQuery query, Class beanClass) {
         if (getClassMetadata(beanClass) != null) {
             query.addEntity(beanClass);
         } else {
