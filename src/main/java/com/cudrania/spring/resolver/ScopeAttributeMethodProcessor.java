@@ -27,12 +27,7 @@ import java.util.Map;
  */
 public class ScopeAttributeMethodProcessor implements HandlerMethodArgumentResolver, HandlerMethodReturnValueHandler {
 
-    private static ThreadLocal<Map<String, Object>> localMap = new ThreadLocal<Map<String, Object>>() {
-        @Override
-        protected Map initialValue() {
-            return new HashMap<String, Object>();
-        }
-    };
+    private static ThreadLocal<Map<String, Object>> localMap = ThreadLocal.withInitial(() -> new HashMap<>());
 
 
     /**
@@ -116,7 +111,7 @@ public class ScopeAttributeMethodProcessor implements HandlerMethodArgumentResol
     }
 
     @Override
-    public void handleReturnValue(Object returnValue, MethodParameter returnType, ModelAndViewContainer mavContainer, NativeWebRequest request) throws Exception {
+    public void handleReturnValue(Object returnValue, MethodParameter returnType, ModelAndViewContainer mavContainer, NativeWebRequest request) {
         if (returnValue != null) {
             ScopeAttribute scopeAttribute = returnType.getMethodAnnotation(ScopeAttribute.class);
             if (scopeAttribute == null)
