@@ -1,9 +1,5 @@
 package com.cudrania.spring.handlermapping;
 
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.LinkedHashMap;
-
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringValueResolver;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +13,10 @@ import org.springframework.web.servlet.mvc.condition.RequestCondition;
 import org.springframework.web.servlet.mvc.condition.RequestMethodsRequestCondition;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.LinkedHashMap;
 
 /**
  * 扩展基于注解的请求映射处理类,实现自动映射功能和统一配置，具体配置项参考{@link RequestMappingConfiguration}<br/>
@@ -56,12 +56,7 @@ public class IdealRequestMappingHandlerMapping extends
     /**
      * 类名及方法名的处理
      */
-    private StringValueResolver nameResolver = new StringValueResolver() {
-        @Override
-        public String resolveStringValue(String strVal) {
-            return strVal;
-        }
-    };
+    private StringValueResolver nameResolver = strVal -> strVal;
 
     /**
      * 默认构造方法
