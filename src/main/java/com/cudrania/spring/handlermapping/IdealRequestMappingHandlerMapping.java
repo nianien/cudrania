@@ -1,5 +1,6 @@
 package com.cudrania.spring.handlermapping;
 
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.StringValueResolver;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -97,8 +98,8 @@ public class IdealRequestMappingHandlerMapping extends
         int mod = method.getModifiers();
         if (Modifier.isPublic(mod) /*必须是public方法*/
                 && !Modifier.isStatic(mod) /*必须是成员方法*/
-                && AnnotationUtils.findAnnotation(handlerType, NotMapping.class) == null /*类型上未添加@NotMapping注解*/
-                && AnnotationUtils.findAnnotation(method, NotMapping.class) == null /*方法上未添加@NotMapping注解*/) {
+                && AnnotatedElementUtils.findMergedAnnotation(handlerType, NotMapping.class) == null /*类型上未添加@NotMapping注解*/
+                && AnnotatedElementUtils.findMergedAnnotation(method, NotMapping.class) == null /*方法上未添加@NotMapping注解*/) {
             RequestMappingInfo typeRequestMappingInfo =
                     createRequestMappingInfo(createRequestMappingConfig(handlerType),
                             getCustomTypeCondition(handlerType));
@@ -117,7 +118,7 @@ public class IdealRequestMappingHandlerMapping extends
      * @return
      */
     protected RequestMappingAnnotationWrapper createRequestMappingConfig(Class handlerType) {
-        RequestMapping annotation = AnnotationUtils.findAnnotation(handlerType, RequestMapping.class);
+        RequestMapping annotation = AnnotatedElementUtils.findMergedAnnotation(handlerType,RequestMapping.class);
         RequestMappingAnnotationWrapper config = new RequestMappingAnnotationWrapper(annotation);
         Package aPackage = handlerType.getPackage();
         String baseName = (aPackage != null ? aPackage.getName() : "").replaceAll(packagePattern, packageReplacement);
