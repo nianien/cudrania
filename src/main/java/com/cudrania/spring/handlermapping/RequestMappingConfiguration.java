@@ -1,6 +1,7 @@
 package com.cudrania.spring.handlermapping;
 
 import org.springframework.util.StringValueResolver;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.LinkedHashMap;
@@ -101,7 +102,8 @@ public class RequestMappingConfiguration {
     }
 
     /**
-     * 设置匹配类名的替换表达式,默认值"$1"
+     * 设置匹配类名的替换表达式,默认值"$1"<br/>
+     * 如果类上标准的{@link RequestMapping#path()}为绝对路径,则不加前缀
      *
      * @param classReplacement
      */

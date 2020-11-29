@@ -106,10 +106,13 @@ public class IdealRequestMappingHandlerMapping extends
      */
     protected RequestMappingWrapper resolveRequestMapping(Class handlerType) {
         Package aPackage = handlerType.getPackage();
-        String baseName = (aPackage != null ? aPackage.getName() : "").replaceAll(packagePattern, packageReplacement);
-        String defaultName = nameResolver.resolveStringValue(handlerType.getSimpleName().replaceAll(classPattern, classReplacement));
+        String baseUrl = (aPackage != null ? aPackage.getName() : "")
+                .replaceFirst(packagePattern, packageReplacement)
+                .replace('.', '/');
+        String defaultName = nameResolver.resolveStringValue(handlerType.getSimpleName()
+                .replaceAll(classPattern, classReplacement));
         RequestMappingWrapper wrapper = new RequestMappingWrapper(findAnnotation(handlerType, RequestMapping.class));
-        wrapper.path(combineURL(baseName, wrapper.value(), defaultName));
+        wrapper.path(combineURL(baseUrl, wrapper.value(), defaultName));
         return wrapper;
     }
 
@@ -170,7 +173,7 @@ public class IdealRequestMappingHandlerMapping extends
             if (!url.startsWith("/")) {
                 url = baseUrl + "/" + url;
             }
-            urls[i++] = url.replace('.', '/').replaceAll("/+", "/");
+            urls[i++] = url.replaceAll("/+", "/");
         }
         return urls;
     }
