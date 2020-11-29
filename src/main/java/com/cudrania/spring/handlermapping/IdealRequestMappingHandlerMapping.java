@@ -109,7 +109,7 @@ public class IdealRequestMappingHandlerMapping extends
         String baseName = (aPackage != null ? aPackage.getName() : "").replaceAll(packagePattern, packageReplacement);
         String defaultName = nameResolver.resolveStringValue(handlerType.getSimpleName().replaceAll(classPattern, classReplacement));
         RequestMappingWrapper wrapper = new RequestMappingWrapper(findAnnotation(handlerType, RequestMapping.class));
-        wrapper.path(combineURL(baseName, defaultName, wrapper.value()));
+        wrapper.path(combineURL(baseName, wrapper.value(), defaultName));
         return wrapper;
     }
 
@@ -123,7 +123,7 @@ public class IdealRequestMappingHandlerMapping extends
         RequestMappingWrapper wrapper = new RequestMappingWrapper(findAnnotation(method, RequestMapping.class));
         String methodName = method.getName();
         String defaultName = nameResolver.resolveStringValue(methodName);
-        wrapper.path(combineURL("", defaultName, wrapper.value()));
+        wrapper.path(combineURL("", wrapper.value(), defaultName));
 
         if (wrapper.method().length == 0) {
             //默认RequestMethod
@@ -156,22 +156,21 @@ public class IdealRequestMappingHandlerMapping extends
      * 组合URL, 如果指定urls不为空,使用base+urls组合, 否则使用baseUrl+defaultUrl组合
      *
      * @param baseUrl    基本路径
-     * @param defaultUrl 默认路径
      * @param urls       URL组
+     * @param defaultUrl 默认路径
      * @return
      */
-    private String[] combineURL(String baseUrl, String defaultUrl, String[] urls) {
-        defaultUrl = "/" + defaultUrl;
+    private String[] combineURL(String baseUrl, String[] urls, String defaultUrl) {
         if (urls == null || urls.length == 0) {
             urls = new String[]{defaultUrl};
         }
         int i = 0;
-        for (String value : urls) {
+        for (String url : urls) {
             //不是绝对路径,自动添加类路径
-            if (!value.startsWith("/")) {
-                value = defaultUrl + "/" + value;
+            if (!url.startsWith("/")) {
+                url = baseUrl + "/" + url;
             }
-            urls[i++] = (baseUrl + "/" + value).replace('.', '/').replaceAll("/+", "/");
+            urls[i++] = url.replace('.', '/').replaceAll("/+", "/");
         }
         return urls;
     }
