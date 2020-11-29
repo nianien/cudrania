@@ -12,93 +12,94 @@ import java.lang.annotation.Annotation;
  */
 public class RequestMappingWrapper implements RequestMapping {
 
-  private String[] value = new String[0];
-  private RequestMethod[] method = new RequestMethod[0];
-  private String[] params = new String[0];
-  private String[] headers = new String[0];
-  private String[] consumes = new String[0];
-  private String[] produces = new String[0];
-  private RequestMapping annotation;
+    private String[] path = new String[0];
+    private RequestMethod[] method = new RequestMethod[0];
+    private String[] params = new String[0];
+    private String[] headers = new String[0];
+    private String[] consumes = new String[0];
+    private String[] produces = new String[0];
+    private RequestMapping annotation;
 
 
-  public RequestMappingWrapper(RequestMapping annotation) {
-    if (annotation != null) {
-      this.annotation = annotation;
-      this.value = annotation.value();
-      this.method = annotation.method();
-      this.params = annotation.params();
-      this.headers = annotation.headers();
-      this.consumes = annotation.consumes();
-      this.produces = annotation.produces();
+    public RequestMappingWrapper(RequestMapping annotation) {
+        if (annotation != null) {
+            this.annotation = annotation;
+            this.path = annotation.path();
+            this.method = annotation.method();
+            this.params = annotation.params();
+            this.headers = annotation.headers();
+            this.consumes = annotation.consumes();
+            this.produces = annotation.produces();
+        }
     }
-  }
 
 
-  @Override
-  public String name() {
-    return annotation != null ? annotation.name() : "";
-  }
+    @Override
+    public String name() {
+        return annotation != null ? annotation.name() : "";
+    }
 
-  public String[] value() {
-    return value;
-  }
+    @Override
+    public String[] value() {
+        return path;
+    }
 
-  @Override
-  public String[] path() {
-    return new String[0];
-  }
+    @Override
+    public String[] path() {
+        return path;
+    }
 
-  public void value(String[] value) {
-    this.value = value;
-  }
+    public void path(String[] path) {
+        this.path = path;
+    }
 
-  @Override
-  public RequestMethod[] method() {
-    return method;
-  }
+    @Override
+    public RequestMethod[] method() {
+        return method;
+    }
 
-  public void method(RequestMethod[] method) {
-    this.method = method;
-  }
+    public void method(RequestMethod[] method) {
+        this.method = method;
+    }
 
-  @Override
-  public String[] params() {
-    return params;
-  }
+    @Override
+    public String[] params() {
+        return params;
+    }
 
-  public void params(String[] params) {
-    this.params = params;
-  }
+    public void params(String[] params) {
+        this.params = params;
+    }
 
-  @Override
-  public String[] headers() {
-    return headers;
-  }
+    @Override
+    public String[] headers() {
+        return headers;
+    }
 
-  public void headers(String[] headers) {
-    this.headers = headers;
-  }
+    public void headers(String[] headers) {
+        this.headers = headers;
+    }
 
-  @Override
-  public String[] consumes() {
-    return consumes;
-  }
+    @Override
+    public String[] consumes() {
+        return consumes;
+    }
 
-  public void consumes(String[] consumes) {
-    this.consumes = consumes;
-  }
+    public void consumes(String[] consumes) {
+        this.consumes = consumes;
+    }
 
-  @Override
-  public String[] produces() {
-    return produces;
-  }
+    @Override
+    public String[] produces() {
+        return produces;
+    }
 
-  public void produces(String[] produces) {
-    this.produces = produces;
-  }
+    public void produces(String[] produces) {
+        this.produces = produces;
+    }
 
-  @Override
-  public Class<? extends Annotation> annotationType() {
-    return annotation != null ? annotation.annotationType() : null;
-  }
+    @Override
+    public Class<? extends Annotation> annotationType() {
+        return annotation != null ? annotation.annotationType() : null;
+    }
 }
