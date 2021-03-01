@@ -75,14 +75,11 @@ public abstract class DBUnit4SpringContextTests extends AbstractTransactionalJUn
             }
         } else {
             File dir = this.applicationContext.getResource(sqlScriptLoader.sqlDir()).getFile();
-            dir.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    if (name.toLowerCase().endsWith(".sql")) {
-                        join(sqlScripts, name);
-                    }
-                    return false;
+            dir.listFiles((dir1, name) -> {
+                if (name.toLowerCase().endsWith(".sql")) {
+                    join(sqlScripts, name);
                 }
+                return false;
             });
         }
         return sqlScripts.toArray(new String[0]);
