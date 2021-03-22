@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<properties xmlns="http://www.nianien.com/properties"
+<properties xmlns="http://www.cudrania.com/properties"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.nianien.com/properties http://www.nianien.com/properties/properties-1.0.xsd">
+	xsi:schemaLocation="http://www.cudrania.com/properties https://raw.githubusercontent.com/nianien/schema/master/properties-1.0.xsd">
 	<property key="delete" value="delete * from default" />
 	<property key="select" value="select * from default" />
 	<package name="users">
