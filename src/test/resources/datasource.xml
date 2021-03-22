@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<datasource xmlns="http://www.nianien.com/datasource"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.nianien.com/datasource http://www.nianien.com/datasource/datasource-1.0.xsd">
+	<!-- 设置默认数据源 -->
+	<default source="mysql" />
+	<source name="sqlserver" description="MSSQLSERVER 2005">
+		<config driver="com.microsoft.sqlserver.jdbc.SQLServerDriver"
+			url="jdbc:sqlserver://localhost:1433;DataBaseName=skyfalling" user="sa"
+			password="5@wuha0.com" />
+	</source>
+	<source name="mysql" description="MySQL 5.2">
+		<config driver="com.mysql.jdbc.Driver"
+			url="jdbc:mysql://127.0.0.1:3306/test?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf8" user="root"
+			password="root" />
+	</source>
+	<source name="oracle" description="Oracle 10g">
+		<config url="jdbc:oracle:thin:@127.0.0.1:1521:xe" driver="oracle.jdbc.OracleDriver" user="scott" password="tiger"/>
+	</source>
+	<source name="sqlite3">
+		<config url="jdbc:sqlite:D:\\DataBase\\Sqlite3\\skyfalling.db" driver="org.sqlite.JDBC"></config>
+        <!--<jndi jndi-name="xd"/>-->
+	</source>
+</datasource>

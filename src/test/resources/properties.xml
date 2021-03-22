@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties xmlns="http://www.nianien.com/properties"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.nianien.com/properties http://www.nianien.com/properties/properties-1.0.xsd">
+	<property key="delete" value="delete * from default" />
+	<property key="select" value="select * from default" />
+	<package name="users">
+		<property key="update" value="update users set name='?'" />
+		<package name="beijing">
+			<property key="select" value="select * from beijing where age &lt; 50" />
+		</package>
+	</package>
+	<!-- 
+	<include file="sql.properties"/>
+	 -->
+</properties>
