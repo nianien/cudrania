@@ -1215,4 +1215,74 @@ public class StringUtils {
         }
         return str.substring(pos + separator.length());
     }
+
+
+    /**
+     * 连字符&下划线转驼峰
+     *
+     * @param src
+     * @return
+     */
+    private static String toCamel(String src) {
+        StringBuilder sb = new StringBuilder();
+        boolean upper = false;
+        for (char ch : src.toCharArray()) {
+            if (ch == '-' || ch == '_') {
+                upper = true;
+            } else if (Character.isLetter(ch)) {
+                if (upper) {
+                    sb.append(Character.toUpperCase(ch));
+                    upper = false;
+                }else{
+                    sb.append(ch);
+                }
+            }
+        }
+//        String dest = Arrays.stream(src.split("[_-]"))
+//                .filter(e -> e.length() > 0)
+//                .map(e -> e.substring(0, 1).toUpperCase() + e.substring(1).toLowerCase())
+//                .collect(Collectors.joining());
+//        return dest.substring(0, 1).toLowerCase() + dest.substring(1);
+        return sb.toString();
+
+    }
+
+    /**
+     * 连字符转驼峰
+     *
+     * @param src
+     * @return
+     */
+    private static String camel2Hyphen(String src) {
+        return fromCamel(src, '-');
+    }
+
+    /**
+     * 下划线转驼峰
+     *
+     * @param src
+     * @return
+     */
+    private static String camel2Underline(String src) {
+        return fromCamel(src, '_');
+    }
+
+    /**
+     * 驼峰转分割符
+     *
+     * @param src
+     * @param separator
+     * @return
+     */
+    private static String fromCamel(String src, char separator) {
+        StringBuilder sb = new StringBuilder();
+        for (char ch : src.toCharArray()) {
+            if (Character.isUpperCase(ch)) {
+                sb.append(separator);
+            }
+            sb.append(Character.toLowerCase(ch));
+        }
+        return sb.toString();
+    }
+
 }
