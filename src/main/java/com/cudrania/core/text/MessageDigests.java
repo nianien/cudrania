@@ -1,4 +1,4 @@
-package com.cudrania.core.utils;
+package com.cudrania.core.text;
 
 import com.cudrania.core.bits.ByteUtils;
 import com.cudrania.core.exception.ExceptionChecker;
@@ -17,7 +17,7 @@ import java.security.NoSuchAlgorithmException;
  *
  * @author skyfalling
  */
-public class MessageDigestUtils {
+public class MessageDigests {
 
     private static ThreadLocal<MessageDigest> md5 = new ThreadLocal<MessageDigest>() {
         @Override

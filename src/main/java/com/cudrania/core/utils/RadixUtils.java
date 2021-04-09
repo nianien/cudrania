@@ -1,6 +1,7 @@
-package com.cudrania.core.text;
+package com.cudrania.core.utils;
 
 import com.cudrania.core.exception.ExceptionChecker;
+import com.cudrania.core.text.Characters;
 
 import java.util.stream.IntStream;
 

@@ -1,4 +1,4 @@
-package com.cudrania.core.text;
+package com.cudrania.core.utils;
 
 import com.cudrania.core.arrays.ArrayUtils;
 import com.cudrania.core.utils.StringUtils;

@@ -1,7 +1,7 @@
 package com.cudrania.test.text;
 
 import com.cudrania.core.text.HighLighter;
-import com.cudrania.core.text.RegexUtils;
+import com.cudrania.core.utils.RegexUtils;
 import com.cudrania.core.text.TextAnalyzer;
 import com.cudrania.core.text.TextAnalyzer.Fragment;
 import com.cudrania.core.text.TextAnalyzer.FragmentHandler;

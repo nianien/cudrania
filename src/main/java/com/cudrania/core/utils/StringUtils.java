@@ -2,7 +2,6 @@ package com.cudrania.core.utils;
 
 import com.cudrania.core.arrays.ArrayUtils;
 import com.cudrania.core.exception.ExceptionChecker;
-import com.cudrania.core.text.RegexUtils;
 import com.cudrania.core.text.TextAnalyzer;
 
 import java.util.Arrays;

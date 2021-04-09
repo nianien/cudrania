@@ -1,6 +1,6 @@
 package com.cudrania.test.math;
 
-import com.cudrania.core.math.Calculator;
+import com.cudrania.algorithm.Calculator;
 
 import org.junit.Test;
 

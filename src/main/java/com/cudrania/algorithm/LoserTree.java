@@ -1,4 +1,4 @@
-package com.cudrania.core.tree;
+package com.cudrania.algorithm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,8 +57,8 @@ public class LoserTree<T> {
      * @return
      */
     public List<T> merge() {
-        List<T> list = new ArrayList<T>();
-        T top = null;
+        List<T> list = new ArrayList<>();
+        T top;
         while ((top = get(tree[0])) != null) {
             list.add(top);
             put(tree[0]);

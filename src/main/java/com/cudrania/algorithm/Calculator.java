@@ -1,10 +1,10 @@
-package com.cudrania.core.math;
+package com.cudrania.algorithm;
 
 import java.util.Stack;
 
 /**
  * 计算数学表达式的工具类, 支持的运算符：'+'、'-'、'*'、'/'、'^'、'('、')'<br>
- * 另参见: {@link com.cudrania.core.math.Calculator.Operator}
+ * 另参见: {@link Calculator.Operator}
  *
  * @author skyfalling
  */
@@ -213,8 +213,8 @@ public class Calculator {
         }
 
         /**
-         * 利用当前运算符计算操作数, 该方法对于{@link com.cudrania.core.math.Calculator.Operator#Lp}和{@link
-         * com.cudrania.core.math.Calculator.Operator#Rp} 无效
+         * 利用当前运算符计算操作数, 该方法对于{@link Calculator.Operator#Lp}和{@link
+         * Calculator.Operator#Rp} 无效
          *
          * @param var1
          * @param var2

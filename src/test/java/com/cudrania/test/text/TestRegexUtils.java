@@ -1,6 +1,6 @@
 package com.cudrania.test.text;
 
-import com.cudrania.core.text.RegexUtils;
+import com.cudrania.core.utils.RegexUtils;
 
 import org.junit.Test;
 

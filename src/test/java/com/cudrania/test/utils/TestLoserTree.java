@@ -1,6 +1,6 @@
 package com.cudrania.test.utils;
 
-import com.cudrania.core.tree.LoserTree;
+import com.cudrania.algorithm.LoserTree;
 
 import org.junit.Test;
 

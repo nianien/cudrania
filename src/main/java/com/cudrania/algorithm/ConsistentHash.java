@@ -1,7 +1,7 @@
 package com.cudrania.algorithm;
 
 import com.cudrania.core.exception.ExceptionChecker;
-import com.cudrania.core.utils.MessageDigestUtils;
+import com.cudrania.core.text.MessageDigests;
 
 import java.util.TreeMap;
 
@@ -30,13 +30,13 @@ public class ConsistentHash<T> {
             size = 1;
         for (T key : nodes) {
             // 将key映射到虚拟节点
-            String virtualKey = MessageDigestUtils.md5(key.toString());
+            String virtualKey = MessageDigests.md5(key.toString());
             for (int i = 0; i < size; i++) {
                 // 计算第i个虚拟节点的哈希值
                 long m = hashCode(virtualKey);
                 keysMap.put(m, key);
                 // 映射下一个虚拟节点
-                virtualKey = MessageDigestUtils.md5(virtualKey);
+                virtualKey = MessageDigests.md5(virtualKey);
             }
         }
     }
@@ -76,7 +76,7 @@ public class ConsistentHash<T> {
     private long hashCode(String key) {
         try {
             // 十六位字节数组
-            byte[] bytes = MessageDigestUtils.md5(key.getBytes());
+            byte[] bytes = MessageDigests.md5(key.getBytes());
             // 每隔四位取一个字节
             long code = ((long) (bytes[12] & 0xFF) << 24)
                     | ((long) (bytes[8] & 0xFF) << 16)
