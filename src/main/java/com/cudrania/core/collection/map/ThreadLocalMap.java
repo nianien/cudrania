@@ -16,10 +16,10 @@ public class ThreadLocalMap<K, V> extends ThreadLocal<Map<K, V>> implements Map<
 
     @Override
     protected Map<K, V> initialValue() {
-        return new HashMap<K, V>();
+        return new HashMap<>();
     }
 
-    @Override
+/*    @Override
     public Map<K, V> get() {
         return super.get();
     }
@@ -27,7 +27,7 @@ public class ThreadLocalMap<K, V> extends ThreadLocal<Map<K, V>> implements Map<
     @Override
     public void set(Map<K, V> value) {
         super.set(value);
-    }
+    }*/
 
     @Override
     public int size() {
