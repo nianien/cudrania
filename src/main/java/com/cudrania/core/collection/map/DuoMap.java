@@ -11,7 +11,7 @@ import java.util.HashMap;
  * @param <V2>
  * @author skyfalling
  */
-public class DoubleMap<K, V1, V2> extends HashMap<K, DoubleValue<V1, V2>> {
+public class DuoMap<K, V1, V2> extends HashMap<K, DuoValue<V1, V2>> {
 
     private static final long serialVersionUID = 1L;
 
@@ -47,8 +47,8 @@ public class DoubleMap<K, V1, V2> extends HashMap<K, DoubleValue<V1, V2>> {
      * @param value2
      * @return
      */
-    public DoubleValue<V1, V2> put(K key, V1 value1, V2 value2) {
-        return this.put(key, new DoubleValue<>(value1, value2));
+    public DuoValue<V1, V2> put(K key, V1 value1, V2 value2) {
+        return this.put(key, new DuoValue<>(value1, value2));
     }
 
     /**
@@ -59,12 +59,12 @@ public class DoubleMap<K, V1, V2> extends HashMap<K, DoubleValue<V1, V2>> {
      * @return
      */
     public V1 updateValue1(K key, V1 value1) {
-        DoubleValue<V1, V2> doubleValue = this.putIfAbsent(key, new DoubleValue<>(value1, null));
-        if (doubleValue == null) {
+        DuoValue<V1, V2> duoValue = this.computeIfAbsent(key, (k) -> new DuoValue<>(value1, null));
+        if (duoValue == null) {
             return null;
         }
-        V1 old = doubleValue.getValue1();
-        doubleValue.setValue1(value1);
+        V1 old = duoValue.getValue1();
+        duoValue.setValue1(value1);
         return old;
     }
 
@@ -77,12 +77,12 @@ public class DoubleMap<K, V1, V2> extends HashMap<K, DoubleValue<V1, V2>> {
      * @return
      */
     public V2 updateValue2(K key, V2 value2) {
-        DoubleValue<V1, V2> doubleValue = this.putIfAbsent(key, new DoubleValue<>(null, value2));
-        if (doubleValue == null) {
+        DuoValue<V1, V2> duoValue = this.computeIfAbsent(key, (k) -> new DuoValue<>(null, value2));
+        if (duoValue == null) {
             return null;
         }
-        V2 old = doubleValue.getValue2();
-        doubleValue.setValue2(value2);
+        V2 old = duoValue.getValue2();
+        duoValue.setValue2(value2);
         return old;
     }
 }
