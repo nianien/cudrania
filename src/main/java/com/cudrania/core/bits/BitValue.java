@@ -118,6 +118,7 @@ public class BitValue {
      *
      * @return
      */
+    @Override
     public String toString() {
         return toString(littleEndian);
     }

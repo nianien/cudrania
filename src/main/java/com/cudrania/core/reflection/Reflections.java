@@ -700,9 +700,9 @@ public class Reflections {
      */
     public static Class<?> getClass(String className) {
         try {
-            Primitive Primitive = Reflections.Primitive.get(className);
-            if (Primitive != null)
-                return Primitive.type;
+            Primitive primitive = Reflections.Primitive.get(className);
+            if (primitive != null)
+                return primitive.type;
             return Class.forName(className);
         } catch (Exception e) {
             throw throwException(e);
@@ -716,9 +716,9 @@ public class Reflections {
      * @return
      */
     public static Class wrapClass(Class<?> clazz) {
-        Primitive Primitive = Reflections.Primitive.get(clazz);
-        if (Primitive != null)
-            return Primitive.clazz;
+        Primitive primitive = Reflections.Primitive.get(clazz);
+        if (primitive != null)
+            return primitive.clazz;
         return clazz;
     }
 

@@ -75,6 +75,7 @@ public class TextAnalyzer {
             return matched;
         }
 
+        @Override
         public String toString() {
             return "[" + begin + ":" + end() + "|" + matched + "]";
         }

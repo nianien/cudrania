@@ -66,15 +66,15 @@ public class TestExpression {
     @Test
     public void test() throws Exception {
 
-        Expression.defaultExpression.eval("{0}年{1}月{2}日,{2}/{1}/{0}", "2010", "01", "6");
-        System.out.println(Expression.defaultExpression.eval("{0}年{1}月{2}日,{0}-{1}-{2}", "2010", "01", "6"));
+        Expression.DEFAULT_INSTANCE.eval("{0}年{1}月{2}日,{2}/{1}/{0}", "2010", "01", "6");
+        System.out.println(Expression.DEFAULT_INSTANCE.eval("{0}年{1}月{2}日,{0}-{1}-{2}", "2010", "01", "6"));
 
         System.out.println(String.format("%3$s年%2$s月%1$s日,%3$s-%2$s-%1$s", "6", "01", "2010"));
         Map map = new HashMap();
         map.put("year", "<em>2012</em>");
         map.put("month", "<em>12</em>");
         map.put("day", "<em>20</em>");
-        System.out.println(Expression.defaultExpression.eval("{year}年{month}月{day}日", map));
+        System.out.println(Expression.DEFAULT_INSTANCE.eval("{year}年{month}月{day}日", map));
 
         map.put("0", 2012);
         map.put("1", 12);
@@ -82,7 +82,7 @@ public class TestExpression {
         map.put("2012", "二〇一二");
         map.put("12", "十二");
         map.put("21", "二十一");
-        System.out.println(Expression.defaultExpression.eval("{{0}}年{{1}}月{{2}}日", map));
+        System.out.println(Expression.DEFAULT_INSTANCE.eval("{{0}}年{{1}}月{{2}}日", map));
     }
 
     @Test

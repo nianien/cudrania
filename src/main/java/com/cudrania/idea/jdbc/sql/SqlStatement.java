@@ -238,7 +238,7 @@ public class SqlStatement {
      * @return
      */
     public SqlStatement append(String sql, Map<String, Object> parameters) {
-        this.parseSql(sql, parameters, originalSql, preparedSql, preparedParameters);
+        parseSql(sql, parameters, originalSql, preparedSql, preparedParameters);
         this.append("");
         return this;
     }

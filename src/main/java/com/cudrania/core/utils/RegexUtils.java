@@ -1,7 +1,6 @@
 package com.cudrania.core.utils;
 
 import com.cudrania.core.arrays.ArrayUtils;
-import com.cudrania.core.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +20,7 @@ public class RegexUtils {
     /**
      * 正则表达式中的转义字符
      */
-    private final static char[] escapeChars = new char[]{'\\', '*', '+', '?',
+    private final static char[] ESCAPE_CHARS = new char[]{'\\', '*', '+', '?',
             '|', '{', '[', '(', ')', '^', '$', '.', '#'};
 
     /**
@@ -63,7 +62,7 @@ public class RegexUtils {
      */
     public static String escapeExcept(String regex, char[] chars) {
         return escape(regex, /* 需要转义的字符 */
-                ArrayUtils.subtract(escapeChars, chars));
+                ArrayUtils.subtract(ESCAPE_CHARS, chars));
     }
 
     /**

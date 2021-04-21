@@ -12,7 +12,7 @@ public class DataTableFactory {
     /**
      * 存储Datable实例的容器,针对每个Class类型全局唯一
      */
-    private final static Map<Class, DataTable> container = new ConcurrentHashMap<Class, DataTable>();
+    private final static Map<Class, DataTable> CONTAINER = new ConcurrentHashMap<>();
 
     /**
      * 禁止实例化
@@ -27,14 +27,14 @@ public class DataTableFactory {
      * @return
      */
     private static DataTable register(Class entityClass) {
-        if (!container.containsKey(entityClass)) {
+        if (!CONTAINER.containsKey(entityClass)) {
             synchronized (entityClass) {
-                if (!container.containsKey(entityClass)) {
-                    container.put(entityClass, new DataTableImpl(entityClass));
+                if (!CONTAINER.containsKey(entityClass)) {
+                    CONTAINER.put(entityClass, new DataTableImpl(entityClass));
                 }
             }
         }
-        return container.get(entityClass);
+        return CONTAINER.get(entityClass);
     }
 
     /**

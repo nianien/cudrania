@@ -41,11 +41,7 @@ import java.util.Locale;
  */
 public class DateFormatter {
 
-    private static ThreadLocal<DateFormat> local = new ThreadLocal<DateFormat>() {
-        protected DateFormat initialValue() {
-            return new SimpleDateFormat();
-        }
-    };
+    private static ThreadLocal<DateFormat> local = ThreadLocal.withInitial(() -> new SimpleDateFormat());
 
     static {
         setLocale(Locale.getDefault());

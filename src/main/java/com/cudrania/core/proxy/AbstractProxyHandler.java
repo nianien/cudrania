@@ -9,7 +9,7 @@ import java.lang.reflect.Method;
  *
  * @author skyfalling
  */
-public abstract class ProxyHandler implements InvocationHandler {
+public abstract class AbstractProxyHandler implements InvocationHandler {
 
     /**
      * 被代理对象实例
@@ -20,7 +20,7 @@ public abstract class ProxyHandler implements InvocationHandler {
     /**
      * 构造函数
      */
-    public ProxyHandler() {
+    public AbstractProxyHandler() {
     }
 
     /**
@@ -28,7 +28,7 @@ public abstract class ProxyHandler implements InvocationHandler {
      *
      * @param target 被代理对象实例
      */
-    public ProxyHandler(Object target) {
+    public AbstractProxyHandler(Object target) {
         this.target = target;
     }
 

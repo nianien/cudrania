@@ -37,7 +37,7 @@ public class Zipper {
         String getEntryName(File file);
     }
 
-    private final static int bufferSize = 8192;
+    private final static int BUFFER_SIZE = 8192;
 
     /**
      * 压缩给定的文件列表,压缩后的文件在包根目录中
@@ -141,7 +141,7 @@ public class Zipper {
         try {
             zos = new ZipOutputStream(new CheckedOutputStream(os, new CRC32()));
             // 8M缓冲区
-            byte[] buffer = new byte[bufferSize];
+            byte[] buffer = new byte[BUFFER_SIZE];
             // 读取字节数
             int readed = 0;
             for (File file : files) {
@@ -268,7 +268,7 @@ public class Zipper {
         try {
             int len = 0;
             int readed = 0;
-            byte[] buffer = new byte[bufferSize];
+            byte[] buffer = new byte[BUFFER_SIZE];
             while ((readed = zin.read(buffer)) != -1) {
                 len += readed;
             }

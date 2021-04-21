@@ -10,7 +10,7 @@ import java.sql.SQLType;
  */
 public class DataField {
 
-    public static final SQLType GenericType = JDBCType.JAVA_OBJECT;
+    public static final SQLType GENERIC_TYPE = JDBCType.JAVA_OBJECT;
     /**
      * 字段名
      */
@@ -36,7 +36,7 @@ public class DataField {
     }
 
     public DataField(String name, Object value) {
-        this(name, value, GenericType);
+        this(name, value, GENERIC_TYPE);
     }
 
 

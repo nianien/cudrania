@@ -1,44 +1,188 @@
 package com.cudrania.idea.jdbc.query;
 
-import com.cudrania.core.exception.ExceptionChecker;
-import com.cudrania.core.io.Closer;
-import com.cudrania.idea.jdbc.sql.SqlGenerator;
 import com.cudrania.idea.jdbc.sql.SqlStatement;
-import com.cudrania.idea.jdbc.table.DataField;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
 
 /**
- * 数据库访问接口实现,该类是线程安全的
+ * 数据库访问接口定义
  *
  * @author skyfalling
  */
-public class SqlQuery implements Query {
-    /**
-     * 数据源
-     */
-    protected DataSource dataSource;
-    /**
-     * SqlStatement对象
-     */
-    protected ThreadLocal<SqlStatement> sqlStatement = new ThreadLocal<SqlStatement>();
+public interface SqlQuery {
 
     /**
-     * 构建方法,提供数据源
+     * 执行更新语句
      *
-     * @param dataSource
+     * @return
      */
-    public SqlQuery(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+    int executeUpdate();
+
+    /**
+     * 执行查询,返回ResultSetHandler接口实例对象rsh对查询的处理结果
+     *
+     * @param rsh
+     * @return
+     */
+    public <T> T executeQuery(ResultSetHandler<T> rsh);
+
+    /**
+     * 获取结果集中索引值为index的列
+     *
+     * @param index
+     * @return
+     */
+    List<Object> getColumns(int index);
+
+    /**
+     * 获取结果集中名称为name的列
+     *
+     * @param name
+     * @return
+     */
+    List<Object> getColumns(String name);
+
+    /**
+     * 将结果集中指定的两列映射成Map对象<br>
+     * 其中索引值为keyIndex的列作为key,索引值为valueIndex的列作为value
+     *
+     * @param keyIndex
+     * @param valueIndex
+     * @return
+     */
+    Map<Object, Object> getColumnsMap(int keyIndex, int valueIndex);
+
+    /**
+     * 将结果集中指定的两列映射成Map对象<br>
+     * 其中名称为keyName的列作为key,名称为valueName的列作为value
+     *
+     * @param keyName
+     * @param valueName
+     * @return
+     */
+    Map<Object, Object> getColumnsMap(String keyName, String valueName);
+
+    /**
+     * 获取结果集中的第一行数据<br>
+     * 数据由Map&lt;String, Object>对象表示
+     *
+     * @return
+     */
+    Map<String, Object> getFirstRow();
+
+    /**
+     * 获取结果集中的第一行数据<br>
+     * 数据由Class&lt;T>对象表示
+     *
+     * @param clazz
+     * @return
+     */
+    <T> T getFirstRow(Class<T> clazz);
+
+    /**
+     * 获取由Map&lt;String, Object>对象表示的查询结果
+     *
+     * @return
+     */
+    List<Map<String, Object>> getRows();
+
+    /**
+     * 获取由Class&lt;T>对象表示的查询结果
+     *
+     * @param clazz
+     * @return
+     */
+    <T> List<T> getRows(Class<T> clazz);
+
+    /**
+     * 获取查询结果中从第start条开始共size条的数据<br>
+     * 其中start起始值为1
+     *
+     * @param start
+     * @param size
+     * @return
+     */
+    List<Map<String, Object>> getRows(int start, int size);
+
+    /**
+     * 获取查询结果中从第start条开始共size条的数据<br>
+     * 其中start起始值为1
+     *
+     * @param clazz
+     * @param start
+     * @param size
+     * @return
+     */
+    <T> List<T> getRows(Class<T> clazz, int start, int size);
+
+    /**
+     * 返回查询结果记录的数目<br>
+     *
+     * @return
+     */
+    int getRowsCount();
+
+    /**
+     * 以索引值为index的列为键值,将查询结果映射成Map&lt;Object,T>对象<br>
+     *
+     * @param clazz
+     * @param index
+     * @return Map&lt;String, T>
+     */
+    <T> Map<Object, T> getRowsMap(Class<T> clazz, int index);
+
+    /**
+     * 以名称为name的列为键值,将查询结果映射成Map&lt;Object,T>对象<br>
+     *
+     * @param name
+     * @param clazz
+     * @return Map&lt;Object, T>
+     */
+    <T> Map<Object, T> getRowsMap(Class<T> clazz, String name);
+
+    /**
+     * 根据实例对象插入记录,只写入非空字段<br>
+     *
+     * @param <T>
+     * @param bean 实体对象
+     */
+    <T> void insert(T bean);
+
+    /**
+     * 根据实例对象的条件字段更新记录,属性值为空的字段不更新<br>
+     *
+     * @param <T>
+     * @param bean            实体对象
+     * @param conditionFields 条件字段,不分大小写
+     */
+    <T> void update(T bean, String... conditionFields);
+
+    /**
+     * 根据实例对象的条件字段删除记录,如未指定则使用全部字段<br>
+     *
+     * @param bean            实体对象
+     * @param conditionFields 条件字段,不分大小写
+     */
+    <T> void delete(T bean, String... conditionFields);
+
+    /**
+     * 批量执行SQL语句
+     *
+     * @param sqlList
+     * @return
+     */
+    int[] executeBatch(String... sqlList);
+
+    /**
+     * 批量执行SQL语句
+     *
+     * @param sql
+     * @param parametersList 多组SQL参数
+     * @return
+     */
+    int[] executeBatch(String sql, Object[][] parametersList);
 
 
     /**
@@ -46,225 +190,14 @@ public class SqlQuery implements Query {
      *
      * @return
      */
-    @Override
-    public SqlStatement getSqlStatement() {
-        ExceptionChecker.throwIfNull(sqlStatement.get(), new NullPointerException("SqlStatement required!"));
-        return this.sqlStatement.get();
-    }
+    SqlStatement getSqlStatement();
+
 
     /**
-     * 设置当前SqlStatement对象
+     * 创建新的查询对象
      *
      * @param sqlStatement
      * @return
      */
-    @Override
-    public SqlQuery setSqlStatement(SqlStatement sqlStatement) {
-        this.sqlStatement.set(sqlStatement);
-        return this;
-    }
-
-
-    @Override
-    public List<Object> getColumns(final int index) {
-        return this.executeQuery(resultSet -> ResultSetAdapter.getColumns(resultSet, index));
-    }
-
-    @Override
-    public List<Object> getColumns(final String name) {
-        return executeQuery(resultSet -> ResultSetAdapter.getColumns(resultSet, name));
-    }
-
-    @Override
-    public Map<Object, Object> getColumnsMap(final int keyIndex, final int valueIndex) {
-        return executeQuery(resultSet -> ResultSetAdapter.getColumnsMap(resultSet, keyIndex, valueIndex));
-    }
-
-    @Override
-    public Map<Object, Object> getColumnsMap(final String keyName, final String valueName) {
-        return executeQuery(resultSet -> ResultSetAdapter.getColumnsMap(resultSet, keyName, valueName));
-    }
-
-    @Override
-    public Map<String, Object> getFirstRow() {
-        return executeQuery(resultSet -> ResultSetAdapter.getFirstRow(resultSet));
-    }
-
-    @Override
-    public <T> T getFirstRow(final Class<T> clazz) {
-        return executeQuery(resultSet -> ResultSetAdapter.getFirstRow(resultSet, clazz));
-    }
-
-    @Override
-    public List<Map<String, Object>> getRows() {
-        return executeQuery(resultSet -> ResultSetAdapter.getRows(resultSet));
-    }
-
-    @Override
-    public <T> List<T> getRows(final Class<T> clazz) {
-        return executeQuery(resultSet -> ResultSetAdapter.getRows(resultSet, clazz));
-    }
-
-    @Override
-    public List<Map<String, Object>> getRows(final int start, final int size) {
-        return executeQuery(resultSet -> ResultSetAdapter.getRows(resultSet, start, size));
-    }
-
-    @Override
-    public <T> List<T> getRows(final Class<T> clazz, final int start, final int size) {
-        return executeQuery(resultSet -> ResultSetAdapter.getRows(resultSet, start, size, clazz));
-    }
-
-    @Override
-    public int getRowsCount() {
-        return executeQuery(resultSet -> ResultSetAdapter.getRowsCount(resultSet));
-    }
-
-    @Override
-    public <T> Map<Object, T> getRowsMap(final Class<T> clazz, final int index) {
-        return executeQuery(resultSet -> ResultSetAdapter.getRowsMap(resultSet, index, clazz));
-    }
-
-    @Override
-    public <T> Map<Object, T> getRowsMap(final Class<T> clazz, final String name) {
-        return executeQuery(resultSet -> ResultSetAdapter.getRowsMap(resultSet, name, clazz));
-    }
-
-    @Override
-    public <T> void insert(T bean) {
-        this.setSqlStatement(SqlGenerator.insertSql(bean)).executeUpdate();
-    }
-
-    @Override
-    public <T> void update(T bean, String... conditionFields) {
-        this.setSqlStatement(SqlGenerator.updateSql(bean, conditionFields)).executeUpdate();
-    }
-
-    @Override
-    public <T> void delete(T bean, String... conditionFields) {
-        this.setSqlStatement(SqlGenerator.deleteSql(bean, conditionFields)).executeUpdate();
-    }
-
-
-    @Override
-    public <T> T executeQuery(ResultSetHandler<T> rsh) {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        Connection connection = null;
-        try {
-            connection = connection();
-            stmt = prepare(connection);
-            return rsh.handle((rs = stmt.executeQuery()));
-        } catch (Exception e) {
-            throw ExceptionChecker.throwException(e);
-        } finally {
-            Closer.close(rs, stmt);
-            releaseConnection(connection);
-        }
-    }
-
-    @Override
-    public int executeUpdate() {
-        PreparedStatement stmt = null;
-        Connection connection = null;
-        try {
-            connection = connection();
-            stmt = prepare(connection);
-            return stmt.executeUpdate();
-        } catch (Exception e) {
-            throw ExceptionChecker.throwException(e);
-        } finally {
-            Closer.close(stmt);
-            releaseConnection(connection);
-        }
-    }
-
-
-    @Override
-    public int[] executeBatch(String... sqlList) {
-        Connection connection = null;
-        Statement stmt = null;
-        try {
-            connection = connection();
-            stmt = connection.createStatement();
-            for (String sql : sqlList) {
-                stmt.addBatch(sql);
-            }
-            return stmt.executeBatch();
-        } catch (SQLException e) {
-            throw ExceptionChecker.throwException(e);
-        } finally {
-            Closer.close(stmt);
-            releaseConnection(connection);
-        }
-    }
-
-
-    @Override
-    public int[] executeBatch(String sql, Object[][] parametersList) {
-        Connection connection = null;
-        PreparedStatement stmt = null;
-        try {
-            connection = connection();
-            stmt = connection.prepareStatement(sql);
-            for (Object[] parameters : parametersList) {
-                int i = 1;
-                for (Object p : parameters) {
-                    stmt.setObject(i++, p);
-                }
-                stmt.addBatch();
-            }
-            return stmt.executeBatch();
-        } catch (Exception e) {
-            throw ExceptionChecker.throwException(e);
-        } finally {
-            Closer.close(stmt);
-            releaseConnection(connection);
-        }
-
-    }
-
-    /**
-     * 获取数据库连接,可以调用{@link #releaseConnection(java.sql.Connection)}方法释放连接
-     *
-     * @return
-     */
-    public Connection connection() {
-        try {
-            return dataSource.getConnection();
-        } catch (SQLException e) {
-            throw ExceptionChecker.throwException(e);
-        }
-    }
-
-    /**
-     * 释放数据库连接
-     *
-     * @param connection
-     */
-    public void releaseConnection(Connection connection) {
-        Closer.close(connection);
-    }
-
-    /**
-     * 创建PreparedStatement对象
-     *
-     * @param connection
-     * @return
-     * @throws SQLException
-     */
-    protected PreparedStatement prepare(Connection connection) throws SQLException {
-        SqlStatement sqlStatement = getSqlStatement();
-        PreparedStatement stmt = connection.prepareStatement(sqlStatement.preparedSql());
-        int i = 1;
-        for (DataField field : sqlStatement.preparedParameters()) {
-            if (field.type == null || field.type == DataField.GenericType) {
-                stmt.setObject(i++, field.value);
-            } else {
-                stmt.setObject(i++, field.value, field.type.getVendorTypeNumber());
-            }
-        }
-        return stmt;
-    }
-
+    SqlQuery create(SqlStatement sqlStatement);
 }

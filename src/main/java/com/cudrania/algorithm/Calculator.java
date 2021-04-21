@@ -151,7 +151,7 @@ public class Calculator {
         /**
          * 所有操作符
          */
-        public final static String operators = "+-*/^()";
+        public final static String OPERATORS = "+-*/^()";
         /**
          * 运算操作符
          */
@@ -179,7 +179,7 @@ public class Calculator {
          * @return
          */
         public static boolean isOperator(char ch) {
-            return operators.indexOf(ch) != -1;
+            return OPERATORS.indexOf(ch) != -1;
         }
 
         /**

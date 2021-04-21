@@ -2,7 +2,7 @@ package com.cudrania.test.proxy;
 
 import com.cudrania.core.proxy.Interceptor;
 import com.cudrania.core.proxy.ProxyFactory;
-import com.cudrania.core.proxy.ProxyHandler;
+import com.cudrania.core.proxy.AbstractProxyHandler;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -33,7 +33,7 @@ public class TestProxy {
 
     public Connector create(final ConnectorManager manager, final ConnectorCloser connectorCloser) {
         Connector connector = manager.getConnector();
-        return (Connector) ProxyFactory.proxy(connector, new ProxyHandler(connector) {
+        return (Connector) ProxyFactory.proxy(connector, new AbstractProxyHandler(connector) {
             @Override
             public Object proxy(Object target, Method method, Object... args) {
 

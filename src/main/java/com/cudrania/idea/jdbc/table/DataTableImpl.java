@@ -153,7 +153,7 @@ class DataTableImpl<T> implements DataTable<T> {
         String setterName = "set" + getterName.substring(getterName.startsWith("is") ? 2 : 3);
         //获取getter对应的setter方法
         Method setter = Reflections.getMethod(type, setterName, getter.getReturnType());
-        fieldProperties.put(columnName, new FieldProperty(columnName, getter.isAnnotationPresent(Column.class) ? getter.getAnnotation(Column.class).sqlType() : DataField.GenericType, getter, setter));
+        fieldProperties.put(columnName, new FieldProperty(columnName, getter.isAnnotationPresent(Column.class) ? getter.getAnnotation(Column.class).sqlType() : DataField.GENERIC_TYPE, getter, setter));
         if (getter.isAnnotationPresent(Id.class)) {
             ExceptionChecker.throwIf(idField != null, "duplicate id field declared in table[" + type + "]: " + columnName + "," + idField);
             this.idField = columnName;

@@ -20,7 +20,10 @@ import java.io.Writer;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -35,11 +38,11 @@ public class Files {
     /**
      * 换行符, windows:"\r\n", unix*: "\n"
      */
-    public final static String newLine = System.getProperty("line.separator");
+    public final static String NEW_LINE = System.getProperty("line.separator");
     /**
      * 缓冲区大小
      */
-    private final static int bufferSize = 1024 * 8;
+    private final static int BUFFER_SIZE = 1024 * 8;
 
 
     /**
@@ -100,7 +103,7 @@ public class Files {
                 inChannel = new FileInputStream(src).getChannel();
                 outChannel = new FileOutputStream(dest).getChannel();
                 // 8M缓冲区
-                ByteBuffer buffer = ByteBuffer.allocate(bufferSize);
+                ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
                 while (inChannel.read(buffer) != -1) {
                     buffer.flip();
                     outChannel.write(buffer);
@@ -167,7 +170,7 @@ public class Files {
             List<byte[]> buffers = new LinkedList<>();
             int size = 0;
             int read;
-            byte[] buffer = new byte[bufferSize];
+            byte[] buffer = new byte[BUFFER_SIZE];
             while ((read = inputStream.read(buffer)) != -1) {
                 size += read;
                 buffers.add(Arrays.copyOf(buffer, read));
@@ -250,7 +253,7 @@ public class Files {
      */
     public static String read(Reader reader) {
         final StringBuilder sb = new StringBuilder();
-        readLines(reader, s -> sb.append(s).append(newLine));
+        readLines(reader, s -> sb.append(s).append(NEW_LINE));
         return sb.toString();
     }
 
@@ -288,11 +291,11 @@ public class Files {
      * 读取文件对象,处理每行的文本内容
      *
      * @param file
-     * @param Consumer
+     * @param consumer
      */
-    public static void readLines(File file, Consumer<String> Consumer) {
+    public static void readLines(File file, Consumer<String> consumer) {
         try {
-            readLines(new FileReader(file), Consumer);
+            readLines(new FileReader(file), consumer);
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
         }
@@ -302,15 +305,14 @@ public class Files {
      * 以指定字符编码格式读取文件对象,处理每行的文本内容
      *
      * @param file
-     * @param Consumer
+     * @param consumer
      * @param charset
      */
-    public static void readLines(File file, Consumer<String> Consumer,
-                                 String charset) {
+    public static void readLines(File file, Consumer<String> consumer, String charset) {
         try {
             readLines(
                     new InputStreamReader(new FileInputStream(file), charset),
-                    Consumer);
+                    consumer);
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
         }
@@ -330,10 +332,10 @@ public class Files {
      * 读取InputStream对象内容的每行内容, 然后关闭InputStream对象
      *
      * @param inputStream
-     * @param Consumer
+     * @param consumer
      */
-    public static void readLines(InputStream inputStream, Consumer<String> Consumer) {
-        readLines(new InputStreamReader(inputStream), Consumer);
+    public static void readLines(InputStream inputStream, Consumer<String> consumer) {
+        readLines(new InputStreamReader(inputStream), consumer);
     }
 
 
@@ -357,13 +359,13 @@ public class Files {
      * 以指定编码格式读取InputStream对象,按行处理文本内容 然后关闭InputStream对象
      *
      * @param inputStream
-     * @param Consumer
+     * @param consumer
      * @param charset
      */
-    public static void readLines(InputStream inputStream, Consumer<String> Consumer,
+    public static void readLines(InputStream inputStream, Consumer<String> consumer,
                                  String charset) {
         try {
-            readLines(new InputStreamReader(inputStream, charset), Consumer);
+            readLines(new InputStreamReader(inputStream, charset), consumer);
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
         }
@@ -386,14 +388,14 @@ public class Files {
      * 读取Reader对象,按行处理文本内容, 然关闭reader对象
      *
      * @param reader
-     * @param Consumer
+     * @param consumer
      */
-    public static void readLines(Reader reader, Consumer<String> Consumer) {
+    public static void readLines(Reader reader, Consumer<String> consumer) {
         try {
             BufferedReader buffer = new BufferedReader(reader);
             String line;
             while ((line = buffer.readLine()) != null) {
-                Consumer.accept(line);
+                consumer.accept(line);
             }
         } catch (Exception e) {
             ExceptionChecker.throwException(e);
@@ -448,7 +450,7 @@ public class Files {
     public static void write(OutputStream outputStream, InputStream inputStream) {
         try {
             int read;
-            byte[] buffer = new byte[bufferSize];
+            byte[] buffer = new byte[BUFFER_SIZE];
             while ((read = inputStream.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, read);
                 outputStream.flush();
@@ -499,7 +501,7 @@ public class Files {
      */
     public static void write(Writer writer, Reader reader) {
         try {
-            char[] buffer = new char[bufferSize];
+            char[] buffer = new char[BUFFER_SIZE];
             int read;
             while ((read = reader.read(buffer)) != -1) {
                 writer.write(buffer, 0, read);
@@ -551,7 +553,7 @@ public class Files {
      * @param lines  待写入文本
      */
     public static void writeLines(Writer writer, List<String> lines) {
-        write(writer, lines.stream().collect(Collectors.joining(newLine)));
+        write(writer, lines.stream().collect(Collectors.joining(NEW_LINE)));
     }
 
     /**

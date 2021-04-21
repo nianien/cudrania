@@ -15,7 +15,7 @@ public class RadixUtils {
     /**
      * 默认字符集合[0-9A-Za-z]
      */
-    public final static char[] defaultCharset = Characters.NUMBER_LETTER;
+    public final static char[] DEFAULT_CHARSET = Characters.NUMBER_LETTER;
 
     /**
      * 将十进制的数字转换为radix进制<br>
@@ -31,7 +31,7 @@ public class RadixUtils {
             return "0";
         StringBuilder sb = new StringBuilder();
         while (num != 0) {
-            sb.insert(0, defaultCharset[(int) (num % radix)]);
+            sb.insert(0, DEFAULT_CHARSET[(int) (num % radix)]);
             num /= radix;
         }
         return sb.toString();
@@ -48,11 +48,11 @@ public class RadixUtils {
         ExceptionChecker.throwIf(charset.length < 2, "the number of different characters must be more than 2.");
         if (num == 0)
             return "0";
-        int N = charset.length;
+        int r = charset.length;
         StringBuilder sb = new StringBuilder();
         while (num != 0) {
-            sb.insert(0, charset[(int) (num % N)]);
-            num /= N;
+            sb.insert(0, charset[(int) (num % r)]);
+            num /= r;
         }
         return sb.toString();
     }
@@ -94,10 +94,10 @@ public class RadixUtils {
         if (source == "0")
             return 0;
         int len = source.length();
-        int N = charset.length;
+        int r = charset.length;
         long sum = 0;
         for (int i = 0; i < len; i++) {
-            sum = sum * N;
+            sum = sum * r;
             int n = toNumber(source.charAt(i), charset, charset.length);
             if (n != 0) {
                 sum += n;
@@ -115,7 +115,7 @@ public class RadixUtils {
      * @return
      */
     private static int toNumber(char ch, int radix) {
-        return toNumber(ch, defaultCharset, radix);
+        return toNumber(ch, DEFAULT_CHARSET, radix);
     }
 
 

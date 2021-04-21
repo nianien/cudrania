@@ -71,7 +71,7 @@ public class Expression {
     /**
      * 默认实例,表达式形如{expression}
      */
-    public final static Expression defaultExpression = new Expression("{", "}");
+    public final static Expression DEFAULT_INSTANCE = new Expression("{", "}");
 
 
     /**

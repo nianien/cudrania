@@ -276,6 +276,7 @@ public class EmailSender {
         props.put("mail.smtp.auth", needAuth);
         props.put("mail.transport.protocol", "smtp");
         Authenticator authenticator = needAuth ? new Authenticator() {
+            @Override
             protected PasswordAuthentication getPasswordAuthentication() {
                 return new PasswordAuthentication(user, password);
             }

@@ -129,12 +129,8 @@ public class ClassScanner {
             return;
         }
         //获取包下的所有文件,包括目录
-        File[] files = dir.listFiles(new FileFilter() {
-            // 自定义过滤规则,目录或者class文件
-            public boolean accept(File file) {
-                return file.isDirectory() || file.getName().endsWith(".class");
-            }
-        });
+        // 自定义过滤规则,目录或者class文件
+        File[] files = dir.listFiles(file -> file.isDirectory() || file.getName().endsWith(".class"));
         // 循环所有文件
         for (File file : files) {
             // 如果是目录,递归遍历

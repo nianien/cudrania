@@ -53,6 +53,7 @@ public class CounterMap<T> extends HashMap<T, Integer> {
     /**
      * 获取key对应的计数,如果不存在,则返回0
      */
+    @Override
     public Integer get(Object key) {
         Integer n = super.get(key);
         return n == null ? 0 : n;

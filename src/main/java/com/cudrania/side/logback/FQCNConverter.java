@@ -38,6 +38,7 @@ public class FQCNConverter extends NamedConverter {
         this("Logger");
     }
 
+    @Override
     protected String getFullyQualifiedName(ILoggingEvent event) {
         StackTraceElement[] cda = event.getCallerData();
         if (cda != null && cda.length > 0) {
