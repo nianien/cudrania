@@ -5,7 +5,7 @@ package com.cudrania.core.functions;
  *
  * @author scorpio
  * @version 1.0.0
- * @email tengzhe.ln@alibaba-inc.com
+ 
  */
 public interface Param<T> {
 

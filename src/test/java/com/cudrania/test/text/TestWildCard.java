@@ -9,7 +9,7 @@ import org.junit.Test;
 /**
  * @author scorpio
  * @version 1.0.0
- * @email tengzhe.ln@alibaba-inc.com
+ 
  */
 public class TestWildCard {
 

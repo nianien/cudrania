@@ -16,7 +16,7 @@ import java.util.function.Predicate;
  *
  * @author scorpio
  * @version 1.0.0
- * @email tengzhe.ln@alibaba-inc.com
+ 
  */
 public class Params {
 

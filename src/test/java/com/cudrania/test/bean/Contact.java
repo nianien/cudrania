@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * @author scorpio
  * @version 1.0.0
- * @email tengzhe.ln@alibaba-inc.com
+ 
  */
 @Data
 public class Contact {

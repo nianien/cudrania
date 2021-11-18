@@ -1,31 +1,21 @@
 package com.cudrania.idea.jdbc.datasource;
 
 
-import org.apache.commons.beanutils.BeanUtils;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.Set;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
-
 import lombok.Data;
 import lombok.SneakyThrows;
+import org.apache.commons.beanutils.BeanUtils;
+
+import javax.sql.DataSource;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * 数据源构建对象, 自适应多种数据源
  *
  * @author scorpio
  * @version 1.0.0
- * @email tengzhe.ln@alibaba-inc.com
  */
 @Data
 public class DataSourceBuilder {
@@ -44,14 +34,6 @@ public class DataSourceBuilder {
     private final Map<String, Map<String, Object>> properties = new LinkedHashMap<>();
 
 
-    @PostConstruct
-    public void init() {
-        Map<String, Object> remove = properties.remove(DEFAULT_NAME);
-        if (remove != null) {
-            defaultProperties.putAll(remove);
-        }
-    }
-
     /**
      * 添加命名配置
      *
@@ -60,8 +42,11 @@ public class DataSourceBuilder {
      * @return
      */
     public DataSourceBuilder addProperties(String name, Map<String, Object> properties) {
-        this.properties.computeIfAbsent(name, (key) -> new HashMap<>());
-        this.properties.get(name).putAll(properties);
+        if (DEFAULT_NAME.equals(name)) {
+            defaultProperties.putAll(properties);
+        } else {
+            this.properties.computeIfAbsent(name, (key) -> new HashMap<>()).putAll(properties);
+        }
         return this;
     }
 
@@ -84,7 +69,7 @@ public class DataSourceBuilder {
         if (dsClass == null) {
             throw new IllegalArgumentException("datasource type is required!");
         }
-        DataSource dataSource = dsClass.newInstance();
+        DataSource dataSource = dsClass.getDeclaredConstructor().newInstance();
         BeanUtils.populate(dataSource, config);
         return dataSource;
     }

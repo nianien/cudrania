@@ -1,8 +1,8 @@
 package com.cudrania.test.bean;
 
-import java.util.Map;
-
 import lombok.Data;
+
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -15,8 +15,12 @@ public class Family {
     private People host;
     private Map<String, People> members;
 
-
     public Family() {
+    }
+
+
+    public People find(String name) {
+        return members.get(name);
     }
 
 }

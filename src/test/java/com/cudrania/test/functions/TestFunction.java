@@ -17,73 +17,71 @@ import static com.cudrania.core.functions.Params.gt0;
 /**
  * @author scorpio
  * @version 1.0.0
- * @email tengzhe.ln@alibaba-inc.com
  */
 public class TestFunction {
 
 
     public static void main(String[] args) {
 
-
         System.out.println(
-                of(new Family()).apply(Family::getHost).apply(People::getContact).apply(Contact::getAddress).get()
+                of(new Family()).$$(Family::getHost).$$(People::getContact).$$(Contact::getAddress).get()
         );
         System.out.println(
-                of((Family) null).apply(Family::getHost).apply(People::getContact).apply(Contact::getAddress).get()
+                of((Family) null).$$(Family::getHost).$$(People::getContact).$$(Contact::getAddress).get()
         );
 
         Family family = new Family();
 
 
-        of(family).apply(Family::getHost).apply(People::getContact).apply(Contact::getAddress).get();
+        of(family).$$(Family::getHost).$$(People::getContact).$$(Contact::getAddress).get();
 
 
         People people = of(new People())
-                .accept(People::setId, 101L)
-                .bind(People::setName)
-                .call("name")
-                .accept(People::setName, "name")
-                .accept(People::setName, "name")
-                .accept(People::setSex, "male")
-                .accept(People::setBirthday, new Date())
-                .accept(People::setContact,
+                .$(People::setId, 101L)
+                .method(People::setName)
+                .invoke("name")
+                .$(People::setName, "name")
+                .$(People::setName, "name")
+                .$(People::setSex, "male")
+                .$(People::setBirthday, new Date())
+                .$(People::setContact,
                         of(new Contact())
-                                .accept(Contact::setAddress, "address*****")
-                                .accept(Contact::setTelephone, "137****")
-                                .accept(Contact::setEmail, "email****")
+                                .$(Contact::setAddress, "address*****")
+                                .$(Contact::setTelephone, "137****")
+                                .$(Contact::setEmail, "email****")
                                 .get()
                 ).get();
 
 
         Fluent.of(people)
-                .accept(gt0(people.getId()).then(id -> id.longValue()), (p, id) -> p.setId(id))
-                .apply(gt0(people.getId()).then(id -> id.longValue()), (p, id) -> {
+                .$(gt0(people.getId()).then(id -> id.longValue()), (p, id) -> p.setId(id))
+                .$$(gt0(people.getId()).then(id -> id.longValue()), (p, id) -> {
                     p.setId(id);
                     return p;
                 });
 
         family.setHost(people);
         System.out.println(of(family)
-                .accept(Family::setAddress, "a")
-                .accept(f -> f.setAddress("b"))
-                .accept(System.out::println)
+                .$(Family::setAddress, "a")
+                .$(f -> f.setAddress("b"))
+                .$(System.out::println)
                 .get());
 
         Map<String, String> map1 = of(new HashMap<String, String>())
-                .accept(Map::put, "a", "Alex")
-                .accept(Map::put, "b", "Brown")
-                .accept(Map::put, "c", "Charles")
-                .accept(Map::put, "d", "Darwin")
+                .$(Map::put, "a", "Alex")
+                .$(Map::put, "b", "Brown")
+                .$(Map::put, "c", "Charles")
+                .$(Map::put, "d", "Darwin")
                 .get();
         System.out.println(map1);
         Map<String, String> map2 = of(new HashMap<String, String>())
-                .<String, String>bind(Map::put)
-                .call("a", "Alex")
-                .call("b", "Brown")
-                .call("c", "Charles")
-                .call("d", "Darwin")
-                .<String>bind(Map::remove)
-                .call("b")
+                .<String, String>method(Map::put)
+                .invoke("a", "Alex")
+                .invoke("b", "Brown")
+                .invoke("c", "Charles")
+                .invoke("d", "Darwin")
+                .<String>method(Map::remove)
+                .invoke("b")
                 .get();
 
         System.out.println(map2);
@@ -109,10 +107,10 @@ public class TestFunction {
 
     static String build2(long id, String name, String email) {
         return of(new StringBuilder())
-                .<String>bind(StringBuilder::append)
-                .call(Params.with(id).when(e -> e > 0).then(e -> e.toString()))
-                .call(Params.notEmpty(name))
-                .call(Params.notEmpty(email))
+                .<String>method(StringBuilder::append)
+                .invoke(Params.with(id).when(e -> e > 0).then(e -> e.toString()))
+                .invoke(Params.notEmpty(name))
+                .invoke(Params.notEmpty(email))
                 .get().toString();
     }
 
