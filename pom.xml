@@ -13,7 +13,7 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
 
-        <jackson.version>2.9.7</jackson.version>
+        <jackson.version>2.9.10.8</jackson.version>
         <javassist.version>3.18.1-GA</javassist.version>
         <dom4j.version>1.6.1</dom4j.version>
         <ant.version>1.9.3</ant.version>
