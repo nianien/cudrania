@@ -19,10 +19,15 @@ public class CustomBeanPropertyWriter extends BeanPropertyWriter {
 
         String name = writer.getName();
         Object value = writer.get(bean);
+        if(value==null){
+            return;
+        }
         if (name.equalsIgnoreCase("password") || name.equalsIgnoreCase("pwd")) {
             value = "*****";
         }
         gen.writeObjectField(name, value);
     }
+
+
 
 }

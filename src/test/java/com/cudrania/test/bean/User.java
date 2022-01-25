@@ -7,6 +7,7 @@ import com.cudrania.idea.jdbc.table.Id;
 import com.cudrania.idea.jdbc.table.Table;
 
 import java.sql.JDBCType;
+import java.util.Map;
 
 /**
  * @author skyfalling
@@ -17,6 +18,10 @@ public class User {
     private int id;
     private String userId, userName, password;
     private String[] userDesc;
+    private Map<String, String> extras;
+
+    public User() {
+    }
 
     /**
      * @return
@@ -66,6 +71,14 @@ public class User {
 
     public void setUserDesc(String[] userDesc) {
         this.userDesc = userDesc;
+    }
+
+    public Map<String, String> getExtras() {
+        return extras;
+    }
+
+    public void setExtras(Map<String, String> extras) {
+        this.extras = extras;
     }
 
     @Override

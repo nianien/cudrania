@@ -18,4 +18,6 @@ public class CustomBeanSerializerModifier extends BeanSerializerModifier {
         return beanProperties.stream().map(writer -> new CustomBeanPropertyWriter(writer))
                 .collect(Collectors.toList());
     }
+
+
 }
