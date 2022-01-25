@@ -31,7 +31,7 @@ public @interface ScopeAttribute {
      *
      * @author skyfalling
      */
-    public enum Scope {
+    enum Scope {
         THREAD, REQUEST, SESSION;
     }
 }
