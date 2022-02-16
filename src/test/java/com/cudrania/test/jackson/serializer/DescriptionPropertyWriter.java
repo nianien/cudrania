@@ -1,13 +1,19 @@
-package com.cudrania.test.jackson;
+package com.cudrania.test.jackson.serializer;
 
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 
-public class CustomBeanPropertyWriter extends BeanPropertyWriter {
+/**
+ * 提供字段描述
+ */
+public class DescriptionPropertyWriter extends BeanPropertyWriter {
+
+
     private final BeanPropertyWriter writer;
 
-    public CustomBeanPropertyWriter(BeanPropertyWriter writer) {
+    public DescriptionPropertyWriter(BeanPropertyWriter writer) {
         super(writer);
         this.writer = writer;
     }
@@ -19,15 +25,14 @@ public class CustomBeanPropertyWriter extends BeanPropertyWriter {
 
         String name = writer.getName();
         Object value = writer.get(bean);
-        if(value==null){
+        if (value == null) {
             return;
         }
-        if (name.equalsIgnoreCase("password") || name.equalsIgnoreCase("pwd")) {
-            value = "*****";
+        super.serializeAsField(bean, gen, prov);
+        JsonPropertyDescription annotation = writer.getAnnotation(JsonPropertyDescription.class);
+        if (annotation != null) {
+            gen.writeObjectField(name + "_desc", annotation.value());
         }
-        gen.writeObjectField(name, value);
     }
-
-
 
 }

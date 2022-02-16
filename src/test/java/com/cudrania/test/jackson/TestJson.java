@@ -138,6 +138,7 @@ public class TestJson {
             users.add(user);
         }
         String json = jp.toJson(users);
+        System.out.println(json);
         users = jp.toList(json, User.class);
         for (User user : users) {
             System.out.println(user);
