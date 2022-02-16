@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.introspect.Annotated;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
@@ -78,19 +79,23 @@ public class TestCustomSerializer {
         JsonParser parser = new JsonParser();
         ObjectMapper objectMapper = parser.getObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-//        objectMapper.registerModule(new SimpleModule().addSerializer(new NodeWrapperSerializer()));
-        objectMapper.setSerializerFactory(
-                objectMapper.getSerializerFactory().withSerializerModifier(new BeanSerializerModifier() {
-                    @Override
-                    public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                        if (serializer instanceof BeanSerializerBase) {
-                            return new RuleNodeSerializer(
-                                    (BeanSerializerBase) serializer);
+        boolean useModule=false;
+        if(useModule){
+            objectMapper.registerModule(new SimpleModule().addSerializer(new NodeWrapperSerializer()));
+        }else{
+            objectMapper.setSerializerFactory(
+                    objectMapper.getSerializerFactory().withSerializerModifier(new BeanSerializerModifier() {
+                        @Override
+                        public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
+                            if (serializer instanceof BeanSerializerBase) {
+                                return new RuleNodeSerializer(
+                                        (BeanSerializerBase) serializer);
+                            }
+                            return serializer;
                         }
-                        return serializer;
-                    }
-                })
-        );
+                    })
+            );
+        }
         RuleNode ruleNode = NodeParser.parse("(a||b)&&(!c||!d)", true);
         System.out.println(ruleNode);
         System.out.println(parser.toJson(ruleNode));
