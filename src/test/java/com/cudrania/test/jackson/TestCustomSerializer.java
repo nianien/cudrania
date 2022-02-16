@@ -4,6 +4,7 @@ import com.cudrania.core.json.JsonParser;
 import com.cudrania.test.bean.Account;
 import com.cudrania.test.bean.Account.FullView;
 import com.cudrania.test.bean.Account.SimpleView;
+import com.cudrania.test.bean.User;
 import com.cudrania.test.jackson.node.NodeParser;
 import com.cudrania.test.jackson.node.RuleNode;
 import com.cudrania.test.jackson.serializer.*;
@@ -143,6 +144,7 @@ public class TestCustomSerializer {
         objectMapper.setFilterProvider(
                 new SimpleFilterProvider().addFilter(filterName, new SecurityPropertyFilter(sensitive))
         );
+        //这里也可使用@JsonFilter
         objectMapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
             @Override
             public Object findFilterId(Annotated a) {
@@ -154,11 +156,14 @@ public class TestCustomSerializer {
         account.setUserName("jack-wang");
         account.setPassword("pwd12345");
         account.setPhone("18901010001");
-        //map无法脱敏
+        //map脱敏
         Map<String, String> map = new HashMap<>();
         map.put("id_card", "110115200810010011");
         map.put("balance", "1314.520");
         map.put("email", "18901010001@qq.com");
+
+        User user=new User();
+        user.setPassword("1233");
         account.setExtras(map);
         System.out.println(jsonParser.toJson(account));
         System.out.println(jsonParser.toJson(map));
