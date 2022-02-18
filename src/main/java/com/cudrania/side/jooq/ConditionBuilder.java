@@ -141,7 +141,7 @@ public class ConditionBuilder {
     public static Condition toCondition(Object queryBean, Function<String, Field> fieldGenerator,
                                         Predicate<QueryField> fieldFilter) {
         Condition condition = DSL.trueCondition();
-        List<QueryField> queryFields = getFieldInfos(queryBean, fieldFilter);
+        List<QueryField> queryFields = getQueryFields(queryBean, fieldFilter);
         for (QueryField info : queryFields) {
             Field field = fieldGenerator.apply(info.name);
             if (field == null) {
@@ -220,8 +220,8 @@ public class ConditionBuilder {
      * @param fieldFilter
      * @return
      */
-    private static List<QueryField> getFieldInfos(Object query, Predicate<QueryField> fieldFilter) {
-        List<java.lang.reflect.Field> fields = Reflections.getFields(query.getClass(), null, null);
+    private static List<QueryField> getQueryFields(Object query, Predicate<QueryField> fieldFilter) {
+        List<java.lang.reflect.Field> fields = Reflections.getFields(query.getClass(), Object.class, null);
         List<QueryField> queryFields = new ArrayList<>(fields.size());
         for (java.lang.reflect.Field field : fields) {
             Operator operator = Operator.EQ;
