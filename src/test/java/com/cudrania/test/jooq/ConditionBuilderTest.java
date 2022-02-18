@@ -1,7 +1,6 @@
 package com.cudrania.test.jooq;
 
 import com.cudrania.side.jooq.ConditionBuilder;
-
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.conf.RenderNameStyle;
@@ -36,7 +35,7 @@ public class ConditionBuilderTest {
         GoodsQuery query = new GoodsQuery();
         query.setSubmitTimeBegin(new Date());
         query.setSubmitTimeEnd(new Date());
-        System.out.println(new ConditionBuilder().generator(false)
+        System.out.println(new ConditionBuilder()
                 .filter(f -> f.getField().getDeclaringClass() == GoodsQuery.class).build(query));
     }
 }

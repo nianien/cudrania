@@ -1,27 +1,21 @@
 package com.cudrania.side.jooq;
 
 
-import com.cudrania.core.reflection.Reflections;
 import com.cudrania.core.collection.CollectionUtils;
+import com.cudrania.core.reflection.Reflections;
 import com.cudrania.core.utils.StringUtils;
-
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 
 /**
  * 匹配条件构造器<br/>
@@ -43,16 +37,25 @@ public class ConditionBuilder {
 
 
     /**
-     * 默认成员字段作为匹配条件
+     * 对象字段名作为数据库查询字段, 自动转换为下划线形式
      *
      * @return
      */
     public ConditionBuilder() {
-        this(byUnderLine());
+        this(true);
     }
 
     /**
-     * 数据库表中对应的字段作为匹配条件
+     * 对象字段名作为数据库查询字段
+     *
+     * @param underlineStyle 是否自动转换为下划线形式
+     */
+    public ConditionBuilder(boolean underlineStyle) {
+        this(underlineStyle ? byUnderLine() : byName());
+    }
+
+    /**
+     * 数据库表字段作为查询字段
      *
      * @param table
      * @return
@@ -63,7 +66,7 @@ public class ConditionBuilder {
 
 
     /**
-     * 函数生成的字段作为匹配条件
+     * 自定义生成查询字段
      *
      * @param fieldGenerator
      * @return
@@ -73,7 +76,7 @@ public class ConditionBuilder {
     }
 
     /**
-     * 设置字段过滤器
+     * 过滤查询字段
      *
      * @param fieldFilter
      * @return
@@ -83,42 +86,6 @@ public class ConditionBuilder {
         return this;
     }
 
-
-    /**
-     * 设置字段函数
-     *
-     * @param fieldGenerator
-     * @return
-     */
-    public ConditionBuilder generator(Function<String, Field> fieldGenerator) {
-        this.fieldGenerator = fieldGenerator;
-        return this;
-    }
-
-
-    /**
-     * 根据表设置字段函数
-     *
-     * @param table
-     * @return
-     * @see ConditionBuilder#generator(Function)
-     */
-    public ConditionBuilder generator(Table table) {
-        this.fieldGenerator = byTable(table);
-        return this;
-    }
-
-
-    /**
-     * 根据字段名生成匹配条件
-     *
-     * @param toUnderline
-     * @return
-     */
-    public ConditionBuilder generator(boolean toUnderline) {
-        this.fieldGenerator = toUnderline ? byUnderLine() : byName();
-        return this;
-    }
 
     /**
      * 使用默认转换逻辑
