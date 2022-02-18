@@ -1,11 +1,14 @@
 package com.cudrania.test.jackson.node;
 
 
+import lombok.NoArgsConstructor;
+
 /**
  * 条件取反
  *
  * @author liyifei <liyifei@kuaishou.com>
  */
+@NoArgsConstructor
 public class NotNode extends TypeNode  implements RuleNode {
 
     private RuleNode node;

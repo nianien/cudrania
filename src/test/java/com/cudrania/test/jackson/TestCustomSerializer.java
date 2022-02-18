@@ -57,21 +57,25 @@ public class TestCustomSerializer {
         JsonParser parser = new JsonParser();
         ObjectMapper objectMapper = parser.getObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-        objectMapper.setSerializerFactory(
-                objectMapper.getSerializerFactory().withSerializerModifier(new BeanSerializerModifier() {
-                    @Override
-                    public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-                        if (serializer instanceof BeanSerializerBase) {
-                            return new TypeAsFieldSerializer(
-                                    (BeanSerializerBase) serializer);
-                        }
-                        return serializer;
-                    }
-                })
-        );
+//        objectMapper.setSerializerFactory(
+//                objectMapper.getSerializerFactory().withSerializerModifier(new BeanSerializerModifier() {
+//                    @Override
+//                    public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
+//                        if (serializer instanceof BeanSerializerBase) {
+//                            return new TypeAsFieldSerializer(
+//                                    (BeanSerializerBase) serializer);
+//                        }
+//                        return serializer;
+//                    }
+//                })
+//        );
         RuleNode ruleNode = NodeParser.parse("(a||b)&&(!c||!d)", false);
         System.out.println(ruleNode);
-        System.out.println(parser.toJson(ruleNode));
+        String json = parser.toJson(ruleNode);
+        System.out.println(json);
+        RuleNode ruleNode1 = parser.toBean(json, RuleNode.class);
+        System.out.println(ruleNode1);
+        System.out.println(parser.toJson(ruleNode1));
     }
 
 

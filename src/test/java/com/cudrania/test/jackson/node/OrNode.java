@@ -1,6 +1,8 @@
 package com.cudrania.test.jackson.node;
 
 
+import lombok.NoArgsConstructor;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -10,6 +12,7 @@ import java.util.List;
  *
  * @author liyifei <liyifei@kuaishou.com>
  */
+@NoArgsConstructor
 public class OrNode extends TypeNode implements RuleNode {
 
     private List<RuleNode> nodes = new ArrayList<>();
