@@ -73,7 +73,8 @@ public class ConditionBuilderTest {
         query.setPrice(new BigDecimal(1111));
         Condition condition = ConditionBuilder.byName()
                 .withRegex("(?i).*name.*", Operator.LIKE)
-                .with("industryId", null)
+                .with(name->name.equals("industryId"),null)
+                .with("price", Operator.LT)
                 .build(query);
 
         System.out.println(dslContext.renderInlined(condition));
