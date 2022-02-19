@@ -42,7 +42,7 @@ public class ConditionBuilder {
     /**
      * 生成查询字段名称
      */
-    private Function<String, String> nameGenerator = Function.identity();
+    private Function<String, String> nameGenerator;
 
     /**
      * 查询字段过滤
