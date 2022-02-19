@@ -13,6 +13,7 @@ import org.jooq.impl.DefaultConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -69,16 +70,35 @@ public class ConditionBuilderTest {
         query.setIndustryName("ddd");
         query.setIndustryId(-100L);
         query.setId(100L);
-        Condition condition = new ConditionBuilder()
-                .with(f -> {
-                    if (f.getField().getName().toLowerCase().contains("name")) {
-                        f.setOperator(Operator.LIKE);
-                    }
-                    return true;
-                })
+        query.setPrice(new BigDecimal(1111));
+        Condition condition = ConditionBuilder.byName()
+                .withRegex("(?i).*name.*", Operator.LIKE)
                 .with("industryId", null)
                 .build(query);
 
         System.out.println(dslContext.renderInlined(condition));
     }
+
+
+    @Test
+    public void testBuilder2() {
+        AdCert adCertPhoto = new AdCert();
+        adCertPhoto.setExpireDate(new Date[]{new Date(), new Date()});
+        adCertPhoto.setStatusDetail("测试");
+        adCertPhoto.setCreateDate(new Date());
+        adCertPhoto.setStatus(-1);
+        Condition condition = ConditionBuilder.byUnderLine()
+                .with("StatusDetail", Operator.LIKE)
+                .with(f -> {
+                    if (f.getValue() instanceof Integer) {
+                        return ((Integer) f.getValue()) > 0;
+                    }
+                    return true;
+                })
+                .with(SQLDialect.MYSQL)
+                .build(adCertPhoto);
+        System.out.println(dslContext.renderInlined(condition));
+    }
+
+
 }

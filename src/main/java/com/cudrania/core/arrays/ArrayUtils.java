@@ -1,8 +1,11 @@
 package com.cudrania.core.arrays;
 
 
+import com.cudrania.core.collection.CollectionUtils;
+import com.cudrania.core.utils.StringUtils;
+
 import java.lang.reflect.Array;
-import java.util.Arrays;
+import java.util.*;
 
 import static java.util.Arrays.binarySearch;
 
@@ -1138,6 +1141,50 @@ public class ArrayUtils {
     }
 
 
+    /**
+     * 对象转换数组<br/>
+     * <ul>
+     *     <li>空对象或空字符串转成空数组</li>
+     *     <li>{@link Object[]}类型强制转换</li>
+     *     <li>{@link Collection}类型转成<code>element</code>数组</li>
+     *     <li>{@link Map}类型转成{@link Map.Entry}数组</li>
+     *     <li>{@link Enumeration}类型转成生成<code>element</code>数组</li>
+     *     <li>{@link Iterable}类型遍历生成<code>element</code>数组</li>
+     *     <li>{@link Iterator}类型遍历生成<code>element</code>数组</li>
+     *     <li>剩余情况, 转成长度为1,元素为自身的数组</li>
+     * </ul>
+     *
+     * @return
+     */
+    public static Object[] forceToArray(Object value) {
+        if (value == null ||
+                value instanceof String && StringUtils.isEmpty((String) value)) {
+            return new Object[0];
+        }
+        if (value.getClass().isArray()) {
+            return toObjectArray(value);
+        } else if (value instanceof Collection) {
+            return ((Collection) value).toArray();
+        } else if (value instanceof Map) {
+            return ((Map<?, ?>) value).entrySet().toArray();
+        } else if (value instanceof Iterable) {
+            return CollectionUtils.list((Iterable<?>) value).toArray();
+        } else if (value instanceof Iterator) {
+            return CollectionUtils.list((Iterator<?>) value).toArray();
+        } else if (value instanceof Enumeration) {
+            return CollectionUtils.list((Enumeration<?>) value).toArray();
+        } else {
+            return new Object[]{value};
+        }
+    }
+
+
+    /**
+     * 对象数组类型强制转换
+     *
+     * @param source
+     * @return
+     */
     public static Object[] toObjectArray(Object source) {
         if (source instanceof Object[]) {
             return (Object[]) source;

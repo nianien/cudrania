@@ -7,10 +7,10 @@ package com.cudrania.test.jooq;
 
 import com.cudrania.side.jooq.Match;
 import com.cudrania.side.jooq.Operator;
-
-import java.util.Date;
-
 import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 
 /**
@@ -92,24 +92,9 @@ public class GoodsQuery {
     private String srcStoreName;
 
     /**
-     * 退货仓code
+     * 价格
      */
-    private String retreatStoreCode;
-
-    /**
-     * 退货仓name
-     */
-    private String retreatStoreName;
-
-    /**
-     * 异常货品任务状态
-     */
-    private Integer bizOrderStatus;
-
-    /**
-     * 顾客申诉结论
-     */
-    private String appealConclusion;
+    private BigDecimal price;
 
 
 }

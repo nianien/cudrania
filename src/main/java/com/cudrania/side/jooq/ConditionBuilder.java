@@ -1,17 +1,23 @@
 package com.cudrania.side.jooq;
 
 
-import com.cudrania.core.collection.CollectionUtils;
+import com.cudrania.core.arrays.ArrayUtils;
 import com.cudrania.core.reflection.Reflections;
 import com.cudrania.core.utils.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.SQLDialect;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
+import org.jooq.impl.DefaultDataType;
 
-import java.util.*;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -26,73 +32,125 @@ import java.util.regex.Pattern;
  */
 public class ConditionBuilder {
 
+    private static final Pattern UPPER_PATTERN = Pattern.compile("[A-Z]");
+    private SQLDialect sqlDialect = SQLDialect.DEFAULT;
+
+
     /**
-     * 条件查询字段生成器
+     * 生成查询字段
      */
-    private Function<String, Field> fieldGenerator;
+    private BiFunction<String, Class<?>, Field<?>> fieldGenerator;
+
     /**
-     * 条件查询字段过滤
+     * 生成查询字段名称
+     */
+    private Function<String, String> nameGenerator = Function.identity();
+
+    /**
+     * 查询字段过滤
      */
     private Predicate<QueryField> filter = (f) -> true;
 
 
     /**
-     * 对象字段名作为条件查询字段, 自动转换为下划线形式
-     *
-     * @return
-     */
-    public ConditionBuilder() {
-        this(true);
-    }
-
-    /**
-     * bean对象字段名作为条件查询字段
-     *
-     * @param underlineStyle 是否自动转换为下划线形式
-     */
-    public ConditionBuilder(boolean underlineStyle) {
-        this(underlineStyle ? byUnderLine() : byName());
-    }
-
-    /**
-     * 数据库表字段作为条件查询字段
-     *
-     * @param table
-     * @return
-     */
-    public ConditionBuilder(Table table) {
-        this(byTable(table));
-    }
-
-
-    /**
-     * 自定义生成条件查询字段
+     * 自定义生成查询字段
      *
      * @param fieldGenerator
      * @return
      */
-    public ConditionBuilder(Function<String, Field> fieldGenerator) {
-        this.fieldGenerator = fieldGenerator;
+    protected ConditionBuilder(Function<String, String> nameGenerator, BiFunction<String, Class<?>, Field<?>> fieldGenerator) {
+        if (nameGenerator != null) {
+            this.nameGenerator = nameGenerator;
+        } else {
+            this.nameGenerator = Function.identity();
+        }
+        if (fieldGenerator != null) {
+            this.fieldGenerator = fieldGenerator;
+        } else {
+            this.fieldGenerator = (name, type) -> field(name, type, sqlDialect);
+        }
     }
 
 
     /**
-     * 设置条件查询字段的匹配操作
+     * 根据表定义的字段同名和下划线映射, 将存在的Java字段作为查询条件<br>
+     *
+     * @param table
+     * @return
+     */
+    public static ConditionBuilder byTable(Table table) {
+        return new ConditionBuilder(Function.identity(), (name, type) -> {
+            Field field = table.field(name);
+            if (field == null) {
+                name = humpToUnderLine(name);
+                field = table.field(name);
+            }
+            return field;
+        });
+    }
+
+
+    /**
+     * 转下划线映射
+     *
+     * @return
+     */
+    public static ConditionBuilder byUnderLine() {
+        return new ConditionBuilder(ConditionBuilder::humpToUnderLine, null);
+    }
+
+    /**
+     * 同名映射
+     *
+     * @return
+     */
+    public static ConditionBuilder byName() {
+        return new ConditionBuilder(Function.identity(), null);
+    }
+
+
+    /**
+     * 设置SQL方言
+     *
+     * @param sqlDialect
+     * @return
+     */
+    public ConditionBuilder with(SQLDialect sqlDialect) {
+        this.sqlDialect = sqlDialect;
+        return this;
+    }
+
+    /**
+     * 设置查询字段的匹配操作
      *
      * @param name     指定字段名称,  驼峰自动匹配下划线模式
-     * @param operator 匹配运算符,如果为null则该字段不参与条件查询
+     * @param operator 匹配运算符,如果为null则该字段不参与查询
      * @return
      */
     public ConditionBuilder with(String name, Operator operator) {
-        return with(new HashSet<>(Arrays.asList(name.toLowerCase(), humpToUnderLine(name).toLowerCase()))::contains, operator);
+        final String name1 = name.toLowerCase();
+        final String name2 = humpToUnderLine(name).toLowerCase();
+        return with(f -> f.toLowerCase().equals(name1) || f.toLowerCase().equals(name2), operator);
     }
 
 
     /**
-     * 设置条件查询字段的匹配操作
+     * 设置查询字段的匹配操作
      *
-     * @param predicate 条件查询字段断言,断言为真,则参与条件查询
-     * @param operator  匹配运算符,如果为null,则该字段不参与条件查询
+     * @param regex    字段名正则表达式
+     * @param operator 匹配运算符,如果为null则该字段不参与查询
+     * @return
+     */
+    public ConditionBuilder withRegex(String regex, Operator operator) {
+        return with(f -> f.matches(regex), operator);
+    }
+
+
+    /**
+     * 设置查询字段的匹配操作
+     *
+     * @param predicate 查询字段断言,断言为真,则参与查询
+     * @param operator  匹配运算符,如果为null,则该字段不参与查询
      * @return
      */
     public ConditionBuilder with(Predicate<String> predicate, Operator operator) {
@@ -114,7 +172,7 @@ public class ConditionBuilder {
     /**
      * 过滤查询字段
      *
-     * @param filter 条件查询字段断言,断言为真,则参与条件查询
+     * @param filter 查询字段断言,断言为真,则参与查询
      * @return
      */
     public ConditionBuilder with(Predicate<QueryField> filter) {
@@ -130,22 +188,8 @@ public class ConditionBuilder {
      * @return
      */
     public Condition build(Object queryBean) {
-        return toCondition(queryBean, fieldGenerator, filter);
-    }
-
-
-    /**
-     * 根据查询对象内容生成查询条件
-     *
-     * @param queryBean      查询对象, 字段值作为查询条件
-     * @param fieldGenerator 查询字段生成器
-     * @param filter         查询字段过滤器
-     * @return
-     */
-    public static Condition toCondition(Object queryBean, Function<String, Field> fieldGenerator,
-                                        Predicate<QueryField> filter) {
         Condition condition = DSL.noCondition();
-        List<QueryField> queryFields = getQueryFields(queryBean, fieldGenerator);
+        List<QueryField> queryFields = getQueryFields(queryBean);
         for (QueryField queryField : queryFields) {
             Field field = queryField.field;
             if (field == null || !filter.test(queryField)) {
@@ -167,7 +211,7 @@ public class ConditionBuilder {
      * @return
      */
     private static Condition singleCondition(QueryField queryField) {
-        Object[] values = queryField.asList().toArray(new Object[0]);
+        Object[] values = ArrayUtils.forceToArray(queryField.value);
         if (values.length == 0) {
             return null;
         }
@@ -220,12 +264,11 @@ public class ConditionBuilder {
     /**
      * 获取查询字段
      *
-     * @param query
-     * @param fieldGenerator
+     * @param queryBean
      * @return
      */
-    private static List<QueryField> getQueryFields(Object query, Function<String, Field> fieldGenerator) {
-        List<java.lang.reflect.Field> javaFields = Reflections.getFields(query.getClass(), Object.class, null);
+    private List<QueryField> getQueryFields(Object queryBean) {
+        List<java.lang.reflect.Field> javaFields = Reflections.getFields(queryBean.getClass(), Object.class, null);
         List<QueryField> queryFields = new ArrayList<>(javaFields.size());
         for (java.lang.reflect.Field javaField : javaFields) {
             Operator operator = Operator.EQ;
@@ -235,48 +278,30 @@ public class ConditionBuilder {
                 if (match.disable()) {
                     continue;
                 }
+                //优先使用注解定义
                 if (StringUtils.isNotEmpty(match.name())) {
                     name = match.name();
+                } else {
+                    //否则使用命名函数
+                    name = nameGenerator.apply(name);
                 }
                 operator = match.op();
             }
-            QueryField queryField = new QueryField(fieldGenerator.apply(name), Reflections.getFieldValue(query, javaField), operator);
-            if (queryField.field != null && queryField.value != null) {
-                queryFields.add(queryField);
+            //获取查询字段值
+            Object fieldValue = Reflections.getFieldValue(queryBean, javaField);
+            //字段转成数组,用于空值判断和字段类型推断
+            Object[] array = ArrayUtils.forceToArray(fieldValue);
+            if (array.length == 0) {
+                continue;
             }
+            // 根据名称和类型生成查询字段
+            Field<?> field = fieldGenerator.apply(name, array[0].getClass());
+            if (field == null) {
+                continue;
+            }
+            queryFields.add(new QueryField(field, array[0].getClass(), fieldValue, operator));
         }
         return queryFields;
-    }
-
-    private static Pattern STR_PATTERN = Pattern.compile("[A-Z]");
-
-
-    /**
-     * 同名映射
-     *
-     * @return
-     */
-    public static Function<String, Field> byName() {
-        return name -> DSL.field(name);
-    }
-
-    /**
-     * 转下划线映射
-     *
-     * @return
-     */
-    public static Function<String, Field> byUnderLine() {
-        return name -> DSL.field(humpToUnderLine(name));
-    }
-
-    /**
-     * 表字段映射,自动适配下划线风格
-     *
-     * @param table
-     * @return
-     */
-    public static Function<String, Field> byTable(Table table) {
-        return (name) -> findField(table, name);
     }
 
 
@@ -287,7 +312,7 @@ public class ConditionBuilder {
      * @return
      */
     private static String humpToUnderLine(String str) {
-        Matcher matcher = STR_PATTERN.matcher(str);
+        Matcher matcher = UPPER_PATTERN.matcher(str);
         StringBuffer sb = new StringBuffer();
         while (matcher.find()) {
             matcher.appendReplacement(sb, "_" + matcher.group(0).toLowerCase());
@@ -296,20 +321,24 @@ public class ConditionBuilder {
         return sb.toString();
     }
 
+
     /**
-     * 根据对象字段名查询表字段,自动识别下划线风格
+     * 创建字段
      *
-     * @param table 数据库表
-     * @param name  对象字段
-     * @return 数据库表字段
+     * @param name
+     * @param type
+     * @param sqlDialect
+     * @return
      */
-    private static Field findField(Table table, String name) {
-        Field field = table.field(name);
-        if (field == null) {
-            name = humpToUnderLine(name);
-            field = table.field(name);
+    private static Field<?> field(String name, Class<?> type, SQLDialect sqlDialect) {
+        if (type == Date.class) {
+            type = Timestamp.class;
         }
-        return field;
+        try {
+            return DSL.field(name, DefaultDataType.getDataType(sqlDialect, type));
+        } catch (Exception e) {
+            return DSL.field(name, DefaultDataType.getDataType(sqlDialect, Object.class));
+        }
     }
 
 
@@ -319,28 +348,23 @@ public class ConditionBuilder {
     @Data
     @AllArgsConstructor
     public static class QueryField {
-        Field field;
-        Object value;
-        Operator operator;
-
         /**
-         * 非空值转集合
-         *
-         * @return
+         * 生成的查询字段
          */
-        Collection asList() {
-            if (value == null ||
-                    value instanceof String && StringUtils.isEmpty((String) value)) {
-                return Collections.EMPTY_LIST;
-            }
-            if (field.getType().isArray()) {
-                return CollectionUtils.arrayToList(value);
-            } else if (value instanceof Collection) {
-                return (Collection) value;
-            } else {
-                return Arrays.asList(value);
-            }
-        }
+        private final Field field;
+        /**
+         * Java字段类型或集合元素类型
+         */
+        private final Class rawType;
+        /**
+         * Java字段值
+         */
+        private final Object value;
+        /**
+         * 匹配操作符
+         */
+        private Operator operator;
+
     }
 
 
