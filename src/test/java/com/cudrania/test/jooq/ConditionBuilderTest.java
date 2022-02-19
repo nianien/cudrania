@@ -1,7 +1,11 @@
 package com.cudrania.test.jooq;
 
 import com.cudrania.side.jooq.ConditionBuilder;
+import com.cudrania.side.jooq.FluentCondition;
+import com.cudrania.side.jooq.Operator;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.SQLDialect;
 import org.jooq.conf.RenderNameStyle;
 import org.jooq.impl.DSL;
@@ -9,7 +13,12 @@ import org.jooq.impl.DefaultConfiguration;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
+
+import static com.cudrania.core.functions.Params.gt;
+import static com.cudrania.core.functions.Params.notEmpty;
 
 /**
  * scm.com Inc.
@@ -17,7 +26,7 @@ import java.util.Date;
  */
 public class ConditionBuilderTest {
 
-    protected DSLContext dslContext;
+    private DSLContext dslContext;
 
     @Before
     public void setup() {
@@ -31,11 +40,45 @@ public class ConditionBuilderTest {
     }
 
     @Test
-    public void test() {
+    public void testFluent() {
+        class User {
+            private Field<Long> ID = DSL.field("id", Long.class);
+            private Field<String> NAME = DSL.field("name", String.class);
+            private Field<Integer> TYPE = DSL.field("type", Integer.class);
+        }
+        User user = new User();
+        long id = 100;
+        String name = "jack";
+        List<Integer> types = Arrays.asList(1001, 1002, 1003, 1004);
+        Condition condition = FluentCondition.and()
+                .when(gt(id, 10), user.ID)
+                .when(notEmpty(name), user.NAME, (f, p) -> f.ne(p))
+                .when(notEmpty(types), user.TYPE::notIn)
+                .get();
+
+        System.out.println(dslContext.renderInlined(condition));
+    }
+
+
+    @Test
+    public void testBuilder() {
         GoodsQuery query = new GoodsQuery();
         query.setSubmitTimeBegin(new Date());
         query.setSubmitTimeEnd(new Date());
-        System.out.println(new ConditionBuilder()
-                .filter(f -> f.getField().getDeclaringClass() == GoodsQuery.class).build(query));
+        query.setSrcStoreName("abc");
+        query.setIndustryName("ddd");
+        query.setIndustryId(-100L);
+        query.setId(100L);
+        Condition condition = new ConditionBuilder()
+                .with(f -> {
+                    if (f.getField().getName().toLowerCase().contains("name")) {
+                        f.setOperator(Operator.LIKE);
+                    }
+                    return true;
+                })
+                .with("industryId", null)
+                .build(query);
+
+        System.out.println(dslContext.renderInlined(condition));
     }
 }

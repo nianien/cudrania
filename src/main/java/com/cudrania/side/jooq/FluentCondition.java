@@ -1,12 +1,12 @@
 package com.cudrania.side.jooq;
 
+import com.cudrania.core.arrays.ArrayUtils;
 import com.cudrania.core.functions.Fluent;
 import com.cudrania.core.functions.Param;
 import com.cudrania.core.functions.Params;
-import com.cudrania.core.arrays.ArrayUtils;
-
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.impl.DSL;
 
 import java.util.Collection;
 import java.util.function.BiFunction;
@@ -18,7 +18,6 @@ import java.util.function.Function;
  *
  * @author scorpio
  * @version 1.0.0
- 
  */
 public class FluentCondition extends Fluent<Condition> {
     /**
@@ -37,25 +36,43 @@ public class FluentCondition extends Fluent<Condition> {
         this.op = op;
     }
 
+    /**
+     * 使用AND构建Condition对象
+     *
+     * @return
+     */
+    public static FluentCondition and() {
+        return and(DSL.noCondition());
+    }
 
     /**
      * 使用AND构建Condition对象
      *
-     * @param target
+     * @param initial
      * @return
      */
-    public static FluentCondition and(Condition target) {
-        return new FluentCondition(target, (c1, c2) -> c1.and(c2));
+    public static FluentCondition and(Condition initial) {
+        return new FluentCondition(initial, (c1, c2) -> c1.and(c2));
     }
 
     /**
      * 使用OR构建Condition对象
      *
-     * @param target
      * @return
      */
-    public static FluentCondition or(Condition target) {
-        return new FluentCondition(target, (c1, c2) -> c1.or(c2));
+    public static FluentCondition or() {
+        return or(DSL.noCondition());
+    }
+
+
+    /**
+     * 使用OR构建Condition对象
+     *
+     * @param initial 初始condition
+     * @return
+     */
+    public static FluentCondition or(Condition initial) {
+        return new FluentCondition(initial, (c1, c2) -> c1.or(c2));
     }
 
 

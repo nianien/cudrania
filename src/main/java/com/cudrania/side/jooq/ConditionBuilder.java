@@ -5,7 +5,7 @@ import com.cudrania.core.collection.CollectionUtils;
 import com.cudrania.core.reflection.Reflections;
 import com.cudrania.core.utils.StringUtils;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.Table;
@@ -27,17 +27,17 @@ import java.util.regex.Pattern;
 public class ConditionBuilder {
 
     /**
-     * 用于生成字段的函数
+     * 条件查询字段生成器
      */
     private Function<String, Field> fieldGenerator;
     /**
-     * 用于过滤字段的函数
+     * 条件查询字段过滤
      */
-    private Predicate<QueryField> fieldFilter;
+    private Predicate<QueryField> filter = (f) -> true;
 
 
     /**
-     * 对象字段名作为数据库查询字段, 自动转换为下划线形式
+     * 对象字段名作为条件查询字段, 自动转换为下划线形式
      *
      * @return
      */
@@ -46,7 +46,7 @@ public class ConditionBuilder {
     }
 
     /**
-     * 对象字段名作为数据库查询字段
+     * bean对象字段名作为条件查询字段
      *
      * @param underlineStyle 是否自动转换为下划线形式
      */
@@ -55,7 +55,7 @@ public class ConditionBuilder {
     }
 
     /**
-     * 数据库表字段作为查询字段
+     * 数据库表字段作为条件查询字段
      *
      * @param table
      * @return
@@ -66,7 +66,7 @@ public class ConditionBuilder {
 
 
     /**
-     * 自定义生成查询字段
+     * 自定义生成条件查询字段
      *
      * @param fieldGenerator
      * @return
@@ -75,46 +75,83 @@ public class ConditionBuilder {
         this.fieldGenerator = fieldGenerator;
     }
 
+
     /**
-     * 过滤查询字段
+     * 设置条件查询字段的匹配操作
      *
-     * @param fieldFilter
+     * @param name     指定字段名称,  驼峰自动匹配下划线模式
+     * @param operator 匹配运算符,如果为null则该字段不参与条件查询
      * @return
      */
-    public ConditionBuilder filter(Predicate<QueryField> fieldFilter) {
-        this.fieldFilter = fieldFilter;
+    public ConditionBuilder with(String name, Operator operator) {
+        return with(new HashSet<>(Arrays.asList(name.toLowerCase(), humpToUnderLine(name).toLowerCase()))::contains, operator);
+    }
+
+
+    /**
+     * 设置条件查询字段的匹配操作
+     *
+     * @param predicate 条件查询字段断言,断言为真,则参与条件查询
+     * @param operator  匹配运算符,如果为null,则该字段不参与条件查询
+     * @return
+     */
+    public ConditionBuilder with(Predicate<String> predicate, Operator operator) {
+        this.filter = this.filter.and(
+                f -> {
+                    if (predicate.test(f.field.getName())) {
+                        if (operator == null) {
+                            return false;
+                        }
+                        f.setOperator(operator);
+                    }
+                    return true;
+                }
+        );
         return this;
     }
 
 
     /**
-     * 使用默认转换逻辑
+     * 过滤查询字段
      *
+     * @param filter 条件查询字段断言,断言为真,则参与条件查询
      * @return
      */
-    public Condition build(Object queryBean) {
-        return toCondition(queryBean, fieldGenerator, fieldFilter);
+    public ConditionBuilder with(Predicate<QueryField> filter) {
+        this.filter = this.filter.and(filter);
+        return this;
     }
 
 
     /**
-     * 自定义函数生成匹配条件
+     * 根据查询对象内容生成查询条件
      *
-     * @param queryBean
-     * @param fieldGenerator
-     * @param fieldFilter
+     * @param queryBean 查询对象, 字段值作为查询条件
+     * @return
+     */
+    public Condition build(Object queryBean) {
+        return toCondition(queryBean, fieldGenerator, filter);
+    }
+
+
+    /**
+     * 根据查询对象内容生成查询条件
+     *
+     * @param queryBean      查询对象, 字段值作为查询条件
+     * @param fieldGenerator 查询字段生成器
+     * @param filter         查询字段过滤器
      * @return
      */
     public static Condition toCondition(Object queryBean, Function<String, Field> fieldGenerator,
-                                        Predicate<QueryField> fieldFilter) {
-        Condition condition = DSL.trueCondition();
-        List<QueryField> queryFields = getQueryFields(queryBean, fieldFilter);
-        for (QueryField info : queryFields) {
-            Field field = fieldGenerator.apply(info.name);
-            if (field == null) {
+                                        Predicate<QueryField> filter) {
+        Condition condition = DSL.noCondition();
+        List<QueryField> queryFields = getQueryFields(queryBean, fieldGenerator);
+        for (QueryField queryField : queryFields) {
+            Field field = queryField.field;
+            if (field == null || !filter.test(queryField)) {
                 continue;
             }
-            Condition subCondition = singleCondition(info, field);
+            Condition subCondition = singleCondition(queryField);
             if (subCondition != null) {
                 condition = condition.and(subCondition);
             }
@@ -126,17 +163,17 @@ public class ConditionBuilder {
     /**
      * 基于单个字段创建匹配条件
      *
-     * @param info
-     * @param field
+     * @param queryField
      * @return
      */
-    private static Condition singleCondition(QueryField info, Field field) {
-        Object[] values = info.asList().toArray(new Object[0]);
+    private static Condition singleCondition(QueryField queryField) {
+        Object[] values = queryField.asList().toArray(new Object[0]);
         if (values.length == 0) {
             return null;
         }
         Object value = values[0];
-        switch (info.operator) {
+        Field field = queryField.field;
+        switch (queryField.operator) {
             case EQ:
                 if (values.length > 1) {
                     return field.in(values);
@@ -167,13 +204,13 @@ public class ConditionBuilder {
                 if (values.length == 1) {
                     return field.ge(values[0]);
                 } else {
-                    throw new IllegalArgumentException("size of field[" + info.name + "] must be 2!");
+                    throw new IllegalArgumentException("size of field[" + field.getName() + "] must be 2!");
                 }
             case NOT_BETWEEN:
                 if (values.length == 2) {
                     return field.notBetween(values[0], values[1]);
                 } else {
-                    throw new IllegalArgumentException("size of field[" + info.name + "] must be 2!");
+                    throw new IllegalArgumentException("size of field[" + field.getName() + "] must be 2!");
                 }
             default:
                 return null;
@@ -184,16 +221,16 @@ public class ConditionBuilder {
      * 获取查询字段
      *
      * @param query
-     * @param fieldFilter
+     * @param fieldGenerator
      * @return
      */
-    private static List<QueryField> getQueryFields(Object query, Predicate<QueryField> fieldFilter) {
-        List<java.lang.reflect.Field> fields = Reflections.getFields(query.getClass(), Object.class, null);
-        List<QueryField> queryFields = new ArrayList<>(fields.size());
-        for (java.lang.reflect.Field field : fields) {
+    private static List<QueryField> getQueryFields(Object query, Function<String, Field> fieldGenerator) {
+        List<java.lang.reflect.Field> javaFields = Reflections.getFields(query.getClass(), Object.class, null);
+        List<QueryField> queryFields = new ArrayList<>(javaFields.size());
+        for (java.lang.reflect.Field javaField : javaFields) {
             Operator operator = Operator.EQ;
-            String name = field.getName();
-            Match match = Reflections.findAnnotation(field, Match.class);
+            String name = javaField.getName();
+            Match match = Reflections.findAnnotation(javaField, Match.class);
             if (match != null) {
                 if (match.disable()) {
                     continue;
@@ -203,9 +240,8 @@ public class ConditionBuilder {
                 }
                 operator = match.op();
             }
-            Object value = Reflections.getFieldValue(query, field);
-            QueryField queryField = new QueryField(field, name, value, operator);
-            if (fieldFilter == null || fieldFilter.test(queryField)) {
+            QueryField queryField = new QueryField(fieldGenerator.apply(name), Reflections.getFieldValue(query, javaField), operator);
+            if (queryField.field != null && queryField.value != null) {
                 queryFields.add(queryField);
             }
         }
@@ -276,14 +312,14 @@ public class ConditionBuilder {
         return field;
     }
 
+
     /**
      * 查询字段
      */
-    @Getter
+    @Data
     @AllArgsConstructor
     public static class QueryField {
-        java.lang.reflect.Field field;
-        String name;
+        Field field;
         Object value;
         Operator operator;
 
