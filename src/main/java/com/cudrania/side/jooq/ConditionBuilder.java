@@ -14,10 +14,9 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultDataType;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -121,58 +120,66 @@ public class ConditionBuilder {
     }
 
     /**
-     * 设置查询字段的匹配操作
+     * 设置匹配字段的查询操作
      *
-     * @param name     指定字段名称,  驼峰自动匹配下划线模式
-     * @param operator 匹配运算符,如果为null则该字段不参与查询
+     * @param name     指定字段名称, 同时匹配下划线模式
+     * @param operator 查询操作,如果为null则该字段不参与查询
      * @return
      */
     public ConditionBuilder with(String name, Operator operator) {
-        final String name1 = name.toLowerCase();
-        final String name2 = humpToUnderLine(name).toLowerCase();
-        return with(f -> f.toLowerCase().equals(name1) || f.toLowerCase().equals(name2), operator);
+        Set<String> set = new HashSet<>(Arrays.asList(name.toLowerCase(), humpToUnderLine(name).toLowerCase()));
+        return with(f -> set.contains(f.toLowerCase()), operator);
     }
 
 
     /**
-     * 设置查询字段的匹配操作
+     * 设置匹配字段的查询操作
      *
-     * @param regex    字段名正则表达式
-     * @param operator 匹配运算符,如果为null则该字段不参与查询
+     * @param regex    字段名匹配的正则表达式
+     * @param operator 查询操作,如果为null则该字段不参与查询
      * @return
      */
     public ConditionBuilder withRegex(String regex, Operator operator) {
         return with(f -> f.matches(regex), operator);
     }
 
+    /**
+     * 设置匹配字段的查询操作
+     *
+     * @param predicate 字段匹配函数, 匹配时设置查询操作
+     * @param operator  查询操作,如果为null则该字段不参与查询
+     * @return
+     */
+    public ConditionBuilder with(BiPredicate<String, Object> predicate, Operator operator) {
+        return with(f -> {
+            if (predicate.test(f.field.getName(), f.value)) {
+                f.setOperator(operator);
+            }
+            return true;
+        });
+    }
 
     /**
-     * 设置查询字段的匹配操作
+     * 设置匹配字段的查询操作
      *
-     * @param predicate 查询字段断言,断言为真,则参与查询
-     * @param operator  匹配运算符,如果为null,则该字段不参与查询
+     * @param predicate 字段匹配函数, 匹配时设置查询操作
+     * @param operator  查询操作,如果为null则字段不参与查询
      * @return
      */
     public ConditionBuilder with(Predicate<String> predicate, Operator operator) {
-        this.filter = this.filter.and(
-                f -> {
-                    if (predicate.test(f.field.getName())) {
-                        if (operator == null) {
-                            return false;
-                        }
-                        f.setOperator(operator);
-                    }
-                    return true;
-                }
-        );
-        return this;
+        return with(f -> {
+            if (predicate.test(f.field.getName())) {
+                f.setOperator(operator);
+            }
+            return true;
+        });
     }
 
 
     /**
      * 过滤查询字段
      *
-     * @param filter 查询字段断言,断言为真,则参与查询
+     * @param filter 过滤函数,判断结果为真时作为查询条件,可同时设置查询操作,如果查询操作为null则不参与查询
      * @return
      */
     public ConditionBuilder with(Predicate<QueryField> filter) {
@@ -191,8 +198,9 @@ public class ConditionBuilder {
         Condition condition = DSL.noCondition();
         List<QueryField> queryFields = getQueryFields(queryBean);
         for (QueryField queryField : queryFields) {
-            Field field = queryField.field;
-            if (field == null || !filter.test(queryField)) {
+            if (!filter.test(queryField)
+                    || queryField.operator == null
+                    || queryField.operator == Operator.NOP) {
                 continue;
             }
             Condition subCondition = singleCondition(queryField);
@@ -275,7 +283,8 @@ public class ConditionBuilder {
             String name = javaField.getName();
             Match match = Reflections.findAnnotation(javaField, Match.class);
             if (match != null) {
-                if (match.disable()) {
+                operator = match.value();
+                if (operator == Operator.NOP) {
                     continue;
                 }
                 //优先使用注解定义
@@ -285,7 +294,9 @@ public class ConditionBuilder {
                     //否则使用命名函数
                     name = nameGenerator.apply(name);
                 }
-                operator = match.op();
+            } else {
+                //否则使用命名函数
+                name = nameGenerator.apply(name);
             }
             //获取查询字段值
             Object fieldValue = Reflections.getFieldValue(queryBean, javaField);

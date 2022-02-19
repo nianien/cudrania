@@ -1,10 +1,6 @@
 package com.cudrania.side.jooq;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * 用于字段匹配的注解
@@ -20,7 +16,7 @@ public @interface Match {
      *
      * @return
      */
-    Operator op() default Operator.EQ;
+    Operator value() default Operator.EQ;
 
     /**
      * 用于匹配的字段名
@@ -29,10 +25,4 @@ public @interface Match {
      */
     String name() default "";
 
-    /**
-     * 是否停用
-     *
-     * @return
-     */
-    boolean disable() default false;
 }

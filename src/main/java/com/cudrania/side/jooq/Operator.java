@@ -7,6 +7,10 @@ package com.cudrania.side.jooq;
  */
 public enum Operator {
     /**
+     * "no operation"
+     */
+    NOP(""),
+    /**
      * "="
      */
     EQ("? = ?"),

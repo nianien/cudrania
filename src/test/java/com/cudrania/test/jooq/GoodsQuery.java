@@ -41,7 +41,7 @@ public class GoodsQuery {
     /**
      * 环境标识
      */
-    @Match(disable = true)
+    @Match(Operator.NOP)
     private String env;
 
     /**
@@ -62,13 +62,13 @@ public class GoodsQuery {
     /**
      * 提报时间开始
      */
-    @Match(name = "out_submit_time", op = Operator.GE)
+    @Match(name = "out_submit_time", value = Operator.GE)
     private Date submitTimeBegin;
 
     /**
      * 提报时间结束
      */
-    @Match(name = "out_submit_time", op = Operator.LE)
+    @Match(name = "out_submit_time", value = Operator.LE)
     private Date submitTimeEnd;
 
     /**
@@ -91,10 +91,24 @@ public class GoodsQuery {
      */
     private String srcStoreName;
 
+
     /**
      * 价格
      */
     private BigDecimal price;
+
+
+    /**
+     * 过期时间
+     */
+    @Match(Operator.BETWEEN)
+    private Date[] expireDate;
+
+    /**
+     * 创建时间
+     */
+    @Match(Operator.BETWEEN)
+    private Date createDate;
 
 
 }

@@ -73,7 +73,7 @@ public class ConditionBuilderTest {
         query.setPrice(new BigDecimal(1111));
         Condition condition = ConditionBuilder.byName()
                 .withRegex("(?i).*name.*", Operator.LIKE)
-                .with(name->name.equals("industryId"),null)
+                .with(name -> name.equals("industryId"), Operator.NOP)
                 .with("price", Operator.LT)
                 .build(query);
 
@@ -83,23 +83,17 @@ public class ConditionBuilderTest {
 
     @Test
     public void testBuilder2() {
-        AdCert adCertPhoto = new AdCert();
-        adCertPhoto.setExpireDate(new Date[]{new Date(), new Date()});
-        adCertPhoto.setStatusDetail("测试");
-        adCertPhoto.setCreateDate(new Date());
-        adCertPhoto.setStatus(-1);
+        GoodsQuery goodsQuery = new GoodsQuery();
+        goodsQuery.setExpireDate(new Date[]{new Date(), new Date()});
+        goodsQuery.setSrcStoreName("测试仓");
+        goodsQuery.setCreateDate(new Date());
+        goodsQuery.setBizType(10);
         Condition condition = ConditionBuilder.byUnderLine()
-                .with("StatusDetail", Operator.LIKE)
-                .with(f -> {
-                    if (f.getValue() instanceof Integer) {
-                        return ((Integer) f.getValue()) > 0;
-                    }
-                    return true;
-                })
+                .with("SrcStoreName", Operator.LIKE)
+                .with((k, v) -> v instanceof Number && ((Number) v).intValue() < 0, Operator.NOP)
                 .with(SQLDialect.MYSQL)
-                .build(adCertPhoto);
+                .build(goodsQuery);
         System.out.println(dslContext.renderInlined(condition));
     }
-
 
 }
