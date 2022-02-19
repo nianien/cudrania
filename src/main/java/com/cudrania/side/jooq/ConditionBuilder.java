@@ -19,8 +19,8 @@ import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static com.cudrania.core.utils.StringUtils.underscoreCase;
 
 /**
  * 匹配条件构造器<br/>
@@ -31,7 +31,6 @@ import java.util.regex.Pattern;
  */
 public class ConditionBuilder {
 
-    private static final Pattern UPPER_PATTERN = Pattern.compile("[A-Z]");
     private SQLDialect sqlDialect = SQLDialect.DEFAULT;
 
 
@@ -81,7 +80,7 @@ public class ConditionBuilder {
         return new ConditionBuilder(Function.identity(), (name, type) -> {
             Field field = table.field(name);
             if (field == null) {
-                name = humpToUnderLine(name);
+                name = underscoreCase(name);
                 field = table.field(name);
             }
             return field;
@@ -95,7 +94,7 @@ public class ConditionBuilder {
      * @return
      */
     public static ConditionBuilder byUnderLine() {
-        return new ConditionBuilder(ConditionBuilder::humpToUnderLine, null);
+        return new ConditionBuilder(StringUtils::underscoreCase, null);
     }
 
     /**
@@ -127,7 +126,7 @@ public class ConditionBuilder {
      * @return
      */
     public ConditionBuilder with(String name, Operator operator) {
-        Set<String> set = new HashSet<>(Arrays.asList(name.toLowerCase(), humpToUnderLine(name).toLowerCase()));
+        Set<String> set = new HashSet<>(Arrays.asList(name.toLowerCase(), underscoreCase(name).toLowerCase()));
         return with(f -> set.contains(f.toLowerCase()), operator);
     }
 
@@ -313,23 +312,6 @@ public class ConditionBuilder {
             queryFields.add(new QueryField(field, array[0].getClass(), fieldValue, operator));
         }
         return queryFields;
-    }
-
-
-    /**
-     * 驼峰转下划线
-     *
-     * @param str
-     * @return
-     */
-    private static String humpToUnderLine(String str) {
-        Matcher matcher = UPPER_PATTERN.matcher(str);
-        StringBuffer sb = new StringBuffer();
-        while (matcher.find()) {
-            matcher.appendReplacement(sb, "_" + matcher.group(0).toLowerCase());
-        }
-        matcher.appendTail(sb);
-        return sb.toString();
     }
 
 

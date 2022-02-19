@@ -469,7 +469,7 @@ public class StringUtils {
      * @param source
      * @param array
      * @return array中元素首次出现的索引位置<br>
-     *         如果array元素为空,返回-1
+     * 如果array元素为空,返回-1
      */
     public static int indexOfAny(String source, char[] array) {
         if (array.length == 0) {
@@ -489,7 +489,7 @@ public class StringUtils {
      * @param source
      * @param parameters
      * @return parameters中参数值首次出现的索引位置<br>
-     *         如果未指定parameters,则返回-1
+     * 如果未指定parameters,则返回-1
      */
     public static int indexOfAny(String source, String... parameters) {
         if (parameters.length == 0)
@@ -512,7 +512,7 @@ public class StringUtils {
      * @param pattern
      * @param count
      * @return 第count次匹配pattern的子串索引位置<br>
-     *         如果source包含pattern的个数小于count,返回-1<br>
+     * 如果source包含pattern的个数小于count,返回-1<br>
      */
     public static int indexOfTimes(String source, String pattern, int count) {
         if (count <= 0)
@@ -628,7 +628,7 @@ public class StringUtils {
      * @param source
      * @param array
      * @return array中元素的最后一次出现的索引位置<br>
-     *         如果array元素为空,返回-1
+     * 如果array元素为空,返回-1
      */
     public static int lastIndexOfAny(String source, char[] array) {
         if (array.length == 0) {
@@ -648,7 +648,7 @@ public class StringUtils {
      * @param source
      * @param parameters
      * @return 返回parameters中参数值的最后一次出现的索引位置<br>
-     *         如果未指定parameters参数,返回-1;
+     * 如果未指定parameters参数,返回-1;
      */
     public static int lastIndexOfAny(String source, String... parameters) {
         if (parameters.length == 0)
@@ -672,8 +672,8 @@ public class StringUtils {
      * @param target
      * @param count
      * @return 倒数第count次匹配pattern的子串索引位置<br>
-     *         如果source包含pattern的个数小于count,返回-1<br>
-     *         如果pattern为空,返回-1<br>
+     * 如果source包含pattern的个数小于count,返回-1<br>
+     * 如果pattern为空,返回-1<br>
      */
     public static int lastIndexOfTimes(String source, String target, int count) {
         if (count <= 0) {
@@ -779,7 +779,7 @@ public class StringUtils {
      * @param target
      * @param replacement
      * @return 处理后的字符串<br>
-     *         如果source为空,则返回源字符串<br>
+     * 如果source为空,则返回源字符串<br>
      */
     public static String replace(String source, char target, String replacement) {
         if (isEmpty(source))
@@ -956,7 +956,7 @@ public class StringUtils {
      * @param source
      * @param array
      * @return 处理后的字符串<br>
-     *         如果array元素为空,则返回源字符串
+     * 如果array元素为空,则返回源字符串
      */
     public static String trim(String source, char[] array) {
         return trimRight(trimLeft(source, array), array);
@@ -968,7 +968,7 @@ public class StringUtils {
      * @param source
      * @param target
      * @return 处理后的字符串<br>
-     *         如果target为空,则返回源字符串
+     * 如果target为空,则返回源字符串
      */
     public static String trim(String source, String target) {
         String pattern = Pattern.quote(target);
@@ -983,7 +983,7 @@ public class StringUtils {
      * @param source
      * @param array
      * @return 处理后的字符串<br>
-     *         如果array元素为空,返回源字符串
+     * 如果array元素为空,返回源字符串
      */
     public static String trimLeft(String source, char[] array) {
         if (isEmpty(source) || array.length == 0)
@@ -1005,7 +1005,7 @@ public class StringUtils {
      * @param source
      * @param target
      * @return 处理后的字符串<br>
-     *         如果target为空,则返回源字符串
+     * 如果target为空,则返回源字符串
      */
     public static String trimLeft(String source, String target) {
         String pattern = "^(" + Pattern.quote(target) + ")+";
@@ -1018,7 +1018,7 @@ public class StringUtils {
      * @param source
      * @param array
      * @return 处理后的字符串<br>
-     *         如果array元素为空,返回源字符串
+     * 如果array元素为空,返回源字符串
      */
     public static String trimRight(String source, char[] array) {
         if (isEmpty(source) || array.length == 0)
@@ -1040,7 +1040,7 @@ public class StringUtils {
      * @param source
      * @param target
      * @return 处理后的字符串<br>
-     *         如果source或target为空,则返回源字符串.
+     * 如果source或target为空,则返回源字符串.
      */
     public static String trimRight(String source, String target) {
         String pattern = "(" + Pattern.quote(target) + ")+$";
@@ -1075,7 +1075,7 @@ public class StringUtils {
      * @param str       the String to get a substring from, may be null
      * @param separator the String to search for, may be null
      * @return the substring before the first occurrence of the separator,
-     *         {@code null} if null String input
+     * {@code null} if null String input
      * @since 2.0
      */
     public static String substringBefore(final String str, final String separator) {
@@ -1117,7 +1117,7 @@ public class StringUtils {
      * @param str       the String to get a substring from, may be null
      * @param separator the String to search for, may be null
      * @return the substring after the first occurrence of the separator,
-     *         {@code null} if null String input
+     * {@code null} if null String input
      * @since 2.0
      */
     public static String substringAfter(final String str, final String separator) {
@@ -1158,7 +1158,7 @@ public class StringUtils {
      * @param str       the String to get a substring from, may be null
      * @param separator the String to search for, may be null
      * @return the substring before the last occurrence of the separator,
-     *         {@code null} if null String input
+     * {@code null} if null String input
      * @since 2.0
      */
     public static String substringBeforeLast(final String str, final String separator) {
@@ -1198,7 +1198,7 @@ public class StringUtils {
      * @param str       the String to get a substring from, may be null
      * @param separator the String to search for, may be null
      * @return the substring after the last occurrence of the separator,
-     *         {@code null} if null String input
+     * {@code null} if null String input
      * @since 2.0
      */
     public static String substringAfterLast(final String str, final String separator) {
@@ -1217,71 +1217,80 @@ public class StringUtils {
 
 
     /**
-     * 连字符&下划线转驼峰
+     * 连接符转驼峰Camel(".","-","_")
      *
      * @param src
      * @return
      */
-    private static String toCamel(String src) {
+    public static String camelCase(String src) {
+        String dest = pascalCase(src);
+        return dest.substring(0, 1).toLowerCase() + dest.substring(1);
+    }
+
+    /**
+     * 连接符转帕斯卡Pascal(".","-","_")
+     *
+     * @param src
+     * @return
+     */
+    public static String pascalCase(String src) {
+        String separators = "_-.";
         StringBuilder sb = new StringBuilder();
-        boolean upper = false;
+        boolean needToUpper = false;
         for (char ch : src.toCharArray()) {
-            if (ch == '-' || ch == '_') {
-                upper = true;
+            if (separators.indexOf(ch) != -1) {
+                needToUpper = true;
             } else if (Character.isLetter(ch)) {
-                if (upper) {
+                if (needToUpper) {
                     sb.append(Character.toUpperCase(ch));
-                    upper = false;
-                }else{
+                    needToUpper = false;
+                } else {
                     sb.append(ch);
                 }
             }
         }
-//        String dest = Arrays.stream(src.split("[_-]"))
-//                .filter(e -> e.length() > 0)
-//                .map(e -> e.substring(0, 1).toUpperCase() + e.substring(1).toLowerCase())
-//                .collect(Collectors.joining());
-//        return dest.substring(0, 1).toLowerCase() + dest.substring(1);
         return sb.toString();
-
     }
 
+
     /**
-     * 连字符转驼峰
+     * 驼峰或帕斯卡转连接符(-)
      *
      * @param src
      * @return
      */
-    private static String camel2Hyphen(String src) {
-        return fromCamel(src, '-');
+    public static String hyphenCase(String src) {
+        return fromCamelOrPascal(src, '-');
     }
 
     /**
-     * 下划线转驼峰
+     * 驼峰或帕斯卡转下划线(_)
      *
      * @param src
      * @return
      */
-    private static String camel2Underline(String src) {
-        return fromCamel(src, '_');
+    public static String underscoreCase(String src) {
+        return fromCamelOrPascal(src, '_');
     }
 
     /**
-     * 驼峰转分割符
+     * 驼峰或帕斯卡转连接符
      *
      * @param src
      * @param separator
      * @return
      */
-    private static String fromCamel(String src, char separator) {
+    private static String fromCamelOrPascal(String src, char separator) {
         StringBuilder sb = new StringBuilder();
-        for (char ch : src.toCharArray()) {
-            if (Character.isUpperCase(ch)) {
+        char[] chs = src.toCharArray();
+        for (int i = 0; i < chs.length; i++) {
+            if (Character.isUpperCase(chs[i]) && i > 0) {
                 sb.append(separator);
             }
-            sb.append(Character.toLowerCase(ch));
+            sb.append(Character.toLowerCase(chs[i]));
         }
         return sb.toString();
     }
+
 
 }
