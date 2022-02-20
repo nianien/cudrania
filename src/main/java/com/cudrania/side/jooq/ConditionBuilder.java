@@ -53,8 +53,17 @@ public class ConditionBuilder {
     /**
      * 自定义生成查询字段
      *
-     * @param fieldGenerator
-     * @return
+     * @param nameGenerator 命名函数
+     */
+    public ConditionBuilder(Function<String, String> nameGenerator) {
+        this(nameGenerator, null);
+    }
+
+    /**
+     * 自定义生成查询字段
+     *
+     * @param nameGenerator  命名函数
+     * @param fieldGenerator 字段生成器
      */
     protected ConditionBuilder(Function<String, String> nameGenerator, BiFunction<String, Class<?>, Field<?>> fieldGenerator) {
         if (nameGenerator != null) {
