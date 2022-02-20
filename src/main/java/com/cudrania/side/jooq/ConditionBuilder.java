@@ -103,7 +103,7 @@ public class ConditionBuilder {
      * @return
      */
     public static ConditionBuilder byUnderLine() {
-        return new ConditionBuilder(StringUtils::underscoreCase, null);
+        return new ConditionBuilder(StringUtils::underscoreCase);
     }
 
     /**
@@ -112,7 +112,7 @@ public class ConditionBuilder {
      * @return
      */
     public static ConditionBuilder byName() {
-        return new ConditionBuilder(Function.identity(), null);
+        return new ConditionBuilder(Function.identity());
     }
 
 
