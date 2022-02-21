@@ -138,7 +138,7 @@ public class FluentCondition extends Fluent<Condition> {
 
 
     /**
-     * 当{@link Param#test()}为true,追加参数条件
+     * 当参数param方法{@link Param#get()}返回结果有值时,追加参数条件
      *
      * @param param    条件参数
      * @param function 表字段连接条件
@@ -150,7 +150,7 @@ public class FluentCondition extends Fluent<Condition> {
     }
 
     /**
-     * 当{@link Param#test()}为true,追加字段匹配
+     * 当参数param方法{@link Param#get()}返回结果有值时,调用函数追加字段匹配
      *
      * @param param    条件参数
      * @param field    表字段
