@@ -3,7 +3,6 @@ package com.cudrania.core.functions;
 
 import com.cudrania.core.arrays.ArrayUtils;
 import com.cudrania.core.utils.StringUtils;
-
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.Collection;
@@ -16,7 +15,6 @@ import java.util.function.Predicate;
  *
  * @author scorpio
  * @version 1.0.0
- 
  */
 public class Params {
 
@@ -237,7 +235,7 @@ public class Params {
      * @param <P>
      * @return
      */
-    public static <T, P> ImmutableParam<T, P> with(P parameter,
+    public static <T, P> ImmutableParam<P, T> with(P parameter,
                                                    Predicate<P> predicate,
                                                    Function<P, T> function) {
         return new ImmutableParam<>(parameter, predicate, function);
@@ -247,30 +245,30 @@ public class Params {
     /**
      * 不变参数类型，通过条件断言和转换函数实现参数的校验和使用
      *
-     * @param <T>
-     * @param <P>
+     * @param <OUT>
+     * @param <IN>
      */
-    public static class ImmutableParam<T, P> implements Param<T> {
+    public static class ImmutableParam<IN, OUT> implements Param<OUT> {
 
         /**
          * 初始参数
          */
-        private P parameter;
+        private IN parameter;
         /**
          * 条件断言,用于条件判定
          */
-        private Predicate<P> condition;
+        private Predicate<IN> condition;
         /**
          * 转换函数,用于参数处理
          */
-        private Function<P, T> resolver;
+        private Function<IN, OUT> resolver;
 
         /**
          * @param parameter 原始参数
          * @param condition 条件断言
          * @param resolver  转换函数
          */
-        public ImmutableParam(P parameter, Predicate<P> condition, Function<P, T> resolver) {
+        public ImmutableParam(IN parameter, Predicate<IN> condition, Function<IN, OUT> resolver) {
             this.parameter = parameter;
             this.condition = condition;
             this.resolver = resolver;
@@ -282,7 +280,7 @@ public class Params {
          * @param condition
          * @return
          */
-        public ImmutableParam<P, P> when(Predicate<P> condition) {
+        public ImmutableParam<IN, IN> when(Predicate<IN> condition) {
             return new ImmutableParam<>(parameter, condition, Function.identity());
         }
 
@@ -292,19 +290,30 @@ public class Params {
          *
          * @return
          */
-        public ImmutableParam<T, P> negate() {
+        public ImmutableParam<IN, OUT> negate() {
             return new ImmutableParam<>(parameter, condition.negate(), resolver);
         }
 
         /**
          * 绑定转换函数
          *
-         * @param resolver
-         * @param <T>
+         * @param resolver 对入参进行转换
+         * @param <OUT2>
          * @return
          */
-        public <T> ImmutableParam<T, P> then(Function<P, T> resolver) {
+        public <OUT2> ImmutableParam<IN, OUT2> then(Function<IN, OUT2> resolver) {
             return new ImmutableParam<>(parameter, condition, resolver);
+        }
+
+        /**
+         * 绑定转换函数
+         *
+         * @param resolver 对出参进行转换
+         * @param <OUT2>
+         * @return
+         */
+        public <OUT2> ImmutableParam<IN, OUT2> andThen(Function<OUT, OUT2> resolver) {
+            return new ImmutableParam<>(parameter, condition, this.resolver.andThen(resolver));
         }
 
         /**
@@ -323,7 +332,7 @@ public class Params {
          * @return
          */
         @Override
-        public T get() {
+        public OUT get() {
             return resolver.apply(parameter);
         }
 
