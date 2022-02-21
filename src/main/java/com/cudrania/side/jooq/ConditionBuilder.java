@@ -134,7 +134,7 @@ public class ConditionBuilder {
      * @param operator 查询操作,如果为null则该字段不参与查询
      * @return
      */
-    public ConditionBuilder with(String name, Operator operator) {
+    public ConditionBuilder withName(String name, Operator operator) {
         Set<String> set = new HashSet<>(Arrays.asList(name.toLowerCase(), underscoreCase(name).toLowerCase()));
         return with(f -> set.contains(f.toLowerCase()), operator);
     }
