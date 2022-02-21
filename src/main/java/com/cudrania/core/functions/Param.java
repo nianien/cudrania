@@ -1,35 +1,20 @@
 package com.cudrania.core.functions;
 
+import java.util.Optional;
+
 /**
- * 条件参数，当{@link #test()}为真时，可获取参数对象{@link #get()}
+ * 条件参数，方法{@link #get()} 返回结果{@link Optional#isPresent()}为true时，参数对象可用
  *
  * @author scorpio
  * @version 1.0.0
- 
  */
 public interface Param<T> {
-
-    /**
-     * 是否满足条件
-     *
-     * @return
-     */
-    boolean test();
 
     /**
      * 获取参数值
      *
      * @return
      */
-    T get();
+    Optional<T> get();
 
-    /**
-     * 如果{@link #test()}为真,获取参数值,否则返回defaultValue
-     *
-     * @param defaultValue
-     * @return
-     */
-    default T compute(T defaultValue) {
-        return test() ? get() : defaultValue;
-    }
 }

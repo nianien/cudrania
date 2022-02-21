@@ -7,8 +7,10 @@ import org.apache.commons.collections.CollectionUtils;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * 预定义{@link Param}对象
@@ -24,7 +26,7 @@ public class Params {
      * @param obj
      * @return
      */
-    public static <T> ImmutableParam<T, T> notNull(T obj) {
+    public static <T> ImmutableParam<T> notNull(T obj) {
         return with(obj).when(Objects::nonNull);
     }
 
@@ -34,7 +36,7 @@ public class Params {
      * @param str
      * @return
      */
-    public static ImmutableParam<String, String> notEmpty(String str) {
+    public static ImmutableParam<String> notEmpty(String str) {
         return with(str, StringUtils::isNotEmpty);
     }
 
@@ -45,7 +47,7 @@ public class Params {
      * @param collection
      * @return
      */
-    public static <T extends Collection<E>, E> ImmutableParam<T, T> notEmpty(T collection) {
+    public static <T extends Collection<E>, E> ImmutableParam<T> notEmpty(T collection) {
         return with(collection, CollectionUtils::isNotEmpty);
     }
 
@@ -68,7 +70,7 @@ public class Params {
      * @param other
      * @return
      */
-    public static <T extends Number> ImmutableParam<T, T> eq(T number, int other) {
+    public static <T extends Number> ImmutableParam<T> eq(T number, int other) {
         return with(number).when(e -> e.intValue() == other);
     }
 
@@ -79,7 +81,7 @@ public class Params {
      * @param number
      * @return
      */
-    public static <T extends Number> ImmutableParam<T, T> eq0(T number) {
+    public static <T extends Number> ImmutableParam<T> eq0(T number) {
         return eq(number, 0);
     }
 
@@ -90,7 +92,7 @@ public class Params {
      * @param other
      * @return
      */
-    public static <T extends Number> ImmutableParam<T, T> ne(T number, int other) {
+    public static <T extends Number> ImmutableParam<T> ne(T number, int other) {
         return with(number).when(e -> e.intValue() != other);
     }
 
@@ -101,7 +103,7 @@ public class Params {
      * @param number
      * @return
      */
-    public static <T extends Number> ImmutableParam<T, T> ne0(T number) {
+    public static <T extends Number> ImmutableParam<T> ne0(T number) {
         return ne(number, 0);
     }
 
@@ -112,7 +114,7 @@ public class Params {
      * @param other
      * @return
      */
-    public static <T extends Number> ImmutableParam<T, T> gt(T number, int other) {
+    public static <T extends Number> ImmutableParam<T> gt(T number, int other) {
         return with(number).when(e -> e.intValue() > other);
     }
 
@@ -123,7 +125,7 @@ public class Params {
      * @param number
      * @return
      */
-    public static <T extends Number> ImmutableParam<T, T> gt0(T number) {
+    public static <T extends Number> ImmutableParam<T> gt0(T number) {
         return gt(number, 0);
     }
 
@@ -134,7 +136,7 @@ public class Params {
      * @param other
      * @return
      */
-    public static <T extends Number> ImmutableParam<T, T> ge(T number, int other) {
+    public static <T extends Number> ImmutableParam<T> ge(T number, int other) {
         return with(number).when(e -> e.intValue() >= other);
     }
 
@@ -144,7 +146,7 @@ public class Params {
      * @param number
      * @return
      */
-    public static <T extends Number> ImmutableParam<T, T> ge0(T number) {
+    public static <T extends Number> ImmutableParam<T> ge0(T number) {
         return ge(number, 0);
     }
 
@@ -155,7 +157,7 @@ public class Params {
      * @param other
      * @return
      */
-    public static <T extends Number> ImmutableParam<T, T> lt(T number, int other) {
+    public static <T extends Number> ImmutableParam<T> lt(T number, int other) {
         return with(number).when(e -> e.intValue() < other);
     }
 
@@ -165,7 +167,7 @@ public class Params {
      * @param number
      * @return
      */
-    public static <T extends Number> ImmutableParam<T, T> lt0(T number) {
+    public static <T extends Number> ImmutableParam<T> lt0(T number) {
         return lt(number, 0);
     }
 
@@ -176,7 +178,7 @@ public class Params {
      * @param other
      * @return
      */
-    public static <T extends Number> ImmutableParam<T, T> le(T number, int other) {
+    public static <T extends Number> ImmutableParam<T> le(T number, int other) {
         return with(number).when(e -> e.intValue() <= other);
     }
 
@@ -186,7 +188,7 @@ public class Params {
      * @param number
      * @return
      */
-    public static <T extends Number> ImmutableParam<T, T> le0(T number) {
+    public static <T extends Number> ImmutableParam<T> le0(T number) {
         return le(number, 0);
     }
 
@@ -198,7 +200,7 @@ public class Params {
      * @param <T>
      * @return
      */
-    public static <T> ImmutableParam<T, T> $(T parameter) {
+    public static <T> ImmutableParam<T> $(T parameter) {
         return with(parameter);
     }
 
@@ -209,122 +211,81 @@ public class Params {
      * @param <T>
      * @return
      */
-    public static <T> ImmutableParam<T, T> with(T parameter) {
-        return new ImmutableParam<>(parameter, e -> true, Function.identity());
+    public static <T> ImmutableParam<T> with(T parameter) {
+        return with(parameter, x -> true);
     }
 
-    /**
-     * 构建参数对象,绑定条件断言
-     *
-     * @param parameter 原始参数
-     * @param predicate 条件断言
-     * @param <T>
-     * @return
-     */
-    public static <T> ImmutableParam<T, T> with(T parameter, Predicate<T> predicate) {
-        return new ImmutableParam<>(parameter, predicate, Function.identity());
-    }
 
     /**
      * 构建参数对象,绑定条件断言和参数转换函数
      *
      * @param parameter 原始参数
      * @param predicate 条件断言
-     * @param function  参数转换函数
      * @param <T>
-     * @param <P>
      * @return
      */
-    public static <T, P> ImmutableParam<P, T> with(P parameter,
-                                                   Predicate<P> predicate,
-                                                   Function<P, T> function) {
-        return new ImmutableParam<>(parameter, predicate, function);
+    public static <T> ImmutableParam<T> with(T parameter,
+                                             Predicate<T> predicate) {
+        return new ImmutableParam<>(() -> parameter, predicate);
     }
 
 
     /**
      * 不变参数类型，通过条件断言和转换函数实现参数的校验和使用
      *
-     * @param <OUT>
      * @param <IN>
      */
-    public static class ImmutableParam<IN, OUT> implements Param<OUT> {
-
+    public static class ImmutableParam<IN> implements Param<IN> {
         /**
          * 初始参数
          */
-        private IN parameter;
+        private Supplier<IN> provider;
         /**
          * 条件断言,用于条件判定
          */
         private Predicate<IN> condition;
-        /**
-         * 转换函数,用于参数处理
-         */
-        private Function<IN, OUT> resolver;
 
         /**
-         * @param parameter 原始参数
+         * @param provider  原始输入
          * @param condition 条件断言
-         * @param resolver  转换函数
          */
-        public ImmutableParam(IN parameter, Predicate<IN> condition, Function<IN, OUT> resolver) {
-            this.parameter = parameter;
+        private ImmutableParam(Supplier<IN> provider, Predicate<IN> condition) {
+            this.provider = provider;
             this.condition = condition;
-            this.resolver = resolver;
-        }
-
-        /**
-         * 绑定指定条件
-         *
-         * @param condition
-         * @return
-         */
-        public ImmutableParam<IN, IN> when(Predicate<IN> condition) {
-            return new ImmutableParam<>(parameter, condition, Function.identity());
         }
 
 
         /**
-         * 将当前条件取反
+         * 追加判定条件
+         *
+         * @param predicate
+         * @return
+         */
+        public ImmutableParam<IN> when(Predicate<IN> predicate) {
+            return new ImmutableParam<>(provider, condition.and(predicate));
+        }
+
+
+        /**
+         * 当前条件取反
          *
          * @return
          */
-        public ImmutableParam<IN, OUT> negate() {
-            return new ImmutableParam<>(parameter, condition.negate(), resolver);
+        public ImmutableParam<IN> negate() {
+            return new ImmutableParam<>(provider, condition.negate());
         }
 
         /**
-         * 绑定转换函数
+         * 结果转换
          *
-         * @param resolver 对入参进行转换
-         * @param <OUT2>
+         * @param resolver 对输入数据进行转换
+         * @param <OUT>
          * @return
          */
-        public <OUT2> ImmutableParam<IN, OUT2> then(Function<IN, OUT2> resolver) {
-            return new ImmutableParam<>(parameter, condition, resolver);
+        public <OUT> ImmutableParam<OUT> then(Function<IN, OUT> resolver) {
+            return new ImmutableParam<>(() -> this.get().map(resolver).orElse(null), x -> true);
         }
 
-        /**
-         * 绑定转换函数
-         *
-         * @param resolver 对出参进行转换
-         * @param <OUT2>
-         * @return
-         */
-        public <OUT2> ImmutableParam<IN, OUT2> andThen(Function<OUT, OUT2> resolver) {
-            return new ImmutableParam<>(parameter, condition, this.resolver.andThen(resolver));
-        }
-
-        /**
-         * 验证条件
-         *
-         * @return
-         */
-        @Override
-        public boolean test() {
-            return condition.test(parameter);
-        }
 
         /**
          * 返回处理后的参数
@@ -332,11 +293,12 @@ public class Params {
          * @return
          */
         @Override
-        public OUT get() {
-            return resolver.apply(parameter);
+        public Optional<IN> get() {
+            IN in = provider.get();
+            if (in != null && condition.test(in)) {
+                return Optional.ofNullable(in);
+            }
+            return Optional.empty();
         }
-
-
     }
-
 }

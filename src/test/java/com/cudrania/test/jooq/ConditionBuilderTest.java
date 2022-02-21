@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +27,12 @@ import static com.cudrania.core.functions.Params.notEmpty;
  * Copyright (c) 2004-2021 All Rights Reserved.
  */
 public class ConditionBuilderTest {
+
+    static class UserTable {
+        private static final Field<Long> ID = DSL.field("id", Long.class);
+        private static final Field<String> NAME = DSL.field("name", String.class);
+        private static final Field<Integer> TYPE = DSL.field("type", Integer.class);
+    }
 
     private DSLContext dslContext;
 
@@ -52,9 +59,14 @@ public class ConditionBuilderTest {
         String name = "jack";
         List<Integer> types = Arrays.asList(1001, 1002, 1003, 1004);
         Condition condition = FluentCondition.and()
-                .when(gt(id, 10), user.ID)
-                .when(notEmpty(name), user.NAME, (f, p) -> f.ne(p))
-                .when(notEmpty(types), user.TYPE::notIn)
+                .when(gt(id, 10), UserTable.ID)
+                .when(notEmpty(types)
+                        .then(ArrayList::new)
+                        .then(e -> {
+                            e.remove((Object) 1004);
+                            return e;
+                        }), UserTable.TYPE::notIn)
+                .when(notEmpty(name), UserTable.NAME, (f, p) -> f.ne(p))
                 .get();
 
         System.out.println(dslContext.renderInlined(condition));

@@ -5,11 +5,7 @@ import com.cudrania.core.utils.StringUtils;
 import com.cudrania.idea.jdbc.table.DataField;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -196,16 +192,14 @@ public class SqlStatement {
 
     /**
      * 追加SQL, 根据{@link Param}对象绑定参数<br/>
-     * 如果{@link Param#test()} ()}返回值为true,则绑定{@link Param#get()}的返回值
+     * 如果{@link Param#get()} ()}有值,则绑定{@link Param#get()}的返回值
      *
      * @param sql
      * @param param 参数对象
      * @return
      */
     public <T> SqlStatement append(String sql, Param<T> param) {
-        if (param.test()) {
-            append(sql, param.get());
-        }
+        param.get().ifPresent(t -> append(sql, t));
         return this;
     }
 

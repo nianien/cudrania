@@ -67,7 +67,7 @@ public class Fluent<T> {
 
 
     /**
-     * 当参数param方法{@link Param#test()}为true时,调用函数并绑定结果
+     * 当参数param方法{@link Param#get()}为有值时,调用函数并绑定结果
      *
      * @param param    条件参数
      * @param function 函数表达式
@@ -75,15 +75,13 @@ public class Fluent<T> {
      * @return
      */
     public <P> Fluent<T> $$(Param<P> param, BiFunction<T, P, T> function) {
-        if (param.test()) {
-            this.target = function.apply(target, param.get());
-        }
+        param.get().ifPresent(p -> this.target = function.apply(target, p));
         return this;
     }
 
 
     /**
-     * 当参数param方法{@link Param#test()}为true时调用函数
+     * 当参数param方法{@link Param#get()}为有值时调用函数
      *
      * @param param    条件参数
      * @param consumer 函数表达式
@@ -91,9 +89,7 @@ public class Fluent<T> {
      * @return
      */
     public <P> Fluent<T> $(Param<P> param, BiConsumer<T, P> consumer) {
-        if (param.test()) {
-            consumer.accept(target, param.get());
-        }
+        param.get().ifPresent(p -> consumer.accept(target, p));
         return this;
     }
 
@@ -550,9 +546,7 @@ public class Fluent<T> {
 
 
         public Fluent2<T, P1> invoke(Param<P1> u) {
-            if (u.test()) {
-                f.accept(target, u.get());
-            }
+            u.get().ifPresent(p -> f.accept(target, p));
             return this;
         }
 

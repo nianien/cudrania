@@ -2,10 +2,12 @@ package com.cudrania.test.functions;
 
 import com.cudrania.core.functions.Fluent;
 import com.cudrania.core.functions.Params;
+import com.cudrania.core.functions.Params.ImmutableParam;
 import com.cudrania.core.utils.StringUtils;
 import com.cudrania.test.bean.Contact;
 import com.cudrania.test.bean.Family;
 import com.cudrania.test.bean.People;
+import org.junit.Test;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -21,7 +23,25 @@ import static com.cudrania.core.functions.Params.gt0;
 public class TestFunction {
 
 
-    public static void main(String[] args) {
+    @Test
+    public void testParam() {
+
+        ImmutableParam<String> param = Params.with(10).then(n -> {
+            System.out.println("====");
+            return n * n;
+        }).when(n -> {
+            System.out.println("====");
+            return n < 200;
+        }).then(n -> {
+            System.out.println("====");
+            return "(" + n + ")";
+        });
+        System.out.println(">>>>>>>>>>>>>");
+        System.out.println(param.get());
+    }
+
+    @Test
+    public void testAll() {
 
         System.out.println(
                 of(new Family()).$$(Family::getHost).$$(People::getContact).$$(Contact::getAddress).get()
