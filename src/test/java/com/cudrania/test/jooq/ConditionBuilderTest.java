@@ -49,12 +49,6 @@ public class ConditionBuilderTest {
 
     @Test
     public void testFluent() {
-        class User {
-            private Field<Long> ID = DSL.field("id", Long.class);
-            private Field<String> NAME = DSL.field("name", String.class);
-            private Field<Integer> TYPE = DSL.field("type", Integer.class);
-        }
-        User user = new User();
         long id = 100;
         String name = "jack";
         List<Integer> types = Arrays.asList(1001, 1002, 1003, 1004);
