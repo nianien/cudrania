@@ -7,10 +7,6 @@ package com.cudrania.side.jooq;
  */
 public enum Operator {
     /**
-     * "no operation"
-     */
-    NOP(""),
-    /**
      * "="
      */
     EQ("? = ?"),
@@ -57,7 +53,11 @@ public enum Operator {
     /**
      * "not between and"
      */
-    NOT_BETWEEN("? not between ? and ?");
+    NOT_BETWEEN("? not between ? and ?"),
+    /**
+     * "no operation"
+     */
+    NONE("");
 
     /**
      * 构造方法,私有访问权限

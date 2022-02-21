@@ -73,7 +73,7 @@ public class ConditionBuilderTest {
         query.setPrice(new BigDecimal(1111));
         Condition condition = ConditionBuilder.byName()
                 .withRegex("(?i).*name.*", Operator.LIKE)
-                .with(name -> name.equals("industryId"), Operator.NOP)
+                .with(name -> name.equals("industryId"), Operator.NONE)
                 .with("price", Operator.LT)
                 .build(query);
 
@@ -90,7 +90,7 @@ public class ConditionBuilderTest {
         goodsQuery.setBizType(10);
         Condition condition = ConditionBuilder.byUnderLine()
                 .with("SrcStoreName", Operator.LIKE)
-                .with((k, v) -> v instanceof Number && ((Number) v).intValue() < 0, Operator.NOP)
+                .with((k, v) -> v instanceof Number && ((Number) v).intValue() < 0, Operator.NONE)
                 .with(SQLDialect.MYSQL)
                 .build(goodsQuery);
         System.out.println(dslContext.renderInlined(condition));

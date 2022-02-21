@@ -41,7 +41,7 @@ public class GoodsQuery {
     /**
      * 环境标识
      */
-    @Match(Operator.NOP)
+    @Match(Operator.NONE)
     private String env;
 
     /**

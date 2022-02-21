@@ -208,7 +208,7 @@ public class ConditionBuilder {
         for (QueryField queryField : queryFields) {
             if (!filter.test(queryField)
                     || queryField.operator == null
-                    || queryField.operator == Operator.NOP) {
+                    || queryField.operator == Operator.NONE) {
                 continue;
             }
             Condition subCondition = singleCondition(queryField);
@@ -292,7 +292,7 @@ public class ConditionBuilder {
             Match match = Reflections.findAnnotation(javaField, Match.class);
             if (match != null) {
                 operator = match.value();
-                if (operator == Operator.NOP) {
+                if (operator == Operator.NONE) {
                     continue;
                 }
                 //优先使用注解定义
