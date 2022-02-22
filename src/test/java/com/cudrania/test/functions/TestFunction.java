@@ -9,9 +9,7 @@ import com.cudrania.test.bean.Family;
 import com.cudrania.test.bean.People;
 import org.junit.Test;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.cudrania.core.functions.Fluent.of;
 import static com.cudrania.core.functions.Params.gt0;
@@ -26,16 +24,16 @@ public class TestFunction {
     @Test
     public void testParam() {
 
-        ImmutableParam<String> param = Params.with(10).then(n -> {
+        ImmutableParam<List> param = Params.with(10).then(n -> {
             System.out.println("====");
             return n * n;
         }).when(n -> {
             System.out.println("====");
-            return n < 200;
+            return n < 10;
         }).then(n -> {
             System.out.println("====");
             return "(" + n + ")";
-        });
+        }).then(s -> new ArrayList(Arrays.asList(s)));
         System.out.println(">>>>>>>>>>>>>");
         System.out.println(param.get());
     }
