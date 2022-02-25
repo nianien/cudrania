@@ -195,8 +195,8 @@ public class SqlGenerator {
             nameString.append(field.name);
             valueString.append("?");
             if (iterator.hasNext()) {
-                nameString.append(SqlOperator.Stop.toString());
-                valueString.append(SqlOperator.Stop.toString());
+                nameString.append(SqlOperator.Comma.toString());
+                valueString.append(SqlOperator.Comma.toString());
             }
         }
 
@@ -312,7 +312,7 @@ public class SqlGenerator {
             DataField field = iterator.next();
             sqlStatement.append(SqlOperator.Equal.toSQL(field.name), field);
             if (iterator.hasNext()) {
-                sqlStatement.append(SqlOperator.Stop.toString());
+                sqlStatement.append(SqlOperator.Comma.toString());
             }
         }
         return whereSql(sqlStatement, conditionFields);

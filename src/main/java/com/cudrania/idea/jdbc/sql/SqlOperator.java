@@ -86,7 +86,7 @@ public enum SqlOperator {
     /**
      * ","
      */
-    Stop(",");
+    Comma(",");
 
     /**
      * 构造方法,私有访问权限
