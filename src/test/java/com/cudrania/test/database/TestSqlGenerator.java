@@ -26,29 +26,29 @@ public class TestSqlGenerator {
         SqlStatement sqlStatement;
         sqlStatement = SqlGenerator.updateSql(user);
 
-        assertThat(sqlStatement.expandSql(), equalTo("update users set password = '' , userName = 'who' , uuid = 1 , userId = 'skyfalling' where uuid = 1"));
+        assertThat(sqlStatement.renderSql(), equalTo("update users set password = '' , userId = 'skyfalling' , userName = 'who' , uuid = 1 where uuid = 1"));
         sqlStatement = SqlGenerator.updateSql(user, (String[]) null);
-        assertThat(sqlStatement.expandSql(), equalTo("update users set password = '' , userName = 'who' , uuid = 1 , userId = 'skyfalling'"));
+        assertThat(sqlStatement.renderSql(), equalTo("update users set password = '' , userId = 'skyfalling' , userName = 'who' , uuid = 1"));
 
 
         sqlStatement = SqlGenerator.deleteSql(user);
-        assertThat(sqlStatement.expandSql(), equalTo("delete from users where userName = 'who' and uuid = 1 and userId = 'skyfalling'"));
+        assertThat(sqlStatement.renderSql(), equalTo("delete from users where userId = 'skyfalling' and userName = 'who' and uuid = 1"));
         sqlStatement = SqlGenerator.deleteSql(user, (String[]) null);
-        assertThat(sqlStatement.expandSql(), equalTo("delete from users"));
+        assertThat(sqlStatement.renderSql(), equalTo("delete from users"));
 
 
         sqlStatement = SqlGenerator.insertSql(user);
-        assertThat(sqlStatement.expandSql(), equalTo("insert into users (userName,uuid,userId) values('who',1,'skyfalling')"));
+        assertThat(sqlStatement.renderSql(), equalTo("insert into users (userId,userName,uuid) values('skyfalling','who',1)"));
 
         sqlStatement = SqlGenerator.selectSql(user);
-        assertThat(sqlStatement.expandSql(), equalTo("select * from users where userName = 'who' and uuid = 1 and userId = 'skyfalling'"));
+        assertThat(sqlStatement.renderSql(), equalTo("select * from users where userId = 'skyfalling' and userName = 'who' and uuid = 1"));
         sqlStatement = SqlGenerator.selectSql(user, (String[]) null);
-        assertThat(sqlStatement.expandSql(), equalTo("select * from users"));
+        assertThat(sqlStatement.renderSql(), equalTo("select * from users"));
 
         sqlStatement = SqlGenerator.whereSql(new SqlStatement("select * from users"), user, "userId", "userName");
-        assertThat(sqlStatement.expandSql(), equalTo("select * from users where userId = 'skyfalling' and userName = 'who'"));
+        assertThat(sqlStatement.renderSql(), equalTo("select * from users where userId = 'skyfalling' and userName = 'who'"));
         sqlStatement = SqlGenerator.whereSql(new SqlStatement("select * from users"), new MapWrapper<>("userId", "skyfalling").with("userName", "who"));
-        assertThat(sqlStatement.expandSql(), equalTo("select * from users where userName = 'who' and userId = 'skyfalling'"));
+        assertThat(sqlStatement.renderSql(), equalTo("select * from users where userName = 'who' and userId = 'skyfalling'"));
 
     }
 

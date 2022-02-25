@@ -1,16 +1,14 @@
 package com.cudrania.idea.jdbc.table;
 
 import com.cudrania.core.annotation.Ignore;
-import com.cudrania.core.collection.map.CaseInsensitiveMap;
 import com.cudrania.core.exception.ExceptionChecker;
 import com.cudrania.core.log.LoggerFactory;
 import com.cudrania.core.reflection.Reflections;
+import com.cudrania.idea.jdbc.sql.DataField;
 
 import java.lang.reflect.Method;
 import java.sql.SQLType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -31,7 +29,7 @@ class DataTableImpl<T> implements DataTable<T> {
     /**
      * 字段属性列表
      */
-    private CaseInsensitiveMap<String, FieldProperty> fieldProperties = new CaseInsensitiveMap<String, FieldProperty>();
+    private Map<String, FieldProperty> fieldProperties = new TreeMap<>();
 
     /**
      * 键值字段
@@ -47,6 +45,7 @@ class DataTableImpl<T> implements DataTable<T> {
     public DataTableImpl(Class<T> entityClass) {
         this.type = entityClass;
         this.name = TableHelper.getTableName(entityClass);
+
         Reflections.getters(entityClass, (method) -> {
             if (!method.isAnnotationPresent(Ignore.class)) {
                 addFieldProperty(method);
@@ -79,7 +78,7 @@ class DataTableImpl<T> implements DataTable<T> {
 
     @Override
     public List<DataField> getFields(T entity) {
-        List<DataField> fields = new ArrayList<DataField>();
+        List<DataField> fields = new ArrayList<>();
         for (FieldProperty property : this.fieldProperties.values()) {
             fields.add(property.getField(entity));
         }
@@ -165,7 +164,7 @@ class DataTableImpl<T> implements DataTable<T> {
      * 字段相关属性信息,包括名称,sqlType类型,getter和setter方法<br/>
      * 字段的getter和setter方法名必须保持一致,且getter方法的返回类型为setter的参数类型
      */
-    public static class FieldProperty {
+    public static class FieldProperty implements Comparable<FieldProperty> {
         final Method getter;
         final Method setter;
         final String name;
@@ -184,6 +183,11 @@ class DataTableImpl<T> implements DataTable<T> {
 
         void setField(Object obj, Object value) {
             Reflections.invoke(setter, obj, value);
+        }
+
+        @Override
+        public int compareTo(FieldProperty o) {
+            return this.name.compareTo(o.name);
         }
     }
 

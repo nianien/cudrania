@@ -418,7 +418,7 @@ public class Reflections {
      * @return getter方法列表
      */
     public static List<Method> getters(Class<?> clazz, Predicate<Method> filter) {
-        return getMethods(clazz, null, IS_GETTER.and(filter));
+        return getMethods(clazz, Object.class, IS_GETTER.and(filter));
     }
 
     /**
@@ -792,7 +792,7 @@ public class Reflections {
      * @return
      */
     public static boolean isGetter(Method method) {
-        return Modifier.isStatic(method.getModifiers())
+        return !Modifier.isStatic(method.getModifiers())
                 && method.getReturnType() != Void.TYPE
                 && method.getParameterTypes().length == 0
                 && (method.getName().startsWith("get")
@@ -807,7 +807,7 @@ public class Reflections {
      * 判断setter方法
      */
     public static boolean isSetter(Method method) {
-        return Modifier.isStatic(method.getModifiers())
+        return !Modifier.isStatic(method.getModifiers())
                 && method.getReturnType() == Void.TYPE
                 && method.getParameterTypes().length == 1
                 && method.getName().startsWith("set")

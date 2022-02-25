@@ -196,17 +196,6 @@ public class Params {
     /**
      * 构建参数对象
      *
-     * @param parameter
-     * @param <T>
-     * @return
-     */
-    public static <T> ImmutableParam<T> $(T parameter) {
-        return with(parameter);
-    }
-
-    /**
-     * 构建参数对象
-     *
      * @param parameter 原始参数
      * @param <T>
      * @return

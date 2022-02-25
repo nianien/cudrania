@@ -15,8 +15,8 @@ import java.util.Map;
 @Table("users")
 public class User {
 
-    private int id;
     private String userId, userName, password;
+    private int id;
     private String[] userDesc;
     private Map<String, String> extras;
 
@@ -73,6 +73,7 @@ public class User {
         this.userDesc = userDesc;
     }
 
+    @Ignore
     public Map<String, String> getExtras() {
         return extras;
     }

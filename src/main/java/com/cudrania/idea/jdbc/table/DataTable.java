@@ -1,5 +1,7 @@
 package com.cudrania.idea.jdbc.table;
 
+import com.cudrania.idea.jdbc.sql.DataField;
+
 import java.util.List;
 import java.util.Set;
 

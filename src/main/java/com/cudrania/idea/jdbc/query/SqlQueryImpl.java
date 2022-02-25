@@ -4,7 +4,7 @@ import com.cudrania.core.exception.ExceptionChecker;
 import com.cudrania.core.io.Closer;
 import com.cudrania.idea.jdbc.sql.SqlGenerator;
 import com.cudrania.idea.jdbc.sql.SqlStatement;
-import com.cudrania.idea.jdbc.table.DataField;
+import com.cudrania.idea.jdbc.sql.DataField;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

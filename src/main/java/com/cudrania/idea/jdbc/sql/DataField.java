@@ -1,4 +1,4 @@
-package com.cudrania.idea.jdbc.table;
+package com.cudrania.idea.jdbc.sql;
 
 import java.sql.JDBCType;
 import java.sql.SQLType;

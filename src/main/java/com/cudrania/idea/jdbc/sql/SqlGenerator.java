@@ -1,6 +1,5 @@
 package com.cudrania.idea.jdbc.sql;
 
-import com.cudrania.idea.jdbc.table.DataField;
 import com.cudrania.idea.jdbc.table.DataTable;
 import com.cudrania.idea.jdbc.table.DataTableFactory;
 
@@ -253,7 +252,7 @@ public class SqlGenerator {
      */
     private static <T> SqlStatement updateSql(DataTable<T> table, T entity, String... conditionFields) {
         if (conditionFields == null) {
-            return updateSql(table.getName(), table.getFields(entity), new ArrayList<DataField>());
+            return updateSql(table.getName(), table.getFields(entity), new ArrayList<>());
         }
         if (conditionFields.length == 0) {
             return updateSql(table.getName(), table.getFields(entity), Arrays.asList(table.idField(entity)));

@@ -2,11 +2,9 @@ package com.cudrania.idea.jdbc.sql;
 
 import com.cudrania.core.functions.Param;
 import com.cudrania.core.utils.StringUtils;
-import com.cudrania.idea.jdbc.table.DataField;
 
 import java.lang.reflect.Array;
 import java.util.*;
-import java.util.function.Function;
 
 /**
  * 支持命名参数的SQL语句,参数形式为 :x,此外可以使用 :n(n=0,1,2...)表示位置参数<br/>
@@ -78,7 +76,7 @@ public class SqlStatement {
      * @param parameters
      */
     public SqlStatement(String sql, Map<String, Object> parameters) {
-        this.append(sql, parameters != null ? parameters : new HashMap<String, Object>());
+        this.append(sql, parameters != null ? parameters : new HashMap<>());
     }
 
 
@@ -137,8 +135,8 @@ public class SqlStatement {
      *
      * @return
      */
-    public String expandSql() {
-        return expandSql(new SqlTypeConverter());
+    public String renderSql() {
+        return renderSql(new SqlTypeConverter());
     }
 
     /**
@@ -147,7 +145,7 @@ public class SqlStatement {
      * @param sqlTypeConverter SQL参数类型转换器
      * @return
      */
-    public String expandSql(SqlTypeConverter sqlTypeConverter) {
+    public String renderSql(SqlTypeConverter sqlTypeConverter) {
         String[] parameters = new String[preparedParameters.size()];
         for (int i = 0; i < parameters.length; i++) {
             Object obj = preparedParameters.get(i).value;
@@ -159,36 +157,16 @@ public class SqlStatement {
 
 
     /**
-     * 如果expression为true,追加SQL
+     * 仅追加SQL, 不作解析
      *
      * @param sql
-     * @param expression 布尔表达式
-     * @param parameters 位置参数
-     * @return
-     * @see #append(String, Object...)
-     */
-    public SqlStatement appendIf(String sql, boolean expression, Object... parameters) {
-        if (expression) {
-            append(sql, parameters);
-        }
-        return this;
-    }
-
-    /**
-     * 如果expression为true,追加SQL
-     *
-     * @param sql
-     * @param expression 布尔表达式
-     * @param parameters 命名参数值
      * @return
      */
-    public SqlStatement appendIf(String sql, boolean expression, Map<String, Object> parameters) {
-        if (expression) {
-            append(sql, parameters);
-        }
+    public SqlStatement append(String sql) {
+        this.preparedSql.append(sql).append(" ");
+        this.originalSql.append(sql).append(" ");
         return this;
     }
-
 
     /**
      * 追加SQL, 根据{@link Param}对象绑定参数<br/>
@@ -204,69 +182,42 @@ public class SqlStatement {
     }
 
     /**
-     * 追加SQL,使用数组对象作为SQL位置参数<br/>
-     * 若SQL语句中含有形如 :n(n=0,1,2...)的参数,则取parameters[n]作为SQL参数值<br/>
-     * SQL中?参数按照出现位置代入
+     * 追加SQL,并设置SQL参数列表<br/>
+     * <ul>
+     *     <li>如果参数为Map对象，SQL中含有形如<code>:name</code>的命名参数，则取Map.get("name")作为SQL参数值
+     *     </li>
+     *     <li>否则，若SQL语句中含有形如 :n(n=0,1,2...)的位置参数，则取parameters[n]作为SQL参数值值
+     *     </li>
+     *     <li>
+     *      SQL中标准?参数按照位置参数:n来处理，n为?出现的顺序,第一个出现的"?"顺序为0
+     *     </li>
+     * </ul>
      *
-     * @param sql        含有位置参数的SQL语句,参数形式为[:n],n为parameters的索引位置
-     * @param parameters sql参数值列表
+     * @param sql        SQL语句,支持"?",":n",":name" 三种形式参数
+     * @param parameters SQL的参数值列表,数组元素可以是Map类型、集合类型或者简单类型
      * @return
      */
     public SqlStatement append(String sql, Object... parameters) {
         Map<String, Object> paramsMap = new HashMap<>();
         if (parameters != null) {
             for (int i = 0; i < parameters.length; i++) {
-                paramsMap.put(String.valueOf(i), parameters[i]);
+                Object parameter = parameters[i];
+                if (parameter instanceof Map) {
+                    paramsMap.putAll((Map) parameter);
+                } else {
+                    paramsMap.put(String.valueOf(i), parameter);
+                }
             }
         }
-        return this.append(sql, paramsMap);
+        this.parseSql(sql, paramsMap);
+        return this.append("");
     }
 
-
-    /**
-     * 追加SQL,使用Map对象作为SQL命名参数
-     * 若SQL语句中含有形如 :name的参数,则取parameters.get("name")作为SQL参数值
-     *
-     * @param sql        含命名参数的sql语句,参数形式为[:name],name为parameters的key
-     * @param parameters sql参数值列表
-     * @return
-     */
-    public SqlStatement append(String sql, Map<String, Object> parameters) {
-        parseSql(sql, parameters, originalSql, preparedSql, preparedParameters);
-        this.append("");
-        return this;
-    }
-
-    /**
-     * 追加SQL,使用函数function返回值作为SQL参数
-     *
-     * @param sql
-     * @param parameter 函数入参
-     * @param function  返回值作为SQL参数
-     * @return
-     * @see #append(String, Object...)
-     */
-    public <T> SqlStatement append(String sql, T parameter, Function<T, ?> function) {
-        return append(sql, function.apply(parameter));
-    }
-
-    /**
-     * 仅追加SQL, 不作解析
-     *
-     * @param sql
-     * @return
-     */
-    public SqlStatement append(String sql) {
-        this.preparedSql.append(sql).append(" ");
-        this.originalSql.append(sql).append(" ");
-        return this;
-    }
 
     @Override
     public String toString() {
         return originalSql.toString();
     }
-
 
     /**
      * 解析SQL语句,将形如[:x]的参数替换为符合JDBC规则的占位符.
@@ -274,7 +225,7 @@ public class SqlStatement {
      * @param sql
      * @param parameters
      */
-    private static void parseSql(String sql, Map<String, Object> parameters, StringBuilder originalSql, StringBuilder preparedSql, List<DataField> preparedParameters) {
+    private void parseSql(String sql, Map<String, Object> parameters) {
         //这里统计参数个数
         int totalCount = 0;
         int lastIndex = 0;
@@ -283,7 +234,7 @@ public class SqlStatement {
         int escapes = 0;
         int i = 0;
         while (i < statement.length) {
-            int skipToPosition = i;
+            int skipToPosition;
             while (i < statement.length) {
                 skipToPosition = skipCommentsAndQuotes(statement, i);
                 if (i == skipToPosition) {
