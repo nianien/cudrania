@@ -127,7 +127,7 @@ public class StringUtils {
      *
      * @param source
      * @param parameters
-     * @return 如果source包含参数parameters所有值返回true, 否则返回false<br>
+     * @return 如果source包含parameters所有参数值返回true, 否则返回false<br>
      */
     public static boolean containsAll(String source, String... parameters) {
         for (String str : parameters) {

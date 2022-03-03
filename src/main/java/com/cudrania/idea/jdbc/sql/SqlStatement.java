@@ -169,8 +169,7 @@ public class SqlStatement {
     }
 
     /**
-     * 追加SQL, 根据{@link Param}对象绑定参数<br/>
-     * 如果{@link Param#get()} ()}有值,则绑定{@link Param#get()}的返回值
+     * 如果{@link Param#get()}返回结果有值,则绑定{@link Param#get()}的返回值
      *
      * @param sql
      * @param param 参数对象

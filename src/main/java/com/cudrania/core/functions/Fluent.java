@@ -67,7 +67,7 @@ public class Fluent<T> {
 
 
     /**
-     * 当参数param方法{@link Param#get()}返回结果有值时,调用函数并绑定结果
+     * 如参数{@link Param#get()}返回结果有值,则调用函数并绑定返回结果
      *
      * @param param    条件参数
      * @param function 函数表达式
@@ -81,7 +81,7 @@ public class Fluent<T> {
 
 
     /**
-     * 当参数param方法{@link Param#get()}返回结果有值时,调用函数
+     * 如参数{@link Param#get()}返回结果有值,则执行函数
      *
      * @param param    条件参数
      * @param consumer 函数表达式

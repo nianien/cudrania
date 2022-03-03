@@ -61,6 +61,7 @@ public class ConditionBuilderTest {
                             return e;
                         }), UserTable.TYPE::notIn)
                 .when(notEmpty(name), UserTable.NAME, (f, p) -> f.ne(p))
+                .when(notEmpty(name), p -> UserTable.NAME.ne(p))
                 .get();
 
         System.out.println(dslContext.renderInlined(condition));
