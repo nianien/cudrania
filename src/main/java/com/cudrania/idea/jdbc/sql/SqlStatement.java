@@ -181,6 +181,19 @@ public class SqlStatement {
         return this;
     }
 
+
+    /**
+     * 追加SQL,根据Map键值设置SQL命名参数<br/>
+     * SQL中含有形如<code>:name</code>的命名参数，则取Map.get("name")作为SQL参数值
+     *
+     * @param sql        SQL语句,支持命名参数":name"
+     * @param parameters SQL参数列表, key对应命名参数,value对应参数值
+     * @return
+     */
+    public SqlStatement append(String sql, Map<String, Object> parameters) {
+        return append(sql, new Object[]{parameters});
+    }
+
     /**
      * 追加SQL,并设置SQL参数列表<br/>
      * <ul>
@@ -194,7 +207,7 @@ public class SqlStatement {
      * </ul>
      *
      * @param sql        SQL语句,支持"?",":n",":name" 三种形式参数
-     * @param parameters SQL的参数值列表,数组元素可以是Map类型、集合类型或者简单类型
+     * @param parameters SQL参数值列表,数组元素可以是Map类型、集合类型或者简单类型
      * @return
      */
     public SqlStatement append(String sql, Object... parameters) {

@@ -7,7 +7,6 @@ import org.junit.Test;
 
 import java.util.*;
 
-import static com.cudrania.core.functions.Params.notEmpty;
 import static com.cudrania.core.functions.Params.notNull;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
@@ -39,8 +38,8 @@ public class TestSqlStatement {
         Map map = new HashMap();
         map.put("type", "special");
         SqlStatement sql = new SqlStatement("select * from user where 1=1")
-                .append("ddd").append("ddd")
-                .append(" name in ? and alias in :0 and type=:type", names, "");
+                .append("and type=:type", map)
+                .append("and name in ? and alias in :0 and type=:type", names, map);
         System.out.println(sql.renderSql());
 
     }
