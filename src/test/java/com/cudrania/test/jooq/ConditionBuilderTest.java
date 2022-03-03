@@ -64,6 +64,13 @@ public class ConditionBuilderTest {
                 .get();
 
         System.out.println(dslContext.renderInlined(condition));
+        System.out.println(dslContext.renderNamedOrInlinedParams(condition));
+        System.out.println("==========================");
+        System.out.println(dslContext.render(condition));
+        System.out.println(dslContext.extractBindValues(condition));
+        System.out.println("==========================");
+        System.out.println(dslContext.renderNamedParams(condition));
+        System.out.println(dslContext.extractParams(condition));
     }
 
 
