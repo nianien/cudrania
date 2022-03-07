@@ -6,6 +6,7 @@ import com.cudrania.core.utils.StringUtils;
 import org.apache.commons.collections.CollectionUtils;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -49,6 +50,17 @@ public class Params {
      */
     public static <T extends Collection<E>, E> ImmutableParam<T> notEmpty(T collection) {
         return with(collection, CollectionUtils::isNotEmpty);
+    }
+
+
+    /**
+     * 判断Map不为空
+     *
+     * @param map
+     * @return
+     */
+    public static <T extends Map<?, ?>> ImmutableParam<T> notEmpty(T map) {
+        return with(map, m -> m != null && !m.isEmpty());
     }
 
 

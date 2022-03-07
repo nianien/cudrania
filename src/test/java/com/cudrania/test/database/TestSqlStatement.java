@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.util.*;
 
 import static com.cudrania.core.functions.Params.notNull;
+import static com.cudrania.core.functions.Params.with;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
@@ -27,7 +28,8 @@ public class TestSqlStatement {
         System.out.println(sqlStatement2.renderSql());
         assertThat(sqlStatement1.renderSql(), equalTo(sqlStatement2.renderSql()));
         SqlStatement sqlStatement3 = new SqlStatement("select * from users where 1=1")
-                .append("and (userName,password) in ?", notNull(new Object[][]{{"userName1", "password1"}, {"userName2", "password2"}}).when(e -> e.length > 1));
+                .append("and (userName,password) in ?", notNull(new Object[][]{{"userName1", "password1"}, {"userName2", "password2"}})
+                        .when(e -> e.length > 1));
         System.out.println(sqlStatement3.renderSql());
     }
 
@@ -36,11 +38,12 @@ public class TestSqlStatement {
     public void testSqlFunc() {
         List<String> names = Arrays.asList(new String[]{"a", "b", "c"});
         Map map = new HashMap();
-        map.put("type", "special");
+//        map.put("type", "special");
         SqlStatement sql = new SqlStatement("select * from user where 1=1")
-                .append("and type=:type", map)
+                .append("and type=:type", with(map).when(m -> !m.isEmpty()))
                 .append("and name in ? and alias in :0 and type=:type", names, map);
         System.out.println(sql.renderSql());
+        System.out.println(sql.preparedSql());
 
     }
 

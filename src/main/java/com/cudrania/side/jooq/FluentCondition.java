@@ -84,6 +84,9 @@ public class FluentCondition extends Fluent<Condition> {
      * @return
      */
     public <P> FluentCondition with(P param, Field field) {
+        if (param instanceof Param) {
+            return when((Param) param, field);
+        }
         return when(Params.notNull(param), field);
     }
 
@@ -97,6 +100,9 @@ public class FluentCondition extends Fluent<Condition> {
      */
     public <P> FluentCondition with(P param,
                                     Function<P, Condition> function) {
+        if (param instanceof Param) {
+            return when((Param) param, function);
+        }
         return when(Params.notNull(param), function);
     }
 
@@ -112,9 +118,11 @@ public class FluentCondition extends Fluent<Condition> {
      */
     public <P, F> FluentCondition with(P param, Field<F> field,
                                        BiFunction<Field<F>, P, Condition> function) {
+        if (param instanceof Param) {
+            return when((Param) param, field, function);
+        }
         return when(Params.notNull(param), field, function);
     }
-
 
     /**
      * 如果{@link Param#get()}返回结果有值,追加EQUAL或IN条件
