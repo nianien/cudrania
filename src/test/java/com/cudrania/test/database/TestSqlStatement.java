@@ -38,12 +38,14 @@ public class TestSqlStatement {
     public void testSqlFunc() {
         List<String> names = Arrays.asList(new String[]{"a", "b", "c"});
         Map map = new HashMap();
-//        map.put("type", "special");
+        map.put("type", "special");
         SqlStatement sql = new SqlStatement("select * from user where 1=1")
                 .append("and type=:type", with(map).when(m -> !m.isEmpty()))
                 .append("and name in ? and alias in :0 and type=:type", names, map);
         System.out.println(sql.renderSql());
         System.out.println(sql.preparedSql());
+        System.out.println(Arrays.asList(sql.preparedParameters()));
+        System.out.println(Arrays.asList(sql.preparedRawParameters()));
 
     }
 

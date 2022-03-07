@@ -274,7 +274,7 @@ public class SqlStatement {
                     Object paramValue = parameters.get(paramName);
                     totalCount++;
                     preparedSql.append(sqlToUse, lastIndex, i - escapes);
-                    substituteNamedParameter(preparedSql, paramValue, preparedParameters);
+                    substituteNamedParameter(preparedSql, paramName, paramValue, preparedParameters);
                     lastIndex = j - escapes;
                 }
                 i = j - 1;
@@ -293,7 +293,7 @@ public class SqlStatement {
                     Object paramValue = parameters.get(paramName);
                     totalCount++;
                     preparedSql.append(sqlToUse, lastIndex, i - escapes);
-                    substituteNamedParameter(preparedSql, paramValue, preparedParameters);
+                    substituteNamedParameter(preparedSql, null, paramValue, preparedParameters);
                     lastIndex = j - escapes;
                 }
             }
@@ -312,14 +312,14 @@ public class SqlStatement {
      * @param value
      * @param preparedParameters
      */
-    private static void substituteNamedParameter(StringBuilder sqlBuilder, Object value, List<DataField> preparedParameters) {
-        DataField dataField = value instanceof DataField ? (DataField) value : new DataField(null, value);
+    private static void substituteNamedParameter(StringBuilder sqlBuilder, String name, Object value, List<DataField> preparedParameters) {
+        DataField dataField = value instanceof DataField ? (DataField) value : new DataField(name, value);
         Object paramValue = dataField.value;
         if (paramValue == null) {
             sqlBuilder.append("?");
             preparedParameters.add(dataField);
         } else if (paramValue instanceof Collection) {
-            substituteNamedParameter(sqlBuilder, new DataField(dataField.name, ((Collection) paramValue).toArray(new Object[0]), dataField.type), preparedParameters);
+            substituteNamedParameter(sqlBuilder, name, new DataField(dataField.name, ((Collection) paramValue).toArray(new Object[0]), dataField.type), preparedParameters);
         } else if (paramValue.getClass().isArray()) {
             sqlBuilder.append("(");
             int length = Array.getLength(paramValue);
@@ -327,7 +327,7 @@ public class SqlStatement {
                 if (i > 0) {
                     sqlBuilder.append(",");
                 }
-                substituteNamedParameter(sqlBuilder, new DataField(dataField.name, Array.get(paramValue, i), dataField.type), preparedParameters);
+                substituteNamedParameter(sqlBuilder, name, new DataField(dataField.name, Array.get(paramValue, i), dataField.type), preparedParameters);
             }
             sqlBuilder.append(")");
         } else {
