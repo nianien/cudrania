@@ -52,7 +52,7 @@ public class SqlStatement {
     /**
      * SQL语句占位符?对应的参数值
      */
-    private final List<DataField> preparedParameters = new ArrayList<DataField>();
+    private final List<DataField> preparedParameters = new ArrayList<>();
     /**
      * 解析后含占位符的SQL语句
      */
