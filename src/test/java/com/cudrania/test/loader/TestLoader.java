@@ -2,7 +2,7 @@ package com.cudrania.test.loader;
 
 import com.cudrania.core.loader.FilePathClassLoader;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author skyfalling

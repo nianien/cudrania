@@ -4,8 +4,8 @@ import com.cudrania.core.io.Files;
 import com.cudrania.core.tree.TrieTree;
 import com.cudrania.core.utils.TimeCounter;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -19,7 +19,7 @@ public class TestTrieTree {
     private static List<String> slist;
 
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() throws IOException {
         alist = Files.readLines(TestTrieTree.class.getClassLoader().getResource("all200000.txt").openStream());
         slist = Files.readLines(TestTrieTree.class.getClassLoader().getResource("search20000.txt").openStream());

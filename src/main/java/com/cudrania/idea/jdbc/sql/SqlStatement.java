@@ -5,6 +5,7 @@ import com.cudrania.core.utils.StringUtils;
 
 import java.lang.reflect.Array;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * 支持命名参数的SQL语句,参数形式为 :x,此外可以使用 :n(n=0,1,2...)表示位置参数<br/>
@@ -153,6 +154,59 @@ public class SqlStatement {
             parameters[i] = quote + sqlTypeConverter.convert(obj) + quote;
         }
         return StringUtils.fill(preparedSql(), '?', parameters).trim();
+    }
+
+
+    /**
+     * 将statement解析后的SQL语句和SQL参数追加到当前SqlStatement中
+     *
+     * @param statement
+     * @return
+     */
+    public SqlStatement append(SqlStatement statement) {
+        return append(statement.preparedSql(), statement.preparedParameters());
+    }
+
+    /**
+     * 根据DataField列表生成匹配条件追加当前SqlStatement中
+     *
+     * @param conditions
+     * @return
+     */
+    public SqlStatement append(Collection<DataField> conditions) {
+        Iterator<DataField> iterator = conditions.iterator();
+        while (iterator.hasNext()) {
+            DataField field = iterator.next();
+            String name = field.name;
+            Object value = field.value;
+            if (value != null) {
+                if (value.getClass().isArray() || value instanceof Collection) {
+                    this.append(SqlOperator.In.toSQL(name), field);
+                } else {
+                    this.append(SqlOperator.Equal.toSQL(name), field);
+                }
+            } else {
+                this.append(SqlOperator.IsNull.toSQL(name));
+            }
+            if (iterator.hasNext()) {
+                this.append(SqlOperator.And.toString());
+            }
+        }
+        return this;
+    }
+
+    /**
+     * 根据Map列表生成匹配条件追加当前SqlStatement中
+     *
+     * @param conditions
+     * @return
+     */
+    public SqlStatement append(Map<String, ?> conditions) {
+        List<DataField> dataFields = new ArrayList<DataField>();
+        for (Entry<String, ?> entry : conditions.entrySet()) {
+            dataFields.add(new DataField(entry.getKey(), entry.getValue()));
+        }
+        return append(dataFields);
     }
 
 

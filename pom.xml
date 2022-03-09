@@ -62,13 +62,13 @@
             <version>${mail.version}</version>
             <optional>true</optional>
         </dependency>
-
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.26</version>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+            <version>${validation-api.version}</version>
             <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>org.jooq</groupId>
             <artifactId>jooq</artifactId>
@@ -86,7 +86,6 @@
             <version>1.2.10</version>
             <optional>true</optional>
         </dependency>
-
         <dependency>
             <groupId>org.codehaus.janino</groupId>
             <artifactId>janino</artifactId>
@@ -99,19 +98,18 @@
             <version>${spring.version}</version>
             <optional>true</optional>
         </dependency>
-
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <version>${validation-api.version}</version>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${spring.version}</version>
             <optional>true</optional>
         </dependency>
 
         <!--for test begin-->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.9</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.8.2</version>
             <optional>true</optional>
         </dependency>
         <dependency>
@@ -120,18 +118,17 @@
             <version>${spring.version}</version>
             <optional>true</optional>
         </dependency>
+
         <dependency>
-            <!--for db unit-->
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
-            <version>${spring.version}</version>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <!--for connection pool-->
-            <groupId>org.apache.tomcat</groupId>
-            <artifactId>tomcat-jdbc</artifactId>
-            <version>8.5.15</version>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>4.0.3</version>
             <scope>test</scope>
         </dependency>
         <!--for test end-->

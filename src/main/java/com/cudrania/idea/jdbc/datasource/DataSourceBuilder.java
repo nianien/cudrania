@@ -1,7 +1,8 @@
 package com.cudrania.idea.jdbc.datasource;
 
 
-import lombok.Data;
+import com.cudrania.core.utils.StringUtils;
+import lombok.Setter;
 import lombok.SneakyThrows;
 import org.apache.commons.beanutils.BeanUtils;
 
@@ -9,15 +10,37 @@ import javax.sql.DataSource;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 /**
- * 数据源构建对象, 自适应多种数据源
+ * 数据源构建对象, 自适应多种数据源,spring配置如下:
+ * <pre>
+ *     spring.datasource.config:
+ *       properties:
+ *         default:
+ *           driver-class-name: com.mysql.jdbc.Driver
+ *           type: com.zaxxer.hikari.HikariDataSource
+ *           minimum-idle: 5
+ *           maximum-pool-size: 15
+ *           auto-commit: true
+ *           idle-timeout: 30000
+ *           pool-name: HikariDataSource
+ *           max-lifetime: 1800000
+ *           connection-timeout: 30000
+ *           connection-test-query: SELECT 1
+ *           data-source-properties:
+ *             useUnicode: true
+ *             characterEncoding: UTF8
+ *             zeroDateTimeBehavior: round
+ *             autoReconnect: true
+ *         naudit:
+ *           username: root
+ *           password: root
+ *           jdbc-url: jdbc:mysql://127.0.0.01:3306/naudit?autoReconnect=true
+ * </pre>
  *
  * @author scorpio
  * @version 1.0.0
  */
-@Data
 public class DataSourceBuilder {
 
     /**
@@ -25,14 +48,20 @@ public class DataSourceBuilder {
      */
     private final static String DEFAULT_NAME = "default";
     /**
-     * 默认数据源配置
-     */
-    private final Map<String, Object> defaultProperties = new LinkedHashMap<>();
-    /**
      * 数据源配置
      */
+    @Setter
     private final Map<String, Map<String, Object>> properties = new LinkedHashMap<>();
 
+    /**
+     * 添加默认配置
+     *
+     * @param properties
+     * @return
+     */
+    public DataSourceBuilder addProperties(Map<String, Object> properties) {
+        return addProperties(DEFAULT_NAME, properties);
+    }
 
     /**
      * 添加命名配置
@@ -42,11 +71,7 @@ public class DataSourceBuilder {
      * @return
      */
     public DataSourceBuilder addProperties(String name, Map<String, Object> properties) {
-        if (DEFAULT_NAME.equals(name)) {
-            defaultProperties.putAll(properties);
-        } else {
-            this.properties.computeIfAbsent(name, (key) -> new HashMap<>()).putAll(properties);
-        }
+        this.properties.computeIfAbsent(name, (key) -> new HashMap<>()).putAll(properties);
         return this;
     }
 
@@ -74,6 +99,14 @@ public class DataSourceBuilder {
         return dataSource;
     }
 
+    /**
+     * 创建默认数据源
+     *
+     * @return
+     */
+    public DataSource build() {
+        return build(DEFAULT_NAME);
+    }
 
     /**
      * 根据数据源名称选择创建数据源列表
@@ -93,29 +126,29 @@ public class DataSourceBuilder {
     }
 
     /**
-     * 创建全部数据源列表,不包含默认数据源
+     * 创建全部数据源列表
      *
      * @return
      */
-    public LinkedHashMap<String, DataSource> build() {
-        return build((name) -> !DEFAULT_NAME.equalsIgnoreCase(name));
+    public LinkedHashMap<String, DataSource> buildAll() {
+        return build(n -> true);
     }
 
-
     /**
-     * 渲染配置项: 驼峰转换,Map-->Properties转换
+     * 合并配置项
      *
      * @param name
      * @return
      */
     private Map<String, Object> renderConfig(String name) {
-        Map<String, Object> config = new HashMap<>(defaultProperties);
-        if (!DEFAULT_NAME.equals(name) && properties.containsKey(name)) {
-            config.putAll(properties.get(name));
+        if (!properties.containsKey(name)) {
+            throw new IllegalArgumentException("datasource not defined: " + name);
         }
+        Map<String, Object> config = new HashMap<>(properties.getOrDefault(DEFAULT_NAME, Collections.EMPTY_MAP));
+        config.putAll(properties.get(name));
         Set<String> keys = new HashSet<>(config.keySet());
         for (String origin : keys) {
-            String hump = hyphenToHump(origin);
+            String hump = StringUtils.camelCase(origin);
             if (!config.containsKey(hump)) {
                 config.put(hump, config.get(origin));
             }
@@ -128,22 +161,6 @@ public class DataSourceBuilder {
             }
         }
         return config;
-    }
-
-
-    /**
-     * 连字符转驼峰
-     *
-     * @param src
-     * @return
-     */
-    private static String hyphenToHump(String src) {
-        String dest = Arrays.stream(src.split("-"))
-                .filter(e -> e.length() > 0)
-                .map(e -> e.substring(0, 1).toUpperCase() + e.substring(1).toLowerCase())
-                .collect(Collectors.joining());
-        return dest.substring(0, 1).toLowerCase() + dest.substring(1);
-
     }
 
 }

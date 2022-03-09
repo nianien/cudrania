@@ -2,7 +2,7 @@ package com.cudrania.test.text;
 
 import com.cudrania.core.utils.RegexUtils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.List;

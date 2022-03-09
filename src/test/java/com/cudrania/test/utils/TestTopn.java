@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.cudrania.core.io.Files;
 import com.cudrania.algorithm.PriorityHeap;

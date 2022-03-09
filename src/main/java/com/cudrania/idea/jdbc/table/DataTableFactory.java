@@ -45,10 +45,31 @@ public class DataTableFactory {
      * @return
      */
     public static DataTable get(final String tableName, Class entityClass) {
-        return new DataTableWrapper(register(entityClass)) {
+        final DataTable dataTable = register(entityClass);
+        return new DataTable() {
             @Override
             public String getName() {
                 return tableName;
+            }
+
+            @Override
+            public Class getType() {
+                return dataTable.getType();
+            }
+
+            @Override
+            public String[] getFieldNames() {
+                return dataTable.getFieldNames();
+            }
+
+            @Override
+            public String[] getKeys() {
+                return dataTable.getKeys();
+            }
+
+            @Override
+            public FieldProperty getField(String fieldName) {
+                return dataTable.getField(fieldName);
             }
         };
     }
@@ -60,7 +81,7 @@ public class DataTableFactory {
      * @return
      */
     public static DataTable get(Class entityClass) {
-        return new DataTableWrapper(register(entityClass));
+        return register(entityClass);
     }
 
 

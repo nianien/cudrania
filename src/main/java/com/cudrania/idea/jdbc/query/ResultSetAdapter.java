@@ -5,14 +5,15 @@ import com.cudrania.core.exception.ExceptionChecker;
 import com.cudrania.core.reflection.Reflections;
 import com.cudrania.idea.jdbc.table.DataTable;
 import com.cudrania.idea.jdbc.table.DataTableFactory;
+import com.cudrania.idea.jdbc.table.FieldProperty;
 
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.*;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 
 /**
  * ResultSet对象的转换类
@@ -369,10 +370,11 @@ public class ResultSetAdapter {
         DataTable table = DataTableFactory.get(bean.getClass());
         final List<String> columns = getColumnsName(resultSet);
         for (String column : columns) {
-            if (table.hasField(column)) {
-                Object value = getFieldValue(table.getFieldType(column), column, resultSet);
+            FieldProperty field = table.getField(column);
+            if (field != null) {
+                Object value = getFieldValue(field.getType(), column, resultSet);
                 if (value != null) {
-                    table.setField(bean, column, value);
+                    field.setValue(bean, value);
                 }
             }
         }

@@ -2,19 +2,15 @@ package com.cudrania.idea.jdbc.query;
 
 import com.cudrania.core.exception.ExceptionChecker;
 import com.cudrania.core.io.Closer;
-import com.cudrania.idea.jdbc.sql.SqlGenerator;
-import com.cudrania.idea.jdbc.sql.SqlStatement;
 import com.cudrania.idea.jdbc.sql.DataField;
+import com.cudrania.idea.jdbc.sql.SqlStatement;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import javax.sql.DataSource;
+import java.sql.*;
 import java.util.List;
 import java.util.Map;
 
-import javax.sql.DataSource;
+import static com.cudrania.idea.jdbc.sql.SqlGenerator.*;
 
 /**
  * 数据库访问接口实现,该类是线程安全的
@@ -124,17 +120,17 @@ class SqlQueryImpl implements SqlQuery {
 
     @Override
     public <T> void insert(T bean) {
-        this.create(SqlGenerator.insertSql(bean)).executeUpdate();
+        this.create(insertSql(bean)).executeUpdate();
     }
 
     @Override
     public <T> void update(T bean, String... conditionFields) {
-        this.create(SqlGenerator.updateSql(bean, conditionFields)).executeUpdate();
+        this.create(updateSql(bean, conditionFields)).executeUpdate();
     }
 
     @Override
     public <T> void delete(T bean, String... conditionFields) {
-        this.create(SqlGenerator.deleteSql(bean, conditionFields)).executeUpdate();
+        this.create(deleteSql(bean, conditionFields)).executeUpdate();
     }
 
 

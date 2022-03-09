@@ -3,17 +3,16 @@ package com.cudrania.test.tree;
 import com.cudrania.core.collection.map.Pair;
 import com.cudrania.core.tree.TreeBuilder;
 import com.cudrania.core.tree.TreeNode;
-
-import org.junit.Test;
+import lombok.Data;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import lombok.Data;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author skyfalling

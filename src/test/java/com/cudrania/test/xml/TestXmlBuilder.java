@@ -3,7 +3,7 @@ package com.cudrania.test.xml;
 import com.cudrania.core.xml.XMLBuilder;
 import com.cudrania.test.bean.Home;
 import com.cudrania.test.bean.User;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;

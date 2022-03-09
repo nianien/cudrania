@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.cudrania.core.json.JsonParser;
 import com.cudrania.test.bean.Color;
 import com.cudrania.test.bean.User;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package com.cudrania.test.reflect;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.cudrania.core.reflection.Methods;
 

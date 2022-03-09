@@ -3,7 +3,7 @@ package com.cudrania.test.utils;
 import java.io.File;
 import java.util.Comparator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.cudrania.core.loader.ResourceLoader;
 import com.cudrania.algorithm.MassSorter;

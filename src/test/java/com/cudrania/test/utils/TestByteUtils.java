@@ -1,7 +1,7 @@
 package com.cudrania.test.utils;
 
 import com.cudrania.core.bits.ByteUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author skyfalling.

@@ -1,10 +1,5 @@
 package com.cudrania.idea.jdbc.table;
 
-import com.cudrania.idea.jdbc.sql.DataField;
-
-import java.util.List;
-import java.util.Set;
-
 /**
  * 基于类定义的表结构信息<br/>
  * 表名称按优先级依次取 指定名称>@Table>类名称<br/>
@@ -33,73 +28,22 @@ public interface DataTable<T> {
      *
      * @return
      */
-    Set<String> getFieldNames();
+    String[] getFieldNames();
 
     /**
-     * 获取全部字段值
+     * 获取主键字段
      *
-     * @param entity
      * @return
      */
-    List<DataField> getFields(T entity);
+    String[] getKeys();
 
     /**
-     * 获取指定字段值
-     *
-     * @param entity
-     * @param fieldNames
-     * @return
-     */
-    List<DataField> getFields(T entity, String... fieldNames);
-
-    /**
-     * 获取指定字段值
-     *
-     * @param entity
-     * @param fieldName
-     * @return
-     */
-    DataField getField(T entity, String fieldName);
-
-    /**
-     * 设定指定字段值
-     *
-     * @param entity
-     * @param fieldName
-     * @return
-     */
-    void setField(T entity, String fieldName, Object value);
-
-    /**
-     * 检查是否包含指定字段,如果包含,则返回字段初始名称,否则抛出异常信息
+     * 查找匹配指定字段,如果不存在,返回null
      *
      * @param fieldName
      * @return
      */
-    String getFieldName(String fieldName);
+    FieldProperty getField(String fieldName);
 
-    /**
-     * 检查是否包含指定字段,如果包含,则返回true,否则返回false
-     *
-     * @param fieldName
-     * @return
-     */
-    boolean hasField(String fieldName);
-
-    /**
-     * 获取指定字段类型
-     *
-     * @param fieldName
-     * @return
-     */
-    Class getFieldType(String fieldName);
-
-
-    /**
-     * 获取键值字段
-     *
-     * @return
-     */
-    DataField idField(T entity);
 
 }

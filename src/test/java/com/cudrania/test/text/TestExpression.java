@@ -3,7 +3,7 @@ package com.cudrania.test.text;
 import com.cudrania.core.collection.wrapper.MapWrapper;
 import com.cudrania.core.text.Expression;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;

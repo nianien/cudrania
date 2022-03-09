@@ -6,7 +6,7 @@ import com.cudrania.core.text.TextAnalyzer;
 import com.cudrania.core.text.TextAnalyzer.Fragment;
 import com.cudrania.core.text.TextAnalyzer.FragmentHandler;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.List;

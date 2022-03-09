@@ -2,7 +2,7 @@ package com.cudrania.test.idea;
 
 import com.cudrania.idea.properties.Properties;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestProperty {
 

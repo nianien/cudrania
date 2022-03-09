@@ -3,7 +3,7 @@ package com.cudrania.test.proxy;
 import com.cudrania.core.proxy.Interceptor;
 import com.cudrania.core.proxy.ProxyFactory;
 import com.cudrania.core.proxy.AbstractProxyHandler;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

@@ -7,7 +7,7 @@ import com.cudrania.core.utils.StringUtils;
 import com.cudrania.test.bean.Contact;
 import com.cudrania.test.bean.Family;
 import com.cudrania.test.bean.People;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 

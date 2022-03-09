@@ -3,14 +3,13 @@ package com.cudrania.test.database;
 import com.cudrania.core.date.DateFormatter;
 import com.cudrania.core.functions.Params;
 import com.cudrania.idea.jdbc.sql.SqlStatement;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
 import static com.cudrania.core.functions.Params.notNull;
 import static com.cudrania.core.functions.Params.with;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author skyfalling
@@ -26,7 +25,7 @@ public class TestSqlStatement {
                 .append("and (userName,password) in ?", new Object[]{new Object[][]{{"userName1", "password1"}, {"userName2", "password2"}}});
         System.out.println(sqlStatement1.renderSql());
         System.out.println(sqlStatement2.renderSql());
-        assertThat(sqlStatement1.renderSql(), equalTo(sqlStatement2.renderSql()));
+        assertEquals(sqlStatement1.renderSql(), sqlStatement2.renderSql());
         SqlStatement sqlStatement3 = new SqlStatement("select * from users where 1=1")
                 .append("and (userName,password) in ?", notNull(new Object[][]{{"userName1", "password1"}, {"userName2", "password2"}})
                         .when(e -> e.length > 1));
@@ -61,9 +60,9 @@ public class TestSqlStatement {
                 .append("and name=:0", Params.notEmpty(name))
                 .append("and desc=':0' and (age>:0 and age<2*:0) and date in :1", age, dates)
                 .append("--注释");
-        assertThat(sqlStatement.originalSql(), equalTo("select * from user where 1=1 and desc=':0' and (age>:0 and age<2*:0) and date in :1 --注释"));
-        assertThat(sqlStatement.preparedSql(), equalTo("select * from user where 1=1 and desc=':0' and (age>? and age<2*?) and date in (?,?) --注释"));
-        assertThat(sqlStatement.renderSql(), equalTo("select * from user where 1=1 and desc=':0' and (age>28 and age<2*28) and date in ('2014-02-08 10:00:00','" + DateFormatter.format(now) + "') --注释"));
+        assertEquals(sqlStatement.originalSql(), "select * from user where 1=1 and desc=':0' and (age>:0 and age<2*:0) and date in :1 --注释");
+        assertEquals(sqlStatement.preparedSql(), "select * from user where 1=1 and desc=':0' and (age>? and age<2*?) and date in (?,?) --注释");
+        assertEquals(sqlStatement.renderSql(), "select * from user where 1=1 and desc=':0' and (age>28 and age<2*28) and date in ('2014-02-08 10:00:00','" + DateFormatter.format(now) + "') --注释");
         System.out.println(sqlStatement.renderSql());
         System.out.println(Arrays.toString(sqlStatement.preparedParameters()));
 

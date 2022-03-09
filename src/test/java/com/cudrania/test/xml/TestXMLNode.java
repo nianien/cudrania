@@ -5,7 +5,7 @@ import com.cudrania.core.xml.XMLDocument;
 import com.cudrania.core.xml.XMLNode;
 
 import org.dom4j.Document;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

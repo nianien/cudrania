@@ -10,8 +10,8 @@ import org.jooq.SQLDialect;
 import org.jooq.conf.RenderNameStyle;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -34,10 +34,10 @@ public class ConditionBuilderTest {
         private static final Field<Integer> TYPE = DSL.field("type", Integer.class);
     }
 
-    private DSLContext dslContext;
+    private static DSLContext dslContext;
 
-    @Before
-    public void setup() {
+    @BeforeAll
+    public static void setup() {
         DefaultConfiguration config = new DefaultConfiguration();
         config.setSQLDialect(SQLDialect.MYSQL);
         config.settings()

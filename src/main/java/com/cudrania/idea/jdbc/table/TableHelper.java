@@ -1,9 +1,11 @@
 package com.cudrania.idea.jdbc.table;
 
 import com.cudrania.core.reflection.Reflections;
-import com.cudrania.core.utils.StringUtils;
 
 import java.lang.reflect.Method;
+
+import static com.cudrania.core.utils.StringUtils.isNotEmpty;
+import static com.cudrania.core.utils.StringUtils.underscoreCase;
 
 /**
  * 获取表名和字段名的辅助类
@@ -24,7 +26,7 @@ public class TableHelper {
     public static String getTableName(Class<?> clazz) {
         Table table = clazz.getAnnotation(Table.class);
         String name = table != null ? table.value() : null;
-        return StringUtils.isNotEmpty(name) ? name : clazz.getSimpleName();
+        return isNotEmpty(name) ? name : underscoreCase(clazz.getSimpleName());
     }
 
     /**
@@ -36,7 +38,7 @@ public class TableHelper {
      */
     public static String getColumnName(Method method) {
         Column column = method.getAnnotation(Column.class);
-        String name = column != null ? column.value() : null;
-        return StringUtils.isNotEmpty(name) ? name : Reflections.propertyName(method);
+        String name = column != null ? column.value() : "";
+        return isNotEmpty(name) ? name : underscoreCase(Reflections.propertyName(method));
     }
 }

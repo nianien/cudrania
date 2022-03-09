@@ -2,7 +2,7 @@ package com.cudrania.test.date;
 
 import com.cudrania.core.date.DateFormatter;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;

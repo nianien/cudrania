@@ -2,7 +2,7 @@ package com.cudrania.test.math;
 
 import com.cudrania.algorithm.Calculator;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 
 public class TestMath {

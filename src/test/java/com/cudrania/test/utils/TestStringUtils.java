@@ -3,7 +3,7 @@ package com.cudrania.test.utils;
 import com.cudrania.core.arrays.ArrayUtils;
 import com.cudrania.core.utils.StringUtils;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.beans.Expression;
 import java.util.Arrays;

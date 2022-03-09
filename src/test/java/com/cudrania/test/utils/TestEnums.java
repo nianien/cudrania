@@ -1,7 +1,7 @@
 package com.cudrania.test.utils;
 
 import com.cudrania.core.utils.Enums;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeUnit;
 
