@@ -7,7 +7,6 @@ import com.cudrania.idea.jdbc.table.Table;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -16,7 +15,7 @@ import java.util.Map;
 @Table("users")
 @Data
 @NoArgsConstructor
-public class User implements Serializable {
+public class User {
 
     private String userId;
     private String userName;
@@ -28,4 +27,9 @@ public class User implements Serializable {
     private String[] userDesc;
     @Ignore
     private Map<String, String> extras;
+
+    public User setUserId2(String userId) {
+        this.userId = userId;
+        return this;
+    }
 }

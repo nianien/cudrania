@@ -2,6 +2,7 @@ package com.cudrania.core.reflection;
 
 import com.cudrania.core.annotation.Property;
 import com.cudrania.core.collection.CollectionUtils;
+import com.cudrania.core.functions.Fn.Lambda;
 import com.cudrania.core.utils.Enums;
 
 import java.lang.annotation.Annotation;
@@ -11,7 +12,7 @@ import java.util.function.Predicate;
 
 import static com.cudrania.core.exception.ExceptionChecker.throwException;
 import static com.cudrania.core.exception.ExceptionChecker.throwIfNull;
-import static com.cudrania.core.utils.StringUtils.deCapitalize;
+import static com.cudrania.core.utils.StringUtils.decapitalize;
 
 /**
  * 反射工具类
@@ -20,41 +21,10 @@ import static com.cudrania.core.utils.StringUtils.deCapitalize;
  */
 public class Reflections {
 
-    /**
-     * 基本类型
-     */
-    public static enum Primitive {
-        Boolean("boolean", java.lang.Boolean.class),
-        Byte("byte", java.lang.Byte.class),
-        Short("short", java.lang.Short.class),
-        Integer("int", java.lang.Integer.class),
-        Long("long", java.lang.Long.class),
-        Float("float", java.lang.Float.class),
-        Double("double", java.lang.Double.class),
-        Character("char", java.lang.Character.class);
-        String name;
-        Class type;
-        Class clazz;
-
-        Primitive(String name, Class clazz) {
-            try {
-                this.name = name;
-                this.clazz = clazz;
-                this.type = (Class) clazz.getField("TYPE").get(null);
-            } catch (Exception e) {
-                throwException(e);
-            }
-        }
-
-        public static Primitive get(String name) {
-            return Enums.with(Primitive.class, "name", name);
-        }
-
-        public static Primitive get(Class clazz) {
-            return Enums.with(Primitive.class, "clazz", clazz);
-        }
-
-    }
+    public final static Predicate<Method> IS_STATIC_METHOD = method -> Modifier.isStatic(method.getModifiers());
+    public final static Predicate<Method> IS_SETTER = Reflections::isSetter;
+    public final static Predicate<Method> IS_GETTER = Reflections::isGetter;
+    public final static Predicate<Field> IS_FINAL_FIELD = field -> Modifier.isFinal(field.getModifiers());
 
     /**
      * 获取指定类型的注解
@@ -72,7 +42,6 @@ public class Reflections {
             return null;
         }
     }
-
 
     /**
      * 是否声明指定类型的注解
@@ -109,7 +78,6 @@ public class Reflections {
         }
     }
 
-
     /**
      * 获取clazz及其父类声明的public方法
      *
@@ -119,7 +87,6 @@ public class Reflections {
     public static List<Method> getMethods(Class<?> clazz) {
         return getMethods(clazz, Object.class, IS_STATIC_METHOD.negate());
     }
-
 
     /**
      * 获取clazz及其父类声明的符合条件的方法
@@ -139,7 +106,6 @@ public class Reflections {
         }
         return list;
     }
-
 
     /**
      * 查找指定名称的字段<br/>
@@ -175,7 +141,6 @@ public class Reflections {
     public static List<Field> getFields(Class<?> clazz) {
         return getFields(clazz, Object.class, null);
     }
-
 
     /**
      * 获取clazz及其父类声明的符合条件的成员字段, 不包含excludeBaseClass及其父类声明的字段
@@ -214,7 +179,7 @@ public class Reflections {
             return ((Field) element).getName();
         } else if (element instanceof Method) {
             String name = ((Method) element).getName();
-            return deCapitalize(name.substring(name.startsWith("is") ? 2 : 3));
+            return decapitalize(name.substring(name.startsWith("is") ? 2 : 3));
         } else {
             throw new UnsupportedOperationException("illegal annotated type:" + element.getClass());
         }
@@ -224,17 +189,30 @@ public class Reflections {
      * 执行指定方法,返回执行结果
      *
      * @param method
-     * @param bean   声明该方法的实例对象
-     * @param args   方法的参数
+     * @param bean       声明该方法的实例对象
+     * @param parameters 方法的参数
      * @return 方法的执行结果<br />
      */
-    public static Object invoke(Method method, Object bean, Object... args) {
+    public static Object invoke(Method method, Object bean, Object... parameters) {
         try {
             method.setAccessible(true);
-            return method.invoke(bean, args);
+            return method.invoke(bean, parameters);
         } catch (Exception e) {
             throw throwException(e);
         }
+    }
+
+    /**
+     * 根据方法名和参数调用指定方法<br/>
+     * 如果方法名称以及参数长度匹配且唯一，此时若类型不匹配，则会尝试类型转换<br/>
+     *
+     * @param lambda     方法引用
+     * @param bean       方法关联的对象
+     * @param parameters 实际参数值
+     * @return
+     */
+    public static Object invoke(Lambda lambda, Object bean, Object... parameters) {
+        return invoke(lambda.name(), bean, parameters);
     }
 
     /**
@@ -301,7 +279,6 @@ public class Reflections {
         return invoke(method, bean, castParams);
     }
 
-
     /**
      * 批量类型转换
      *
@@ -320,7 +297,6 @@ public class Reflections {
         }
         return castParams;
     }
-
 
     /**
      * 获取public getter方法, 如果不存在,则返回null
@@ -393,7 +369,6 @@ public class Reflections {
         }
         return null;
     }
-
 
     /**
      * 获取getter方法列表,不包含{@link Object}声明的getter方法
@@ -474,7 +449,6 @@ public class Reflections {
         return map;
     }
 
-
     /**
      * 调用方法getXxx()或方法isXxx()获取属性值
      *
@@ -500,7 +474,6 @@ public class Reflections {
         throwIfNull(setter, new NoSuchMethodException("No such setter Method for property: " + propertyName));
         invoke(setter, obj, propertyValue);
     }
-
 
     /**
      * 获取字段值
@@ -581,7 +554,6 @@ public class Reflections {
                 }
         );
     }
-
 
     /**
      * 根据字符串尽可能地去获取指定类型的实例<br/>
@@ -744,7 +716,6 @@ public class Reflections {
         return true;
     }
 
-
     /**
      * 判断clazz类型是否为抽象类型
      *
@@ -755,7 +726,6 @@ public class Reflections {
         return Modifier.isAbstract(clazz.getModifiers());
     }
 
-
     /**
      * 根据类型名称判断是否为原始数据类型
      *
@@ -765,7 +735,6 @@ public class Reflections {
     public static boolean isPrimitive(String className) {
         return Primitive.get(className) != null;
     }
-
 
     /**
      * 查找类对象clazz绑定的genericClass声明的泛型参数
@@ -796,7 +765,6 @@ public class Reflections {
                 && method.getName().length() > 2);
     }
 
-
     /**
      * 判断setter方法
      */
@@ -808,13 +776,44 @@ public class Reflections {
                 && method.getName().length() > 3;
     }
 
-
     private static <T> Predicate<T> nullable(Predicate<T> filter) {
         return Optional.ofNullable(filter).orElse((f) -> true);
     }
 
-    public final static Predicate<Method> IS_STATIC_METHOD = method -> Modifier.isStatic(method.getModifiers());
-    public final static Predicate<Method> IS_SETTER = Reflections::isSetter;
-    public final static Predicate<Method> IS_GETTER = Reflections::isGetter;
-    public final static Predicate<Field> IS_FINAL_FIELD = field -> Modifier.isFinal(field.getModifiers());
+    /**
+     * 基本类型
+     */
+    public static enum Primitive {
+        Boolean("boolean", java.lang.Boolean.class),
+        Byte("byte", java.lang.Byte.class),
+        Short("short", java.lang.Short.class),
+        Integer("int", java.lang.Integer.class),
+        Long("long", java.lang.Long.class),
+        Float("float", java.lang.Float.class),
+        Double("double", java.lang.Double.class),
+        Character("char", java.lang.Character.class);
+        String name;
+        Class type;
+        Class clazz;
+
+        Primitive(String name, Class clazz) {
+            try {
+                this.name = name;
+                this.clazz = clazz;
+                this.type = (Class) clazz.getField("TYPE").get(null);
+            } catch (Exception e) {
+                throwException(e);
+            }
+        }
+
+        public static Primitive get(String name) {
+            return Enums.with(Primitive.class, "name", name);
+        }
+
+        public static Primitive get(Class clazz) {
+            return Enums.with(Primitive.class, "clazz", clazz);
+        }
+
+    }
+
 }

@@ -441,7 +441,7 @@ public class StringUtils {
      * @param source
      * @return 处理后的字符串
      */
-    public static String deCapitalize(String source) {
+    public static String decapitalize(String source) {
         if (isEmpty(source)) {
             return source;
         }

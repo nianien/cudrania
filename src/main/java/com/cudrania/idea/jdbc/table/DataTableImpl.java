@@ -18,7 +18,7 @@ import static com.cudrania.core.exception.ExceptionChecker.throwIf;
 import static com.cudrania.core.exception.ExceptionChecker.throwIfNull;
 import static com.cudrania.core.reflection.Reflections.getMethod;
 import static com.cudrania.core.reflection.Reflections.getters;
-import static com.cudrania.core.utils.StringUtils.deCapitalize;
+import static com.cudrania.core.utils.StringUtils.decapitalize;
 
 /**
  * 接口{@link DataTable}的默认实现
@@ -106,7 +106,7 @@ class DataTableImpl<T> implements DataTable<T> {
             return;
         }
         String getterName = getter.getName();
-        String propertyName = deCapitalize(getterName.substring(getterName.startsWith("is") ? 2 : 3));
+        String propertyName = decapitalize(getterName.substring(getterName.startsWith("is") ? 2 : 3));
         Field field = Reflections.getField(type, propertyName);
         if (field != null && field.isAnnotationPresent(Ignore.class)) {
             return;
