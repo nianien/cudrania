@@ -3,7 +3,6 @@ package com.cudrania.idea.jdbc.sql;
 import com.cudrania.core.arrays.ArrayUtils;
 import com.cudrania.idea.jdbc.table.DataTable;
 
-import java.sql.JDBCType;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -238,7 +237,7 @@ public class SqlGenerator {
         DataTable table = get(entity.getClass());
         return Arrays.stream(fields)
                 .map(table::getField)
-                .map(f -> new DataField(f.getName(), f.getValue(entity), JDBCType.JAVA_OBJECT))
+                .map(f -> new DataField(f.getName(), f.getValue(entity), f.getSqlType()))
                 .filter(f -> includeNull || f.value != null)
                 .collect(Collectors.toList());
     }

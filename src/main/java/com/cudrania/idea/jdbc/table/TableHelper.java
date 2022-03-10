@@ -1,8 +1,12 @@
 package com.cudrania.idea.jdbc.table;
 
+import com.cudrania.core.annotation.Property;
 import com.cudrania.core.reflection.Reflections;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.sql.JDBCType;
 
 import static com.cudrania.core.utils.StringUtils.isNotEmpty;
 import static com.cudrania.core.utils.StringUtils.underscoreCase;
@@ -36,9 +40,40 @@ public class TableHelper {
      * @param method
      * @return 字段名称
      */
-    public static String getColumnName(Method method) {
+    public static Column getColumnName(Method method, Field field) {
         Column column = method.getAnnotation(Column.class);
-        String name = column != null ? column.value() : "";
-        return isNotEmpty(name) ? name : underscoreCase(Reflections.propertyName(method));
+        if (column == null && field != null) {
+            column = field.getAnnotation(Column.class);
+        }
+        if (column != null && !column.value().isEmpty()) {
+            return column;
+        }
+        String name;
+        if (!method.isAnnotationPresent(Property.class)
+                && field != null
+                && field.isAnnotationPresent(Property.class)) {
+            name = underscoreCase(Reflections.propertyName(field));
+        } else {
+            name = underscoreCase(Reflections.propertyName(method));
+        }
+        return new Column() {
+
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return Column.class;
+            }
+
+            @Override
+            public String value() {
+                return name;
+            }
+
+            @Override
+            public JDBCType sqlType() {
+                return JDBCType.JAVA_OBJECT;
+            }
+        };
     }
+
+
 }

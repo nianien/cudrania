@@ -441,7 +441,7 @@ public class StringUtils {
      * @param source
      * @return 处理后的字符串
      */
-    public static String headLower(String source) {
+    public static String deCapitalize(String source) {
         if (isEmpty(source)) {
             return source;
         }
@@ -455,7 +455,7 @@ public class StringUtils {
      * @param source
      * @return 处理后的字符串
      */
-    public static String headUpper(String source) {
+    public static String capitalize(String source) {
         if (isEmpty(source)) {
             return source;
         }

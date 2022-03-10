@@ -5,24 +5,13 @@ import com.cudrania.core.collection.CollectionUtils;
 import com.cudrania.core.utils.Enums;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.lang.reflect.*;
+import java.util.*;
 import java.util.function.Predicate;
 
 import static com.cudrania.core.exception.ExceptionChecker.throwException;
 import static com.cudrania.core.exception.ExceptionChecker.throwIfNull;
-import static com.cudrania.core.utils.StringUtils.headLower;
-import static com.cudrania.core.utils.StringUtils.isNotEmpty;
+import static com.cudrania.core.utils.StringUtils.deCapitalize;
 
 /**
  * 反射工具类
@@ -212,18 +201,23 @@ public class Reflections {
      * 获取getter或setter方法对应的属性名称<br/>
      * 如果方法声明了{@link com.cudrania.core.annotation.Property}注解,则以注解为准; 否则按照getter和setter规则取其属性
      *
-     * @param method
+     * @param element
      * @return getter或setter方法对应的属性名<br />
-     *         注意:这里只对形如getXxx()或isXxx()或SetXxx()的方法有效,对应属性名为xxx<br/>
+     * 注意:这里只对形如getXxx()或isXxx()或SetXxx()的方法有效,对应属性名为xxx<br/>
      */
-    public static String propertyName(Method method) {
-        Property property = method.getAnnotation(Property.class);
-        String name = property != null ? property.value() : null;
-        if (isNotEmpty(name)) {
-            return name;
+    public static String propertyName(AnnotatedElement element) {
+        Property property = element.getAnnotation(Property.class);
+        if (property != null && !property.value().isEmpty()) {
+            return property.value();
         }
-        name = method.getName();
-        return headLower(name.substring(name.startsWith("is") ? 2 : 3));
+        if (element instanceof Field) {
+            return ((Field) element).getName();
+        } else if (element instanceof Method) {
+            String name = ((Method) element).getName();
+            return deCapitalize(name.substring(name.startsWith("is") ? 2 : 3));
+        } else {
+            throw new UnsupportedOperationException("illegal annotated type:" + element.getClass());
+        }
     }
 
     /**
