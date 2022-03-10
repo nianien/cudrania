@@ -18,11 +18,11 @@ public enum SqlOperator {
     /**
      * ">"
      */
-    Greater("? > ?"),
+    GreaterThan("? > ?"),
     /**
      * "<"
      */
-    Less("? < ?"),
+    LessThan("? < ?"),
     /**
      * ">="
      */
