@@ -24,5 +24,5 @@ public @interface Table {
 	 * 
 	 * @return 表名称
 	 */
-	public String value() ;
+	String value() ;
 }
