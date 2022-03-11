@@ -1,7 +1,6 @@
 package com.cudrania.test.functions;
 
 import com.cudrania.core.functions.Fluent;
-import com.cudrania.core.functions.Fn;
 import com.cudrania.core.functions.Fn.Consumer;
 import com.cudrania.core.functions.Params;
 import com.cudrania.core.functions.Params.ImmutableParam;
@@ -27,51 +26,46 @@ public class TestFluent {
 
     @Test
     public void testBindMethod() {
-        System.out.println(
-                of(new HashMap<String, String>())
-                        .accept(Map::put, "a", "Alex")
-                        .accept(Map::put, "b", "Brown")
-                        .accept(Map::put, "c", "Charles")
-                        .accept(Map::put, "d", "Darwin")
-                        .get()
-        );
-        System.out.println(
-                of(new HashMap<String, String>())
-                        .<String, String>consumer(Map::put)
-                        .accept("a", "Alex")
-                        .accept("b", "Brown")
-                        .accept("c", "Charles")
-                        .accept("d", "Darwin")
-                        .consumer(System.out::println)
-                        .accept()
-                        .<String>consumer(Map::remove)
-                        .accept("b")
-                        .consumer(System.out::println)
-                        .accept()
-                        .function(Map::get)
-                        .apply("d")
-                        .get()
-        );
+        of(new HashMap<String, String>())
+                .accept(Map::put, "a1", "Alex")
+                .accept(Map::put, "b2", "Brown")
+                .accept(Map::put, "c3", "Charles")
+                .accept(Map::put, "d4", "Darwin")
+                .accept(System.out::println)
+                .get();
+        of(new HashMap<String, String>())
+                .<String, String>consumer(Map::put)
+                .accept("a-1", "Alex")
+                .accept("b-2", "Brown")
+                .accept("c-3", "Charles")
+                .accept("d-4", "Darwin")
+                .accept(System.out::println)
+                .<String>consumer(Map::remove)
+                .accept("d-4")
+                .consumer(System.out::println)
+                .accept()
+                .function(Map::get)
+                .apply("c-3")
+                .accept(System.out::println)
+                .get();
 
-        System.out.println(
-                of(new People())
-                        .consumer(People::setName)
-                        .accept("name")
-                        .consumer(People::setId)
-                        .accept(1001L)
-                        .consumer((Consumer<People>) System.out::println)
-                        .accept()
-                        .function(People::getId)
-                        .apply()
-                        .accept(System.out::println)
-                        .get()
-        );
+        of(new People())
+                .consumer(People::setName)
+                .accept("name")
+                .consumer(People::setId)
+                .accept(1001L)
+                .consumer((Consumer<People>) System.out::println)
+                .accept()
+                .function(People::getId)
+                .apply()
+                .accept(System.out::println)
+                .get();
 
-        System.out.println(of(new Family())
+        of(new Family())
                 .accept(Family::setAddress, "a")
                 .accept(f -> f.setAddress("b"))
                 .accept(System.out::println)
-                .get());
+                .get();
     }
 
 
@@ -104,8 +98,6 @@ public class TestFluent {
 
     @Test
     public void testAll() {
-
-
         People people = of(new People())
                 .accept(People::setId, 101L)
                 .consumer(People::setName)
