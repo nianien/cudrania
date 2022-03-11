@@ -3,10 +3,6 @@ package com.cudrania.core.functions;
 
 import com.cudrania.core.functions.Fn.*;
 
-import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * 构建Fluent API的Function工具<br/>
@@ -14,11 +10,11 @@ import java.util.function.Function;
  * <ul>
  * <li>
  * 执行函数，并持有函数执行结果<br/>
- * {@link Fluent#$$(Function)}
+ * {@link Fluent#apply(Function)}
  * </li>
  * <li>
  * 执行函数，并忽略函数执行结果（持有对象不变）<br/>
- * {@link Fluent#$(Consumer)}
+ * {@link Fluent#accept(Consumer)}
  * </li>
  * </ul>
  * </p>
@@ -74,7 +70,7 @@ public class Fluent<T> {
      * @param <P>      参数类型&函数第二个参数类型
      * @return
      */
-    public <P> Fluent<T> $$(Param<P> param, BiFunction<T, P, T> function) {
+    public <P> Fluent<T> apply(Param<P> param, BiFunction<T, P, T> function) {
         param.get().ifPresent(p -> this.target = function.apply(target, p));
         return this;
     }
@@ -88,19 +84,15 @@ public class Fluent<T> {
      * @param <P>      参数类型&函数第二个参数类型
      * @return
      */
-    public <P> Fluent<T> $(Param<P> param, BiConsumer<T, P> consumer) {
+    public <P> Fluent<T> accept(Param<P> param, BiConsumer<T, P> consumer) {
         param.get().ifPresent(p -> consumer.accept(target, p));
         return this;
     }
 
     /**
      * 执行函数，持有返回结果
-     *
-     * @param function
-     * @param <R>      函数返回类型
-     * @return
      */
-    public <R> Fluent<R> $$(Function<T, R> function) {
+    public <R> Fluent<R> apply(Function<T, R> function) {
         Fluent<R> f = (Fluent<R>) this;
         if (target != null) {
             f.target = function.apply(target);
@@ -110,14 +102,8 @@ public class Fluent<T> {
 
     /**
      * 执行函数，持有返回结果
-     *
-     * @param function
-     * @param p        函数参数
-     * @param <R>      函数返回类型
-     * @param <P>      参数类型
-     * @return
      */
-    public <R, P> Fluent<R> $$(BiFunction<T, P, R> function, P p) {
+    public <R, P> Fluent<R> apply(BiFunction<T, P, R> function, P p) {
         Fluent<R> f = (Fluent<R>) this;
         if (target != null) {
             f.target = function.apply(target, p);
@@ -127,144 +113,66 @@ public class Fluent<T> {
 
     /**
      * 执行函数，持有返回结果
-     *
-     * @param function
-     * @param p1       第一个参数
-     * @param p2       第二个参数
-     * @param <R>      函数返回类型
-     * @param <P1>     第一个参数类型
-     * @param <P2>     第二个参数类型
-     * @return
      */
-    public <P1, P2, R> Fluent<R> $$(TriFunction<T, P1, P2, R> function, P1 p1, P2 p2) {
+    public <P1, P2, R> Fluent<R> apply(TriFunction<T, P1, P2, R> function, P1 p1, P2 p2) {
         Fluent<R> f = (Fluent<R>) this;
         if (target != null) {
-            f.target = function.invoke(target, p1, p2);
+            f.target = function.apply(target, p1, p2);
         }
         return f;
     }
 
     /**
      * 执行函数，持有返回结果
-     *
-     * @param function
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param <P1>
-     * @param <P2>
-     * @param <P3>
-     * @param <R>
-     * @return
      */
-    public <P1, P2, P3, R> Fluent<R> $$(QuaFunction<T, P1, P2, P3, R> function, P1 p1, P2 p2, P3 p3) {
+    public <P1, P2, P3, R> Fluent<R> apply(QuaFunction<T, P1, P2, P3, R> function, P1 p1, P2 p2, P3 p3) {
         Fluent<R> f = (Fluent<R>) this;
         if (target != null) {
-            f.target = function.invoke(target, p1, p2, p3);
+            f.target = function.apply(target, p1, p2, p3);
         }
         return f;
     }
 
     /**
      * 执行函数，持有返回结果
-     *
-     * @param function
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     * @param <P1>
-     * @param <P2>
-     * @param <P3>
-     * @param <P4>
-     * @param <R>
-     * @return
      */
-    public <P1, P2, P3, P4, R> Fluent<R> $$(QuiFunction<T, P1, P2, P3, P4, R> function, P1 p1, P2 p2, P3 p3, P4 p4) {
+    public <P1, P2, P3, P4, R> Fluent<R> apply(QuiFunction<T, P1, P2, P3, P4, R> function, P1 p1, P2 p2, P3 p3, P4 p4) {
         Fluent<R> f = (Fluent<R>) this;
         if (target != null) {
-            f.target = function.invoke(target, p1, p2, p3, p4);
+            f.target = function.apply(target, p1, p2, p3, p4);
         }
         return f;
     }
 
     /**
      * 执行函数，持有返回结果
-     *
-     * @param function
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     * @param p5
-     * @param <P1>
-     * @param <P2>
-     * @param <P3>
-     * @param <P4>
-     * @param <P5>
-     * @param <R>
-     * @return
      */
-    public <P1, P2, P3, P4, P5, R> Fluent<R> $$(HexFunction<T, P1, P2, P3, P4, P5, R> function, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
+    public <P1, P2, P3, P4, P5, R> Fluent<R> apply(HexFunction<T, P1, P2, P3, P4, P5, R> function, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
         Fluent<R> f = (Fluent<R>) this;
         if (target != null) {
-            f.target = function.invoke(target, p1, p2, p3, p4, p5);
+            f.target = function.apply(target, p1, p2, p3, p4, p5);
         }
         return f;
     }
 
     /**
      * 执行函数，持有返回结果
-     *
-     * @param function
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     * @param p5
-     * @param p6
-     * @param <P1>
-     * @param <P2>
-     * @param <P3>
-     * @param <P4>
-     * @param <P5>
-     * @param <P6>
-     * @param <R>
-     * @return
      */
-    public <P1, P2, P3, P4, P5, P6, R> Fluent<R> $$(HepFunction<T, P1, P2, P3, P4, P5, P6, R> function, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) {
+    public <P1, P2, P3, P4, P5, P6, R> Fluent<R> apply(HepFunction<T, P1, P2, P3, P4, P5, P6, R> function, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) {
         Fluent<R> f = (Fluent<R>) this;
         if (target != null) {
-            f.target = function.invoke(target, p1, p2, p3, p4, p5, p6);
+            f.target = function.apply(target, p1, p2, p3, p4, p5, p6);
         }
         return f;
     }
 
     /**
      * 执行函数，持有返回结果
-     *
-     * @param function
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     * @param p5
-     * @param p6
-     * @param p7
-     * @param <P1>
-     * @param <P2>
-     * @param <P3>
-     * @param <P4>
-     * @param <P5>
-     * @param <P6>
-     * @param <P7>
-     * @param <R>
-     * @return
      */
-    public <P1, P2, P3, P4, P5, P6, P7, R> Fluent<R> $$(OctFunction<T, P1, P2, P3, P4, P5, P6, P7, R> function, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) {
+    public <P1, P2, P3, P4, P5, P6, P7, R> Fluent<R> apply(OctFunction<T, P1, P2, P3, P4, P5, P6, P7, R> function, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) {
         Fluent<R> f = (Fluent<R>) this;
         if (target != null) {
-            f.target = function.invoke(target, p1, p2, p3, p4, p5, p6, p7);
+            f.target = function.apply(target, p1, p2, p3, p4, p5, p6, p7);
         }
         return f;
     }
@@ -273,30 +181,12 @@ public class Fluent<T> {
     /**
      * 执行函数，持有返回结果
      *
-     * @param function
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     * @param p5
-     * @param p6
-     * @param p7
-     * @param p8
-     * @param <P1>
-     * @param <P2>
-     * @param <P3>
-     * @param <P4>
-     * @param <P5>
-     * @param <P6>
-     * @param <P7>
-     * @param <P8>
-     * @param <R>
      * @return
      */
-    public <P1, P2, P3, P4, P5, P6, P7, P8, R> Fluent<R> $$(NonFunction<T, P1, P2, P3, P4, P5, P6, P7, P8, R> function, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) {
+    public <P1, P2, P3, P4, P5, P6, P7, P8, R> Fluent<R> apply(NonFunction<T, P1, P2, P3, P4, P5, P6, P7, P8, R> function, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) {
         Fluent<R> f = (Fluent<R>) this;
         if (target != null) {
-            f.target = function.invoke(target, p1, p2, p3, p4, p5, p6, p7, p8);
+            f.target = function.apply(target, p1, p2, p3, p4, p5, p6, p7, p8);
         }
         return f;
     }
@@ -304,11 +194,8 @@ public class Fluent<T> {
 
     /**
      * 执行函数，忽略返回结果
-     *
-     * @param consumer
-     * @return
      */
-    public Fluent<T> $(Consumer<T> consumer) {
+    public Fluent<T> accept(Consumer<T> consumer) {
         if (target != null) {
             consumer.accept(target);
         }
@@ -317,13 +204,8 @@ public class Fluent<T> {
 
     /**
      * 执行函数，忽略返回结果
-     *
-     * @param consumer
-     * @param p
-     * @param <P>
-     * @return
      */
-    public <P> Fluent<T> $(BiConsumer<T, P> consumer, P p) {
+    public <P> Fluent<T> accept(BiConsumer<T, P> consumer, P p) {
         if (target != null) {
             consumer.accept(target, p);
         }
@@ -332,16 +214,13 @@ public class Fluent<T> {
 
 
     /**
-     * 执行函数，参数为p，忽略返回结果
+     * 执行函数，忽略返回结果
      *
-     * @param consumer
-     * @param <P1>     参数1类型
-     * @param <P2>     参数2类型
      * @return
      */
-    public <P1, P2> Fluent<T> $(TriConsumer<T, P1, P2> consumer, P1 p1, P2 p2) {
+    public <P1, P2> Fluent<T> accept(TriConsumer<T, P1, P2> consumer, P1 p1, P2 p2) {
         if (target != null) {
-            consumer.invoke(target, p1, p2);
+            consumer.accept(target, p1, p2);
         }
         return this;
     }
@@ -349,307 +228,294 @@ public class Fluent<T> {
 
     /**
      * 执行函数，忽略返回结果
-     *
-     * @param consumer
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param <P1>
-     * @param <P2>
-     * @param <P3>
-     * @return
      */
-    public <P1, P2, P3> Fluent<T> $(QuaConsumer<T, P1, P2, P3> consumer, P1 p1, P2 p2, P3 p3) {
+    public <P1, P2, P3> Fluent<T> accept(QuaConsumer<T, P1, P2, P3> consumer, P1 p1, P2 p2, P3 p3) {
         if (target != null) {
-            consumer.invoke(target, p1, p2, p3);
+            consumer.accept(target, p1, p2, p3);
         }
         return this;
     }
 
     /**
-     * 执行函数，忽略返回结果
+     * 绑定无参方法,忽略返回结果
      *
-     * @param consumer
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     * @param <P1>
-     * @param <P2>
-     * @param <P3>
-     * @param <P4>
+     * @param function
      * @return
      */
-    public <P1, P2, P3, P4> Fluent<T> $(QuiConsumer<T, P1, P2, P3, P4> consumer, P1 p1, P2 p2, P3 p3, P4 p4) {
-        if (target != null) {
-            consumer.invoke(target, p1, p2, p3, p4);
-        }
-        return this;
+    public FConsumer<T> consumer(Consumer<T> function) {
+        return new FConsumer<>(target, function);
     }
 
     /**
-     * 执行函数，忽略返回结果
-     *
-     * @param consumer
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     * @param p5
-     * @param <P1>
-     * @param <P2>
-     * @param <P3>
-     * @param <P4>
-     * @param <P5>
-     * @return
+     * 绑定单参方法,忽略返回结果
      */
-    public <P1, P2, P3, P4, P5> Fluent<T> $(HexConsumer<T, P1, P2, P3, P4, P5> consumer, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
-        if (target != null) {
-            consumer.invoke(target, p1, p2, p3, p4, p5);
-        }
-        return this;
+    public <P1> FBiConsumer<T, P1> consumer(BiConsumer<T, P1> function) {
+        return new FBiConsumer<>(target, function);
     }
 
     /**
-     * 执行函数，忽略返回结果
-     *
-     * @param consumer
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     * @param p5
-     * @param p6
-     * @param <P1>
-     * @param <P2>
-     * @param <P3>
-     * @param <P4>
-     * @param <P5>
-     * @param <P6>
-     * @return
+     * 绑定双参方法,忽略返回结果
      */
-    public <P1, P2, P3, P4, P5, P6> Fluent<T> $(HepConsumer<T, P1, P2, P3, P4, P5, P6> consumer, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) {
-        if (target != null) {
-            consumer.invoke(target, p1, p2, p3, p4, p5, p6);
-        }
-        return this;
+    public <P1, P2> FTriConsumer<T, P1, P2> consumer(TriConsumer<T, P1, P2> function) {
+        return new FTriConsumer<>(target, function);
+    }
+
+    /**
+     * 绑定三参方法,忽略返回结果
+     */
+    public <P1, P2, P3> FQuaConsumer<T, P1, P2, P3> consumer(QuaConsumer<T, P1, P2, P3> function) {
+        return new FQuaConsumer<>(target, function);
     }
 
 
     /**
-     * 执行函数，忽略返回结果
+     * 绑定四参方法,忽略返回结果
+     */
+    public <P1, P2, P3, P4> FQuiConsumer<T, P1, P2, P3, P4> consumer(QuiConsumer<T, P1, P2, P3, P4> function) {
+        return new FQuiConsumer<>(target, function);
+    }
+
+
+    /**
+     * 绑定无参方法,持有返回结果
+     */
+    public <R> FFunction<T, R> function(Function<T, R> function) {
+        return new FFunction<>(target, function);
+    }
+
+
+    /**
+     * 绑定单参方法,持有返回结果
+     */
+    public <P1, R> FBiFunction<T, P1, R> function(BiFunction<T, P1, R> function) {
+        return new FBiFunction<>(target, function);
+    }
+
+
+    /**
+     * 绑定双参方法,持有返回结果
+     */
+    public <P1, P2, R> FTriFunction<T, P1, P2, R> function(TriFunction<T, P1, P2, R> function) {
+        return new FTriFunction<>(target, function);
+    }
+
+
+    /**
+     * 绑定三参方法,持有返回结果
+     */
+    public <P1, P2, P3, R> FQuaFunction<T, P1, P2, P3, R> function(QuaFunction<T, P1, P2, P3, R> function) {
+        return new FQuaFunction<>(target, function);
+    }
+
+
+    /**
+     * 绑定四参方法,持有返回结果
      *
-     * @param consumer
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     * @param p5
-     * @param p6
-     * @param p7
-     * @param <P1>
-     * @param <P2>
-     * @param <P3>
-     * @param <P4>
-     * @param <P5>
-     * @param <P6>
-     * @param <P7>
+     * @param function
      * @return
      */
-    public <P1, P2, P3, P4, P5, P6, P7> Fluent<T> $(OctConsumer<T, P1, P2, P3, P4, P5, P6, P7> consumer, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) {
-        if (target != null) {
-            consumer.invoke(target, p1, p2, p3, p4, p5, p6, p7);
-        }
-        return this;
+    public <P1, P2, P3, P4, R> FQuiFunction<T, P1, P2, P3, P4, R> function(QuiFunction<T, P1, P2, P3, P4, R> function) {
+        return new FQuiFunction<>(target, function);
     }
 
     /**
-     * 执行函数，忽略返回结果
+     * 柯里化(Currying){@link Consumer}
      *
-     * @param consumer
-     * @param p1
-     * @param p2
-     * @param p3
-     * @param p4
-     * @param p5
-     * @param p6
-     * @param p7
-     * @param p8
-     * @param <P1>
-     * @param <P2>
-     * @param <P3>
-     * @param <P4>
-     * @param <P5>
-     * @param <P6>
-     * @param <P7>
-     * @param <P8>
-     * @return
+     * @param <T>
      */
-    public <P1, P2, P3, P4, P5, P6, P7, P8> Fluent<T> $(NonConsumer<T, P1, P2, P3, P4, P5, P6, P7, P8> consumer, P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) {
-        if (target != null) {
-            consumer.invoke(target, p1, p2, p3, p4, p5, p6, p7, p8);
-        }
-        return this;
-    }
+    public static class FConsumer<T> extends Fluent<T> {
 
+        private Consumer<T> f;
 
-    public <P1> Fluent2<T, P1> method(BiConsumer<T, P1> function) {
-        return new Fluent2<>(target, function);
-    }
-
-    public <P1, P2> Fluent3<T, P1, P2> method(TriConsumer<T, P1, P2> function) {
-        return new Fluent3<>(target, function);
-    }
-
-    public <P1, P2, P3> Fluent4<T, P1, P2, P3> method(QuaConsumer<T, P1, P2, P3> function) {
-        return new Fluent4<>(target, function);
-    }
-
-
-    public <P1, P2, P3, P4> Fluent5<T, P1, P2, P3, P4> method(QuiConsumer<T, P1, P2, P3, P4> function) {
-        return new Fluent5<>(target, function);
-    }
-
-    public <P1, P2, P3, P4, P5> Fluent6<T, P1, P2, P3, P4, P5> method(HexConsumer<T, P1, P2, P3, P4,
-                    P5> function) {
-        return new Fluent6<>(target, function);
-    }
-
-    public <P1, P2, P3, P4, P5, P6> Fluent7<T, P1, P2, P3, P4, P5, P6> method(HepConsumer<T, P1, P2, P3, P4,
-                            P5, P6> function) {
-        return new Fluent7<>(target, function);
-    }
-
-    public <P1, P2, P3, P4, P5, P6, P7> Fluent8<T, P1, P2, P3, P4, P5, P6, P7> method(OctConsumer<T, P1, P2, P3, P4,
-                        P5, P6, P7> function) {
-        return new Fluent8<>(target, function);
-    }
-
-    public <P1, P2, P3, P4, P5, P6, P7, P8> Fluent9<T, P1, P2, P3, P4, P5, P6, P7, P8> method(NonConsumer<T, P1, P2, P3, P4, P5, P6, P7, P8> function) {
-        return new Fluent9<>(target, function);
-    }
-
-
-    public static class Fluent2<T, P1> extends Fluent<T> {
-
-        private BiConsumer<T, P1> f;
-
-        public Fluent2(T target, BiConsumer<T, P1> f) {
+        public FConsumer(T target, Consumer<T> f) {
             super(target);
             this.f = f;
         }
 
-        public Fluent2<T, P1> invoke(P1 p1) {
+        public FConsumer<T> accept() {
+            f.accept(target);
+            return this;
+        }
+    }
+
+
+    /**
+     * 柯里化(Currying){@link BiConsumer}
+     *
+     * @param <T>
+     * @param <P1>
+     */
+    public static class FBiConsumer<T, P1> extends Fluent<T> {
+
+        private BiConsumer<T, P1> f;
+
+        public FBiConsumer(T target, BiConsumer<T, P1> f) {
+            super(target);
+            this.f = f;
+        }
+
+        public FBiConsumer<T, P1> accept(P1 p1) {
             f.accept(target, p1);
             return this;
         }
 
-
-        public Fluent2<T, P1> invoke(Param<P1> u) {
-            u.get().ifPresent(p -> f.accept(target, p));
+        /**
+         * 如参数{@link Param#get()}返回结果有值,则执行函数
+         *
+         * @param param 条件参数
+         * @return
+         */
+        public FBiConsumer<T, P1> accept(Param<P1> param) {
+            param.get().ifPresent(p -> f.accept(target, p));
             return this;
         }
-
     }
 
 
-    public static class Fluent3<T, P1, P2> extends Fluent<T> {
+    /**
+     * 柯里化(Currying){@link TriConsumer}
+     */
+    public static class FTriConsumer<T, P1, P2> extends Fluent<T> {
         private TriConsumer<T, P1, P2> f;
 
-        public Fluent3(T target, TriConsumer<T, P1, P2> f) {
+        public FTriConsumer(T target, TriConsumer<T, P1, P2> f) {
             super(target);
             this.f = f;
         }
 
-        public Fluent3<T, P1, P2> invoke(P1 p1, P2 p2) {
-            f.invoke(target, p1, p2);
+        public FTriConsumer<T, P1, P2> accept(P1 p1, P2 p2) {
+            f.accept(target, p1, p2);
             return this;
         }
     }
 
-    public static class Fluent4<T, P1, P2, P3> extends Fluent<T> {
+    /**
+     * 柯里化(Currying){@link QuaConsumer}
+     */
+    public static class FQuaConsumer<T, P1, P2, P3> extends Fluent<T> {
         private QuaConsumer<T, P1, P2, P3> f;
 
-        public Fluent4(T target, QuaConsumer<T, P1, P2, P3> f) {
+        public FQuaConsumer(T target, QuaConsumer<T, P1, P2, P3> f) {
             super(target);
             this.f = f;
         }
 
-        public Fluent4<T, P1, P2, P3> invoke(P1 p1, P2 p2, P3 p3) {
-            f.invoke(target, p1, p2, p3);
+        public FQuaConsumer<T, P1, P2, P3> accept(P1 p1, P2 p2, P3 p3) {
+            f.accept(target, p1, p2, p3);
             return this;
         }
     }
 
-    public static class Fluent5<T, P1, P2, P3, P4> extends Fluent<T> {
+    /**
+     * 柯里化(Currying){@link QuaConsumer}
+     */
+    public static class FQuiConsumer<T, P1, P2, P3, P4> extends Fluent<T> {
         private QuiConsumer<T, P1, P2, P3, P4> f;
 
-        public Fluent5(T target, QuiConsumer<T, P1, P2, P3, P4> f) {
+        public FQuiConsumer(T target, QuiConsumer<T, P1, P2, P3, P4> f) {
             super(target);
             this.f = f;
         }
 
-        public Fluent5<T, P1, P2, P3, P4> invoke(P1 p1, P2 p2, P3 p3, P4 p4) {
-            f.invoke(target, p1, p2, p3, p4);
+        public FQuiConsumer<T, P1, P2, P3, P4> accept(P1 p1, P2 p2, P3 p3, P4 p4) {
+            f.accept(target, p1, p2, p3, p4);
             return this;
         }
     }
 
-    public static class Fluent6<T, P1, P2, P3, P4, P5> extends Fluent<T> {
-        private HexConsumer<T, P1, P2, P3, P4, P5> f;
 
-        public Fluent6(T target, HexConsumer<T, P1, P2, P3, P4, P5> f) {
+    /**
+     * 柯里化(Currying){@link Function}
+     */
+    public static class FFunction<T, R> extends Fluent<T> {
+        private Function<T, R> f;
+
+        public FFunction(T target, Function<T, R> f) {
             super(target);
             this.f = f;
         }
 
-        public Fluent6<T, P1, P2, P3, P4, P5> invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
-            f.invoke(target, p1, p2, p3, p4, p5);
-            return this;
+        public Fluent<R> apply() {
+            Fluent<R> fluent = (Fluent<R>) this;
+            fluent.target = f.apply(target);
+            return fluent;
         }
+
     }
 
-    public static class Fluent7<T, P1, P2, P3, P4, P5, P6> extends Fluent<T> {
-        private HepConsumer<T, P1, P2, P3, P4, P5, P6> f;
 
-        public Fluent7(T target, HepConsumer<T, P1, P2, P3, P4, P5, P6> f) {
+    /**
+     * 柯里化(Currying){@link BiFunction}
+     */
+    public static class FBiFunction<T, P1, R> extends Fluent<T> {
+        private BiFunction<T, P1, R> f;
+
+        public FBiFunction(T target, BiFunction<T, P1, R> f) {
             super(target);
             this.f = f;
         }
 
-        public Fluent7<T, P1, P2, P3, P4, P5, P6> invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) {
-            f.invoke(target, p1, p2, p3, p4, p5, p6);
-            return this;
+        public Fluent<R> apply(P1 p1) {
+            Fluent<R> fluent = (Fluent<R>) this;
+            fluent.target = f.apply(target, p1);
+            return fluent;
         }
+
     }
 
-    public static class Fluent8<T, P1, P2, P3, P4, P5, P6, P7> extends Fluent<T> {
-        private OctConsumer<T, P1, P2, P3, P4, P5, P6, P7> f;
+    /**
+     * 柯里化(Currying){@link TriFunction}
+     */
+    public static class FTriFunction<T, P1, P2, R> extends Fluent<T> {
+        private TriFunction<T, P1, P2, R> f;
 
-        public Fluent8(T target, OctConsumer<T, P1, P2, P3, P4, P5, P6, P7> f) {
+        public FTriFunction(T target, TriFunction<T, P1, P2, R> f) {
             super(target);
             this.f = f;
         }
 
-        public Fluent8<T, P1, P2, P3, P4, P5, P6, P7> invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) {
-            f.invoke(target, p1, p2, p3, p4, p5, p6, p7);
-            return this;
+        public Fluent<R> apply(P1 p1, P2 p2) {
+            Fluent<R> fluent = (Fluent<R>) this;
+            fluent.target = f.apply(target, p1, p2);
+            return fluent;
         }
+
     }
 
-    public static class Fluent9<T, P1, P2, P3, P4, P5, P6, P7, P8> extends Fluent<T> {
-        private NonConsumer<T, P1, P2, P3, P4, P5, P6, P7, P8> f;
+    /**
+     * 柯里化(Currying){@link QuaFunction}
+     */
+    public static class FQuaFunction<T, P1, P2, P3, R> extends Fluent<T> {
+        private QuaFunction<T, P1, P2, P3, R> f;
 
-        public Fluent9(T target, NonConsumer<T, P1, P2, P3, P4, P5, P6, P7, P8> f) {
+        public FQuaFunction(T target, QuaFunction<T, P1, P2, P3, R> f) {
             super(target);
             this.f = f;
         }
 
-        public Fluent9<T, P1, P2, P3, P4, P5, P6, P7, P8> invoke(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) {
-            f.invoke(target, p1, p2, p3, p4, p5, p6, p7, p8);
-            return this;
+        public Fluent<R> apply(P1 p1, P2 p2, P3 p3) {
+            Fluent<R> fluent = (Fluent<R>) this;
+            fluent.target = f.apply(target, p1, p2, p3);
+            return fluent;
         }
     }
 
+    /**
+     * 柯里化(Currying){@link QuiFunction}
+     */
+    public static class FQuiFunction<T, P1, P2, P3, P4, R> extends Fluent<T> {
+        private QuiFunction<T, P1, P2, P3, P4, R> f;
+
+        public FQuiFunction(T target, QuiFunction<T, P1, P2, P3, P4, R> f) {
+            super(target);
+            this.f = f;
+        }
+
+        public Fluent<R> apply(P1 p1, P2 p2, P3 p3, P4 p4) {
+            Fluent<R> fluent = (Fluent<R>) this;
+            fluent.target = f.apply(target, p1, p2, p3, p4);
+            return fluent;
+        }
+    }
 
 }

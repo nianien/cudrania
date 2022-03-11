@@ -1,12 +1,16 @@
 package com.cudrania.test.functions;
 
 import com.cudrania.core.functions.Fn;
-import com.cudrania.core.reflection.Reflections;
+import com.cudrania.core.functions.Fn.Consumer;
 import com.cudrania.test.bean.User;
+import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -21,27 +25,19 @@ public class TestSFunction implements Serializable {
     @SneakyThrows
     public void test() {
         User user = new User();
-        System.out.println(Fn.of(TestSFunction::ff).name());
+
+        Map map = new HashMap();
+        Fn.of(map::put);
+        Fn.of(Map<String, String>::put);
+        Fn.of((Consumer<Type>) System.out::println).accept(new TypeReference<Consumer<Integer>>() {
+        }.getType().getClass());
         System.out.println(Fn.of(User::getId).name());
         System.out.println(Fn.of(User::getUserId).name());
-        Fn.of(User::setUserId).invoke(user, "111");
-        System.out.println(Fn.of(User::getUserId).invoke(user));
-        Reflections.invoke(Fn.of(User::setUserName), user, "aaaa");
+        Fn.of(User::setUserId).accept(user, "111");
+        Fn.of(User::setUserId).bind(user).bind("222").run();
+        System.out.println(Fn.of(User::getUserId).bind(user).call());
         System.out.println(user);
     }
 
-
-    public void ff(int a, int b, String c) {
-
-    }
-
-    public String getName(java.util.function.BiFunction<User, String, User> function) {
-        return function.toString();
-    }
-
-    public String getName(java.util.function.Function<String, User> function) {
-
-        return function.toString();
-    }
 
 }

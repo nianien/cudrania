@@ -154,7 +154,7 @@ public class FluentCondition extends Fluent<Condition> {
      * @return
      */
     public <P> FluentCondition when(Param<P> param, Function<P, Condition> function) {
-        return (FluentCondition) this.$$(param, (c, p) -> op.apply(c, function.apply(p)));
+        return (FluentCondition) this.apply(param, (c, p) -> op.apply(c, function.apply(p)));
     }
 
     /**
@@ -168,7 +168,7 @@ public class FluentCondition extends Fluent<Condition> {
      */
     public <P, F> FluentCondition when(Param<P> param, Field<F> field,
                                        BiFunction<Field<F>, P, Condition> function) {
-        return (FluentCondition) this.$$(param, (c, p) -> op.apply(c, function.apply(field, p)));
+        return (FluentCondition) this.apply(param, (c, p) -> op.apply(c, function.apply(field, p)));
     }
 
 
