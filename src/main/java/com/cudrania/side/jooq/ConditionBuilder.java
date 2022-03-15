@@ -3,24 +3,27 @@ package com.cudrania.side.jooq;
 
 import com.cudrania.core.arrays.ArrayUtils;
 import com.cudrania.core.functions.Fn;
+import com.cudrania.core.reflection.BeanProperty;
 import com.cudrania.core.reflection.Reflections;
 import com.cudrania.core.utils.StringUtils;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.SQLDialect;
-import org.jooq.Table;
+import org.jooq.TableLike;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultDataType;
 
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static com.cudrania.core.utils.StringUtils.decapitalize;
 import static com.cudrania.core.utils.StringUtils.underscoreCase;
 
 /**
@@ -33,7 +36,6 @@ import static com.cudrania.core.utils.StringUtils.underscoreCase;
 public class ConditionBuilder {
 
     private SQLDialect sqlDialect = SQLDialect.DEFAULT;
-
 
     /**
      * 生成查询字段
@@ -86,12 +88,12 @@ public class ConditionBuilder {
      * @param table
      * @return
      */
-    public static ConditionBuilder byTable(Table table) {
-        return new ConditionBuilder(Function.identity(), (name, type) -> {
-            Field field = table.field(name);
+    public static ConditionBuilder byTable(TableLike table) {
+        return new ConditionBuilder(Function.identity(), (property, type) -> {
+            Field field = table.field(property);
             if (field == null) {
-                name = underscoreCase(name);
-                field = table.field(name);
+                property = underscoreCase(property);
+                field = table.field(property);
             }
             return field;
         });
@@ -123,7 +125,7 @@ public class ConditionBuilder {
      * @param sqlDialect
      * @return
      */
-    public ConditionBuilder with(SQLDialect sqlDialect) {
+    public ConditionBuilder dialect(SQLDialect sqlDialect) {
         this.sqlDialect = sqlDialect;
         return this;
     }
@@ -135,9 +137,15 @@ public class ConditionBuilder {
      * @param operator 查询操作,如果为null则该字段不参与查询
      * @return
      */
-    public ConditionBuilder withName(String name, Operator operator) {
+    public ConditionBuilder match(String name, Operator operator) {
         Set<String> set = new HashSet<>(Arrays.asList(name.toLowerCase(), underscoreCase(name).toLowerCase()));
-        return with(f -> set.contains(f.toLowerCase()), operator);
+        return filter(f -> {
+            if (set.contains(f.getField().getName().toLowerCase())) {
+                f.setOperator(operator);
+            }
+            return true;
+        });
+
     }
 
     /**
@@ -147,47 +155,12 @@ public class ConditionBuilder {
      * @param operator 查询操作,如果为null则该字段不参与查询
      * @return
      */
-    public ConditionBuilder withName(Fn.Function getter, Operator operator) {
-        return withName(getter.name(), operator);
-    }
-
-    /**
-     * 设置匹配字段的查询操作
-     *
-     * @param regex    字段名匹配的正则表达式
-     * @param operator 查询操作,如果为null则该字段不参与查询
-     * @return
-     */
-    public ConditionBuilder withRegex(String regex, Operator operator) {
-        return with(f -> f.matches(regex), operator);
-    }
-
-    /**
-     * 设置匹配字段的查询操作
-     *
-     * @param predicate 字段匹配函数, 匹配时设置查询操作
-     * @param operator  查询操作,如果为null则该字段不参与查询
-     * @return
-     */
-    public ConditionBuilder with(BiPredicate<String, Object> predicate, Operator operator) {
-        return with(f -> {
-            if (predicate.test(f.field.getName(), f.value)) {
-                f.setOperator(operator);
-            }
-            return true;
-        });
-    }
-
-    /**
-     * 设置匹配字段的查询操作
-     *
-     * @param predicate 字段匹配函数, 匹配时设置查询操作
-     * @param operator  查询操作,如果为null则字段不参与查询
-     * @return
-     */
-    public ConditionBuilder with(Predicate<String> predicate, Operator operator) {
-        return with(f -> {
-            if (predicate.test(f.field.getName())) {
+    public <P, R> ConditionBuilder match(Fn.Function<P, R> getter, Operator operator) {
+        String name = getter.name();
+        int index = name.startsWith("get") || name.startsWith("set") ? 3 : name.startsWith("is") ? 2 : 0;
+        String propertyName = decapitalize(name.substring(index));
+        return filter(f -> {
+            if (f.property.getName().equals(propertyName)) {
                 f.setOperator(operator);
             }
             return true;
@@ -201,7 +174,7 @@ public class ConditionBuilder {
      * @param filter 过滤函数,判断结果为真时作为查询条件,可同时设置查询操作,如果查询操作为null则不参与查询
      * @return
      */
-    public ConditionBuilder with(Predicate<QueryField> filter) {
+    public ConditionBuilder filter(Predicate<QueryField> filter) {
         this.filter = this.filter.and(filter);
         return this;
     }
@@ -295,43 +268,59 @@ public class ConditionBuilder {
      * @return
      */
     private List<QueryField> getQueryFields(Object queryBean) {
-        List<java.lang.reflect.Field> javaFields = Reflections.getFields(queryBean.getClass());
-        List<QueryField> queryFields = new ArrayList<>(javaFields.size());
-        for (java.lang.reflect.Field javaField : javaFields) {
-            Operator operator = Operator.EQ;
-            String name = javaField.getName();
-            Match match = Reflections.findAnnotation(javaField, Match.class);
-            if (match != null) {
-                operator = match.value();
-                if (operator == Operator.NONE) {
-                    continue;
-                }
-                //优先使用注解定义
-                if (StringUtils.isNotEmpty(match.name())) {
-                    name = match.name();
-                } else {
-                    //否则使用命名函数
-                    name = nameGenerator.apply(name);
-                }
+        List<BeanProperty> beanProperties = Reflections.beanProperties(queryBean.getClass());
+        List<QueryField> queryFields = new ArrayList<>(beanProperties.size());
+        for (BeanProperty property : beanProperties) {
+            QueryField queryField = createQueryField(property, queryBean);
+            if (queryField != null) {
+                queryFields.add(queryField);
+            }
+        }
+        return queryFields;
+    }
+
+
+    /**
+     * 创建查询字段
+     *
+     * @param property
+     * @param queryBean
+     * @return
+     */
+    private QueryField createQueryField(BeanProperty property, Object queryBean) {
+        Operator operator = Operator.EQ;
+        String name = property.getName();
+        Match[] matches = property.getAnnotations(Match.class);
+        if (matches.length > 0) {
+            Match match = matches[0];
+            operator = match.value();
+            if (operator == Operator.NONE) {
+                return null;
+            }
+            //优先使用注解定义
+            if (StringUtils.isNotEmpty(match.name())) {
+                name = match.name();
             } else {
                 //否则使用命名函数
                 name = nameGenerator.apply(name);
             }
-            //获取查询字段值
-            Object fieldValue = Reflections.getFieldValue(javaField, queryBean);
-            //字段转成数组,用于空值判断和字段类型推断
-            Object[] array = ArrayUtils.forceToArray(fieldValue);
-            if (array.length == 0) {
-                continue;
-            }
-            // 根据名称和类型生成查询字段
-            Field<?> field = fieldGenerator.apply(name, array[0].getClass());
-            if (field == null) {
-                continue;
-            }
-            queryFields.add(new QueryField(field, array[0].getClass(), fieldValue, operator));
+        } else {
+            //否则使用命名函数
+            name = nameGenerator.apply(name);
         }
-        return queryFields;
+        //获取查询字段值
+        Object fieldValue = property.getValue(queryBean);
+        //字段转成数组,用于空值判断和字段类型推断
+        Object[] array = ArrayUtils.forceToArray(fieldValue);
+        if (array.length == 0) {
+            return null;
+        }
+        // 根据名称和类型生成查询字段
+        Field<?> field = fieldGenerator.apply(name, array[0].getClass());
+        if (field == null) {
+            return null;
+        }
+        return new QueryField(field, array[0].getClass(), fieldValue, operator, property);
     }
 
 
@@ -358,7 +347,8 @@ public class ConditionBuilder {
     /**
      * 查询字段
      */
-    @Data
+    @Getter
+    @Setter(AccessLevel.PRIVATE)
     @AllArgsConstructor
     public static class QueryField {
         /**
@@ -377,6 +367,9 @@ public class ConditionBuilder {
          * 匹配操作符
          */
         private Operator operator;
+
+        @Getter(AccessLevel.PRIVATE)
+        private BeanProperty property;
 
     }
 

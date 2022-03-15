@@ -1,9 +1,13 @@
 package com.cudrania.core.reflection;
 
+import com.cudrania.core.collection.CollectionUtils;
 import lombok.Getter;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class BeanProperty {
@@ -79,6 +83,26 @@ public class BeanProperty {
         }
     }
 
+
+    /**
+     * 获取指定类型的注解
+     *
+     * @param annotationClass
+     * @param <T>
+     * @return
+     */
+    public <T extends Annotation> T[] getAnnotations(Class<T> annotationClass) {
+        List<T> list = new ArrayList<>();
+        T t1 = getter.getAnnotation(annotationClass);
+        if (t1 != null) {
+            list.add(t1);
+        }
+        T t2 = field.getAnnotation(annotationClass);
+        if (t2 != null) {
+            list.add(t2);
+        }
+        return CollectionUtils.array(list, annotationClass);
+    }
 
     @Override
     public String toString() {
