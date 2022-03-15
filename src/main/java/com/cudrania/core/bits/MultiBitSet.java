@@ -144,7 +144,7 @@ public class MultiBitSet {
      *
      * @param fromIndex
      * @return
-     * @see java.util.BitSet#nextSetBit
+     * @see java.util.BitSet#nextSetBit(int) 
      */
     public int nextSetBit(int fromIndex) {
         return this.bitset.nextSetBit(fromIndex * nBit) / nBit;

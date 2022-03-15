@@ -77,22 +77,6 @@ public class Fluent<T> {
     }
 
     /**
-     * 如参数{@link Param#get()}返回结果有值,则调用函数并绑定返回结果
-     *
-     * @param param    条件参数
-     * @param function 函数表达式
-     * @param <P>      参数类型&函数第二个参数类型
-     * @return
-     */
-    public <P> Fluent<T> apply(Param<P> param, BiFunction<T, P, T> function) {
-        if (target != null) {
-            param.get().ifPresent(p -> this.target = function.apply(target, p));
-        }
-        return this;
-    }
-
-
-    /**
      * 执行双参方法，持有返回结果
      */
     public <P1, P2, R> Fluent<R> apply(TriFunction<T, P1, P2, R> function, P1 p1, P2 p2) {
@@ -131,12 +115,12 @@ public class Fluent<T> {
     /**
      * 如参数{@link Param#get()}返回结果有值,则执行函数
      *
-     * @param param    条件参数
-     * @param consumer 函数表达式
      * @param <P>      参数类型&函数第二个参数类型
+     * @param consumer 函数表达式
+     * @param param    条件参数
      * @return
      */
-    public <P> Fluent<T> accept(Param<P> param, BiConsumer<T, P> consumer) {
+    public <P> Fluent<T> acceptIf(BiConsumer<T, P> consumer, Param<P> param) {
         if (target != null) {
             param.get().ifPresent(p -> consumer.accept(target, p));
         }
@@ -301,7 +285,7 @@ public class Fluent<T> {
          * @param param 条件参数
          * @return
          */
-        public FBiConsumer<T, P1> accept(Param<P1> param) {
+        public FBiConsumer<T, P1> acceptIf(Param<P1> param) {
             if (target != null) {
                 param.get().ifPresent(p -> f.accept(target, p));
             }

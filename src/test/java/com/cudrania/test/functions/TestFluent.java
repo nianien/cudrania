@@ -2,8 +2,6 @@ package com.cudrania.test.functions;
 
 import com.cudrania.core.functions.Fluent;
 import com.cudrania.core.functions.Fn.Consumer;
-import com.cudrania.core.functions.Params;
-import com.cudrania.core.functions.Params.ImmutableParam;
 import com.cudrania.core.utils.StringUtils;
 import com.cudrania.test.bean.Contact;
 import com.cudrania.test.bean.Family;
@@ -13,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 
 import static com.cudrania.core.functions.Fluent.of;
-import static com.cudrania.core.functions.Params.gt0;
+import static com.cudrania.core.functions.Params.*;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -26,6 +24,14 @@ public class TestFluent {
 
     @Test
     public void testBindMethod() {
+        of(new ArrayList<>())
+                .<String>consumer(List::add)
+                .accept("a1")
+                .accept("a2")
+                .accept("a3")
+                .accept("a4")
+                .accept(System.out::println)
+                .get();
         of(new HashMap<String, String>())
                 .accept(Map::put, "a1", "Alex")
                 .accept(Map::put, "b2", "Brown")
@@ -72,7 +78,7 @@ public class TestFluent {
     @Test
     public void testParam() {
 
-        ImmutableParam<List> param = Params.with(10).then(n -> {
+        ImmutableParam<List> param = with(10).then(n -> {
             System.out.println("2.====");
             return n * n;
         }).when(n -> {
@@ -122,7 +128,7 @@ public class TestFluent {
         assertEquals("137****", people.getContact().getTelephone());
         assertEquals(100,
                 Fluent.of(people)
-                        .accept(gt0(100).then(id -> id.longValue()), People::setId)
+                        .acceptIf(People::setId, gt0(100).then(id -> id.longValue()))
                         .apply(People::getId).get());
 
 
@@ -148,9 +154,9 @@ public class TestFluent {
     static String build2(long id, String name, String email) {
         return of(new StringBuilder())
                 .<String>consumer(StringBuilder::append)
-                .accept(Params.with(id).when(e -> e > 0).then(e -> e.toString()))
-                .accept(Params.notEmpty(name))
-                .accept(Params.notEmpty(email))
+                .acceptIf(with(id).when(e -> e > 0).then(e -> e.toString()))
+                .acceptIf(notEmpty(name))
+                .acceptIf(notEmpty(email))
                 .get().toString();
     }
 
