@@ -1,4 +1,4 @@
-package com.cudrania.core.annotation;
+package com.cudrania.core.reflection;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

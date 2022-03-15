@@ -1,11 +1,8 @@
 package com.cudrania.idea.jdbc.table;
 
-import com.cudrania.core.annotation.Property;
-import com.cudrania.core.reflection.Reflections;
+import com.cudrania.core.reflection.BeanProperty;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.sql.JDBCType;
 
 import static com.cudrania.core.utils.StringUtils.isNotEmpty;
@@ -37,25 +34,19 @@ public class TableHelper {
      * 根据getter/setter(或isXXX)方法获取数据库表中字段名称<br>
      * 优先级: @Column>@Property>getter
      *
-     * @param method
-     * @return 字段名称
+     * @param beanProperty
+     * @return Column
      */
-    public static Column getColumnName(Method method, Field field) {
-        Column column = method.getAnnotation(Column.class);
-        if (column == null && field != null) {
-            column = field.getAnnotation(Column.class);
-        }
+    public static Column getColumnName(BeanProperty beanProperty) {
+        Column column = beanProperty.getGetter().getAnnotation(Column.class);
         if (column != null && !column.value().isEmpty()) {
             return column;
         }
-        String name;
-        if (!method.isAnnotationPresent(Property.class)
-                && field != null
-                && field.isAnnotationPresent(Property.class)) {
-            name = underscoreCase(Reflections.propertyName(field));
-        } else {
-            name = underscoreCase(Reflections.propertyName(method));
+        column = beanProperty.getField().getAnnotation(Column.class);
+        if (column != null && !column.value().isEmpty()) {
+            return column;
         }
+
         return new Column() {
 
             @Override
@@ -65,7 +56,7 @@ public class TableHelper {
 
             @Override
             public String value() {
-                return name;
+                return underscoreCase(beanProperty.getAlias());
             }
 
             @Override

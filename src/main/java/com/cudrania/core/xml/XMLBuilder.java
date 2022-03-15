@@ -2,6 +2,7 @@ package com.cudrania.core.xml;
 
 import com.cudrania.core.date.DateFormatter;
 import com.cudrania.core.date.DatePattern;
+import com.cudrania.core.reflection.BeanProperty;
 import com.cudrania.core.reflection.Reflections;
 import com.cudrania.core.utils.StringUtils;
 
@@ -188,12 +189,13 @@ public class XMLBuilder {
             }
         } else {
             // 获取get方法
-            List<Method> methods = Reflections.getters(bean.getClass());
-            for (Method m : methods) {
-                String name = Reflections.propertyName(m);
-                Object value = Reflections.invoke(m, bean);
-                if (value == null)
+            List<BeanProperty> properties = Reflections.beanProperties(bean.getClass());
+            for (BeanProperty p : properties) {
+                String name = p.getAlias();
+                Object value = p.getValue(bean);
+                if (value == null){
                     continue;
+                }
                 buildNode(value, name, sb);
             }
         }
@@ -242,10 +244,10 @@ public class XMLBuilder {
             }
         } else {
             // 获取公开的get方法
-            List<Method> methods = Reflections
-                    .getters(bean.getClass());
-            for (Method m : methods) {
-                appendAttributes(Reflections.propertyName(m), Reflections.invoke(m, bean), sb, sub);
+            List<BeanProperty> properties = Reflections
+                    .beanProperties(bean.getClass());
+            for (BeanProperty p : properties) {
+                appendAttributes(p.getAlias(), p.getValue(bean), sb, sub);
             }
         }
         if (sub.length() == 0) {

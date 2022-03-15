@@ -2,8 +2,11 @@ package com.cudrania.core.collection;
 
 import com.cudrania.core.arrays.ArrayUtils;
 import com.cudrania.core.reflection.Reflections;
+import lombok.SneakyThrows;
+import org.apache.commons.beanutils.BeanUtils;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -446,8 +449,9 @@ public class CollectionUtils {
     /**
      * 获取对象属性
      */
+    @SneakyThrows
     private static Object getProperty(Object obj, String property) {
-        return obj instanceof Map ? ((Map) obj).get(property) : Reflections.getPropertyValue(obj, property);
+        return BeanUtils.getProperty(obj,property);
     }
 
 }

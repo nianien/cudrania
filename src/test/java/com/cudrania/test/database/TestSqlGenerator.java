@@ -1,7 +1,9 @@
 package com.cudrania.test.database;
 
 import com.cudrania.core.collection.wrapper.MapWrapper;
+import com.cudrania.core.reflection.Reflections;
 import com.cudrania.idea.jdbc.sql.SqlStatement;
+import com.cudrania.test.bean.Student;
 import com.cudrania.test.bean.User;
 import org.junit.jupiter.api.Test;
 
@@ -42,6 +44,7 @@ public class TestSqlGenerator {
         assertEquals("select * from users where user_id = 'skyfalling' and user_name = 'who'", sqlStatement.renderSql());
         sqlStatement = new SqlStatement("select * from users where").append(new MapWrapper<>("user_id", "skyfalling").with("user_name", "who"));
         assertEquals("select * from users where user_id = 'skyfalling' and user_name = 'who'", sqlStatement.renderSql());
+
 
     }
 

@@ -1,17 +1,15 @@
 package com.cudrania.core.reflection;
 
-import com.cudrania.core.annotation.Property;
 import com.cudrania.core.collection.CollectionUtils;
-import com.cudrania.core.functions.Fn.Lambda;
-import com.cudrania.core.utils.Enums;
+import lombok.SneakyThrows;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static com.cudrania.core.exception.ExceptionChecker.throwException;
-import static com.cudrania.core.exception.ExceptionChecker.throwIfNull;
 import static com.cudrania.core.utils.StringUtils.decapitalize;
 
 /**
@@ -21,10 +19,10 @@ import static com.cudrania.core.utils.StringUtils.decapitalize;
  */
 public class Reflections {
 
-    public final static Predicate<Method> IS_STATIC_METHOD = method -> Modifier.isStatic(method.getModifiers());
+    private final static Map<Class, List<Method>> methodCache = new WeakHashMap<>();
+    private final static Map<Class, List<Field>> fieldCache = new WeakHashMap<>();
     public final static Predicate<Method> IS_SETTER = Reflections::isSetter;
     public final static Predicate<Method> IS_GETTER = Reflections::isGetter;
-    public final static Predicate<Field> IS_FINAL_FIELD = field -> Modifier.isFinal(field.getModifiers());
 
     /**
      * 获取指定类型的注解
@@ -55,7 +53,6 @@ public class Reflections {
 
     /**
      * 查找指定名称和参数类型的方法<br/>
-     * 首先查找该类的public方法,如果不存在,则查找该类声明的方法,如果不存在,则递归查找父类声明的方法<br/>
      * 如果查找不到相应的方法,则返回null
      *
      * @param clazz
@@ -64,29 +61,27 @@ public class Reflections {
      * @return
      */
     public static Method getMethod(Class<?> clazz, String methodName, Class<?>... parameterTypes) {
-        try {
-            return clazz.getMethod(methodName, parameterTypes);
-        } catch (NoSuchMethodException e) {
-            for (; clazz != null; clazz = clazz.getSuperclass()) {
-                try {
-                    return clazz.getDeclaredMethod(methodName, parameterTypes);
-                } catch (NoSuchMethodException ex) {
-                    //ignore
-                }
+        List<Method> methods = getMethods(clazz, m -> m.getName().equals(methodName));
+        List<Method> candidates = new ArrayList<>();
+        for (Method method : methods) {
+            int matched = typeMatched(method.getParameterTypes(), parameterTypes);
+            if (matched == 0) {
+                return method;
             }
-            return null;
+            candidates.add(method);
         }
+        if (candidates.size() > 1) {
+            throw new IllegalArgumentException("ambiguous methods:" + candidates);
+        }
+
+        if (candidates.size() == 0) {
+            throw new IllegalArgumentException(
+                    "no suitable method [" + methodName + "] for class [" + clazz + "] with parameters: "
+                            + Arrays.toString(parameterTypes));
+        }
+        return candidates.get(0);
     }
 
-    /**
-     * 获取clazz及其父类声明的public方法
-     *
-     * @param clazz
-     * @return
-     */
-    public static List<Method> getMethods(Class<?> clazz) {
-        return getMethods(clazz, Object.class, IS_STATIC_METHOD.negate());
-    }
 
     /**
      * 获取clazz及其父类声明的符合条件的方法
@@ -95,21 +90,95 @@ public class Reflections {
      * @param filter
      * @return
      */
-    public static List<Method> getMethods(Class<?> clazz, Class baseExcludeClass, Predicate<Method> filter) {
-        filter = nullable(filter);
-        List<Method> list = new ArrayList<Method>();
-        for (; clazz != null; clazz = clazz.getSuperclass()) {
-            if (clazz == baseExcludeClass) {
-                break;
-            }
-            Arrays.stream(clazz.getDeclaredMethods()).filter(filter).forEach(list::add);
-        }
-        return list;
+    public static List<Method> getMethods(Class<?> clazz, Predicate<Method> filter) {
+        return getMethods(clazz).stream().filter(nullable(filter)).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取clazz及其父类声明的符合条件的方法
+     *
+     * @param clazz
+     * @return
+     */
+    public static List<Method> getMethods(Class<?> clazz) {
+        return methodCache.computeIfAbsent(clazz, key -> {
+            Set<Method> methods = new LinkedHashSet<>();
+            Arrays.stream(clazz.getMethods()).forEach(methods::add);
+            Arrays.stream(clazz.getDeclaredMethods()).forEach(methods::add);
+            return methods.stream().collect(Collectors.toList());
+        });
+    }
+
+    /**
+     * 获取getter方法
+     *
+     * @param clazz
+     * @return getter方法列表
+     */
+    public static Method getter(Class<?> clazz, String propertyName) {
+        return getters(clazz).stream().filter(m -> propertyName(m).equals(propertyName)).findAny().orElse(null);
+    }
+
+    /**
+     * 获取getter方法列表,不包含{@link Object}声明的方法
+     *
+     * @param clazz
+     * @return getter方法列表
+     */
+    public static List<Method> getters(Class<?> clazz) {
+        return getMethods(clazz, IS_GETTER);
+    }
+
+    /**
+     * 获取getter方法
+     *
+     * @param clazz
+     * @return getter方法列表
+     */
+    public static Method setter(Class<?> clazz, String propertyName) {
+        return setters(clazz).stream().filter(m -> propertyName(m).equals(propertyName)).findAny().orElse(null);
+    }
+
+    /**
+     * 获取setter方法列表,不包含{@link Object}声明的方法
+     *
+     * @param clazz
+     * @return getter方法列表
+     */
+    public static List<Method> setters(Class<?> clazz) {
+        return getMethods(clazz, IS_SETTER);
+    }
+
+
+    /**
+     * 获取clazz的BeanProperty列表
+     *
+     * @param clazz
+     * @return
+     */
+    public static List<BeanProperty> beanProperties(Class<?> clazz) {
+        Map<String, Method> getters = CollectionUtils.map(getters(clazz), m -> propertyName(m));
+        Map<String, Method> setters = CollectionUtils.map(setters(clazz), m -> propertyName(m));
+        Map<String, Field> fields = CollectionUtils.map(getFields(clazz), Field::getName);
+        Map<String, BeanProperty> propertyMap = new HashMap<>();
+        getters.forEach((name, value) -> propertyMap.computeIfAbsent(name, key -> new BeanProperty(key, value, setters.get(key), fields.get(key))));
+        fields.forEach((name, value) -> propertyMap.computeIfAbsent(name, key -> new BeanProperty(key, getters.get(key), setters.get(key), value)));
+        return new ArrayList<>(propertyMap.values());
+    }
+
+
+    /**
+     * 获取clazz的BeanProperty列表
+     *
+     * @param clazz
+     * @return
+     */
+    public static BeanProperty beanProperty(Class<?> clazz, String propertyName) {
+        return beanProperties(clazz).stream().filter(b -> b.getAlias().equals(propertyName)).findAny().orElse(null);
     }
 
     /**
      * 查找指定名称的字段<br/>
-     * 首先查找该类的public字段,如果不存在,则查找该类声明的字段,如果不存在,则递归查找父类声明的字段<br/>
      * 如果查找不到相应的字段,则返回null
      *
      * @param clazz
@@ -117,145 +186,171 @@ public class Reflections {
      * @return
      */
     public static Field getField(Class<?> clazz, String fieldName) {
-        try {
-            return clazz.getField(fieldName);
-        } catch (NoSuchFieldException e) {
-            for (; clazz != null; clazz = clazz.getSuperclass()) {
-                try {
-                    return clazz.getDeclaredField(fieldName);
-                } catch (NoSuchFieldException ex) {
-                    //ignore
-                }
-            }
-            return null;
-        }
+        return getFields(clazz, f -> f.getName().equals(fieldName)).stream().findAny().orElse(null);
 
     }
 
     /**
-     * 获取clazz及其父类声明的public字段
+     * 获取clazz及其父类声明字段
+     *
+     * @param clazz
+     * @param filter
+     * @return
+     */
+    public static List<Field> getFields(Class<?> clazz, Predicate<Field> filter) {
+        return getFields(clazz).stream().filter(nullable(filter)).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取clazz及其父类声明字段
      *
      * @param clazz
      * @return
      */
     public static List<Field> getFields(Class<?> clazz) {
-        return getFields(clazz, Object.class, null);
+        return fieldCache.computeIfAbsent(clazz, key -> {
+            List<Field> list = new ArrayList<>();
+            for (; key != Object.class; key = key.getSuperclass()) {
+                Arrays.stream(clazz.getDeclaredFields()).forEach(list::add);
+            }
+            return list;
+        });
     }
 
     /**
-     * 获取clazz及其父类声明的符合条件的成员字段, 不包含excludeBaseClass及其父类声明的字段
+     * 获取字段值
      *
-     * @param clazz
-     * @param baseExcludeClass
-     * @param filter
+     * @param field
+     * @param obj
      * @return
      */
-    public static List<Field> getFields(Class<?> clazz, Class baseExcludeClass, Predicate<Field> filter) {
-        filter = nullable(filter);
-        List<Field> list = new ArrayList<>();
-        for (; clazz != null; clazz = clazz.getSuperclass()) {
-            if (clazz == baseExcludeClass) {
-                break;
-            }
-            Arrays.stream(clazz.getDeclaredFields()).filter(filter).forEach(list::add);
-        }
-        return list;
+    @SneakyThrows
+    public static Object getFieldValue(Field field, Object obj) {
+        field.setAccessible(true);
+        return field.get(obj);
     }
 
     /**
-     * 获取getter或setter方法对应的属性名称<br/>
-     * 如果方法声明了{@link com.cudrania.core.annotation.Property}注解,则以注解为准; 否则按照getter和setter规则取其属性
+     * 获取字段值
      *
-     * @param element
-     * @return getter或setter方法对应的属性名<br />
-     * 注意:这里只对形如getXxx()或isXxx()或SetXxx()的方法有效,对应属性名为xxx<br/>
+     * @param fieldName
+     * @param obj
+     * @return Object
      */
-    public static String propertyName(AnnotatedElement element) {
-        Property property = element.getAnnotation(Property.class);
-        if (property != null && !property.value().isEmpty()) {
-            return property.value();
-        }
-        if (element instanceof Field) {
-            return ((Field) element).getName();
-        } else if (element instanceof Method) {
-            String name = ((Method) element).getName();
-            return decapitalize(name.substring(name.startsWith("is") ? 2 : 3));
-        } else {
-            throw new UnsupportedOperationException("illegal annotated type:" + element.getClass());
-        }
+    public static Object getFieldValue(String fieldName, Object obj) {
+        return getFieldValue(getField(obj.getClass(), fieldName), obj);
+    }
+
+    /**
+     * 设置字段值
+     *
+     * @param field
+     * @param obj
+     * @param fieldValue
+     */
+    @SneakyThrows
+    public static void setFieldValue(Field field, Object obj, Object fieldValue) {
+        field.setAccessible(true);
+        field.set(obj, fieldValue);
+    }
+
+    /**
+     * 设置字段值
+     *
+     * @param fieldName
+     * @param obj
+     * @param fieldValue
+     */
+
+    public static void setFieldValue(String fieldName, Object obj, Object fieldValue) {
+        setFieldValue(getField(obj.getClass(), fieldName), obj, fieldValue);
+    }
+
+
+    /**
+     * 获取getter或setter方法对应的属性名称
+     *
+     * @param method
+     * @return
+     */
+    private static String propertyName(Method method) {
+        String name = method.getName();
+        return decapitalize(name.substring(name.startsWith("is") ? 2 : 3));
+    }
+
+
+    /**
+     * 将from实例中的属性赋值给to实例中的同名属性<br/>
+     * 如果同名属性类型不兼容,则不赋值
+     *
+     * @param from
+     * @param to
+     */
+    public static void copyProperties(Object to, Object from) {
+        Map<String, BeanProperty> setters = CollectionUtils.map(beanProperties(to.getClass()), BeanProperty::getAlias);
+        Map<String, BeanProperty> getters = CollectionUtils.map(beanProperties(from.getClass()), BeanProperty::getAlias);
+
+        setters.forEach(
+                (n, setter) -> {
+                    try {
+                        BeanProperty getter = getters.get(n);
+                        // 调用setter方法赋值
+                        if (getter != null
+                                && getter.getGetter() != null
+                                && setter.getSetter().getParameterTypes()[0].isAssignableFrom(getter.getGetter().getReturnType())) {
+                            setter.setValue(to, getter.getValue(from));
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+        );
     }
 
     /**
      * 执行指定方法,返回执行结果
      *
      * @param method
-     * @param bean       声明该方法的实例对象
+     * @param owner      声明该方法的实例对象
      * @param parameters 方法的参数
-     * @return 方法的执行结果<br />
+     * @return 方法的执行结果
      */
-    public static Object invoke(Method method, Object bean, Object... parameters) {
-        try {
-            method.setAccessible(true);
-            return method.invoke(bean, parameters);
-        } catch (Exception e) {
-            throw throwException(e);
-        }
+    @SneakyThrows
+    public static Object invoke(Method method, Object owner, Object... parameters) {
+        method.setAccessible(true);
+        return method.invoke(owner, parameters);
     }
 
-    /**
-     * 根据方法名和参数调用指定方法<br/>
-     * 如果方法名称以及参数长度匹配且唯一，此时若类型不匹配，则会尝试类型转换<br/>
-     *
-     * @param lambda     方法引用
-     * @param bean       方法关联的对象
-     * @param parameters 实际参数值
-     * @return
-     */
-    public static Object invoke(Lambda lambda, Object bean, Object... parameters) {
-        return invoke(lambda.name(), bean, parameters);
-    }
 
     /**
      * 根据方法名和参数调用指定方法<br/>
      * 如果方法名称以及参数长度匹配且唯一，此时若类型不匹配，则会尝试类型转换<br/>
      *
      * @param methodName 方法名称
-     * @param bean       方法关联的对象
+     * @param owner      方法关联的对象
      * @param parameters 实际参数值
      * @return
      */
-    public static Object invoke(String methodName, Object bean, Object[] parameters) {
-        Class beanClass = bean.getClass();
-        Class<?>[] types = new Class<?>[parameters.length];
-        for (int i = 0; i < parameters.length; i++) {
-            types[i] = parameters[i].getClass();
-        }
-        Method method = getMethod(beanClass, methodName, types);
-        if (method != null) {
-            return invoke(method, bean, parameters);
-        }
-        List<Method> methods = getMethods(beanClass);
-        Iterator<Method> iterator = methods.iterator();
-        while (iterator.hasNext()) {
-            Method candidate = iterator.next();
-            if (candidate.getName().equals(methodName) && candidate.getParameterTypes().length == parameters.length) {
-                if (instanceOfTypes(candidate.getParameterTypes(), parameters)) {
-                    return invoke(candidate, bean, parameters);
-                }
-            } else {
-                iterator.remove();
+    public static Object invoke(String methodName, Object owner, Object[] parameters) {
+        Class beanClass = owner.getClass();
+        List<Method> methods = getMethods(beanClass, m -> m.getName().equals(methodName) && argsMatched(m.getParameterTypes(), parameters) >= 0);
+        for (Method method : methods) {
+            if (argsMatched(method.getParameterTypes(), parameters) == 0) {
+                return invoke(method, owner, parameters);
             }
         }
-        if (methods.size() != 1) {
+        if (methods.size() > 1) {
+            throw new IllegalArgumentException("ambiguous methods:" + methods);
+        }
+        if (methods.size() == 0) {
             throw new IllegalArgumentException(
                     "no suitable method [" + methodName + "] for class [" + beanClass + "] with parameters: "
                             + Arrays.toString(parameters));
         }
-        method = methods.get(0);
-        Class[] parameterTypes = method.getParameterTypes();
+        Method method = methods.get(0);
         // 构造参数转型
-        Object[] castParams = cast(parameters, parameterTypes);
-        return invoke(method, bean, castParams);
+        Object[] castParams = cast(parameters, method.getParameterTypes());
+        return invoke(method, owner, castParams);
     }
 
     /**
@@ -298,262 +393,6 @@ public class Reflections {
         return castParams;
     }
 
-    /**
-     * 获取public getter方法, 如果不存在,则返回null
-     *
-     * @param clazz
-     * @param propertyName 属性名称,注解{@link Property}的优先级高于方法名
-     * @return
-     */
-    public static Method getter(Class<?> clazz, String propertyName) {
-        return getters(clazz, m -> propertyName(m).equals(propertyName))
-                .stream().findAny().orElse(null);
-    }
-
-    /**
-     * 获取public getter方法, 如果不存在,则返回null
-     *
-     * @param clazz
-     * @param propertyName 属性名称,注解{@link Property}的优先级高于方法名
-     * @param propertyType 属性类型
-     * @return
-     */
-    public static Method getter(Class<?> clazz, String propertyName, Class<?> propertyType) {
-        Method getter = getter(clazz, propertyName);
-        if (getter != null && getter.getReturnType() == propertyType) {
-            return getter;
-        }
-        return null;
-    }
-
-    /**
-     * 获取setter方法, 如果不存在,则返回null
-     *
-     * @param clazz
-     * @param propertyName 属性名称,注解{@link Property}的优先级高于方法名
-     * @return
-     */
-    public static Method setter(Class<?> clazz, String propertyName) {
-        return setters(clazz, m -> propertyName(m).equals(propertyName))
-                .stream().findAny().orElse(null);
-    }
-
-    /**
-     * 获取setter方法, 如果不存在,则返回null
-     *
-     * @param clazz
-     * @param propertyName 属性名称,注解{@link Property}的优先级高于方法名
-     * @param propertyType 属性类型
-     * @return
-     */
-    public static Method setter(Class<?> clazz, String propertyName, Class<?> propertyType) {
-        Method setter = getter(clazz, propertyName);
-        if (setter != null && setter.getParameterTypes()[0] == propertyType) {
-            return setter;
-        }
-        return null;
-    }
-
-    /**
-     * 获取setter方法, 如果不存在,则返回null
-     *
-     * @param clazz
-     * @param propertyName  属性名称,注解{@link Property}的优先级高于方法名
-     * @param propertyValue 属性值
-     * @return
-     */
-    public static Method setter(Class<?> clazz, String propertyName, Object propertyValue) {
-        Method setter = getter(clazz, propertyName);
-        if (setter != null && setter.getParameterTypes()[0].isInstance(propertyValue)) {
-            return setter;
-        }
-        return null;
-    }
-
-    /**
-     * 获取getter方法列表,不包含{@link Object}声明的getter方法
-     *
-     * @param clazz
-     * @return getter方法列表
-     */
-    public static List<Method> getters(Class<?> clazz) {
-        return getters(clazz, null);
-    }
-
-    /**
-     * 获取符合条件的getter方法列表,不包含{@link Object}声明的getter方法
-     *
-     * @param clazz
-     * @return getter方法列表
-     */
-    public static List<Method> getters(Class<?> clazz, Predicate<Method> filter) {
-        return getMethods(clazz, Object.class, IS_GETTER.and(filter));
-    }
-
-    /**
-     * 获取setter方法列表,不包含{@link Object}声明的setter方法
-     *
-     * @param clazz
-     * @return getter方法列表
-     */
-    public static List<Method> setters(Class<?> clazz) {
-        return setters(clazz, null);
-    }
-
-    /**
-     * 获取符合条件的setter方法列表,不包含{@link Object}声明的setter方法
-     *
-     * @param clazz
-     * @return getter方法列表
-     */
-    public static List<Method> setters(Class<?> clazz, Predicate<Method> filter) {
-        return getMethods(clazz, null, IS_SETTER.and(nullable(filter)));
-    }
-
-    /**
-     * 根据map的key为bean的同名属性赋值
-     *
-     * @param <T>
-     * @param bean
-     * @param map
-     * @return bean
-     */
-    public static <T> T setProperties(T bean, Map<String, ?> map) {
-        List<Method> methods = setters(bean.getClass());
-        for (Method method : methods) {
-            String key = propertyName(method);
-            Object value = map.get(key);
-            if (value != null && instanceOf(method.getParameterTypes()[0], value)) {
-                invoke(method, bean, value);
-            }
-        }
-        return bean;
-    }
-
-    /**
-     * 获取bean的属性集合,属性名称作为键值<br/>
-     * 注: 这里不包括null属性以及{@link Object}声明的属性
-     *
-     * @param bean
-     * @return Map对象
-     */
-    public static Map<String, Object> getProperties(Object bean) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        List<Method> methods = getters(bean.getClass());
-        for (Method method : methods) {
-            Object value = invoke(method, bean);
-            if (value != null) {
-                map.put(propertyName(method), value);
-            }
-        }
-        return map;
-    }
-
-    /**
-     * 调用方法getXxx()或方法isXxx()获取属性值
-     *
-     * @param obj
-     * @param propertyName
-     * @return 属性值
-     */
-    public static Object getPropertyValue(Object obj, String propertyName) {
-        Method getter = getter(obj.getClass(), propertyName);
-        throwIfNull(getter, new NoSuchMethodException("No such getter Method for property: " + propertyName));
-        return invoke(getter, obj);
-    }
-
-    /**
-     * 调用方法setXxx(propertyValue)设置属性值
-     *
-     * @param obj
-     * @param propertyName
-     * @param propertyValue
-     */
-    public static void setPropertyValue(Object obj, String propertyName, Object propertyValue) {
-        Method setter = setter(obj.getClass(), propertyName, propertyValue);
-        throwIfNull(setter, new NoSuchMethodException("No such setter Method for property: " + propertyName));
-        invoke(setter, obj, propertyValue);
-    }
-
-    /**
-     * 获取字段值
-     *
-     * @param obj
-     * @param field
-     * @return
-     */
-    public static Object getFieldValue(Object obj, Field field) {
-        try {
-            field.setAccessible(true);
-            return field.get(obj);
-        } catch (Exception e) {
-            throw throwException(e);
-        }
-    }
-
-    /**
-     * 获取字段值
-     *
-     * @param obj
-     * @param fieldName
-     * @return Object
-     */
-    public static Object getFieldValue(Object obj, String fieldName) {
-        return getFieldValue(obj, getField(obj.getClass(), fieldName));
-    }
-
-    /**
-     * 设置字段值
-     *
-     * @param obj
-     * @param field
-     * @param fieldValue
-     */
-    public static void setFieldValue(Object obj, Field field, Object fieldValue) {
-        try {
-            field.setAccessible(true);
-            field.set(obj, fieldValue);
-        } catch (Exception e) {
-            throwException(e);
-        }
-    }
-
-    /**
-     * 设置字段值
-     *
-     * @param obj
-     * @param fieldName
-     * @param fieldValue
-     */
-
-    public static void setFieldValue(Object obj, String fieldName, Object fieldValue) {
-        setFieldValue(obj, getField(obj.getClass(), fieldName), fieldValue);
-    }
-
-    /**
-     * 将from实例中的属性赋值给to实例中的同名属性<br/>
-     * 如果同名属性类型不兼容,则不赋值
-     *
-     * @param from
-     * @param to
-     */
-    public static void copyProperties(Object to, Object from) {
-        Map<String, Method> setters = CollectionUtils.map(setters(to.getClass()), Reflections::propertyName);
-        Map<String, Method> getters = CollectionUtils.map(getters(from.getClass()), Reflections::propertyName);
-        setters.forEach(
-                (n, setter) -> {
-                    try {
-                        Method getter = getters.get(n);
-                        // 调用setter方法赋值
-                        if (getter != null && setter.getParameterTypes()[0].isAssignableFrom(getter.getReturnType())) {
-                            setter.invoke(to, getter.invoke(from));
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-        );
-    }
 
     /**
      * 根据字符串尽可能地去获取指定类型的实例<br/>
@@ -633,28 +472,24 @@ public class Reflections {
      * @return 对象实例
      * @throws Exception
      */
-    @SuppressWarnings("unchecked")
+    @SneakyThrows
     public static <T> T newInstance(Class<T> clazz, Object... args) {
+        if (args.length == 0)
+            return clazz.getConstructor().newInstance();
+        Class<?>[] parameterTypes = new Class<?>[args.length];
+        for (int i = 0; i < args.length; i++) {
+            parameterTypes[i] = args[i].getClass();
+        }
         try {
-            if (args.length == 0)
-                return clazz.newInstance();
-            Class<?>[] parameterTypes = new Class<?>[args.length];
-            for (int i = 0; i < args.length; i++) {
-                parameterTypes[i] = args[i].getClass();
-            }
-            try {
-                Constructor<T> con = clazz.getConstructor(parameterTypes);
-                return con.newInstance(args);
-            } catch (NoSuchMethodException e) {
-                for (Constructor<?> con : clazz.getConstructors()) {
-                    if (instanceOfTypes(con.getParameterTypes(), args)) {
-                        return (T) con.newInstance(args);
-                    }
+            Constructor<T> con = clazz.getConstructor(parameterTypes);
+            return con.newInstance(args);
+        } catch (NoSuchMethodException e) {
+            for (Constructor<?> con : clazz.getConstructors()) {
+                if (argsMatched(con.getParameterTypes(), args) >= 0) {
+                    return (T) con.newInstance(args);
                 }
-                throw new IllegalArgumentException("no matched constructor!");
             }
-        } catch (Exception e) {
-            throw throwException(e);
+            throw new IllegalArgumentException("no matched constructor!");
         }
     }
 
@@ -664,15 +499,12 @@ public class Reflections {
      * @param className
      * @return
      */
+    @SneakyThrows
     public static Class<?> getClass(String className) {
-        try {
-            Primitive primitive = Reflections.Primitive.get(className);
-            if (primitive != null)
-                return primitive.type;
-            return Class.forName(className);
-        } catch (Exception e) {
-            throw throwException(e);
-        }
+        Primitive primitive = Primitive.get(className);
+        if (primitive != null)
+            return primitive.type;
+        return Class.forName(className);
     }
 
     /**
@@ -682,7 +514,7 @@ public class Reflections {
      * @return
      */
     public static Class wrapClass(Class<?> clazz) {
-        Primitive primitive = Reflections.Primitive.get(clazz);
+        Primitive primitive = Primitive.get(clazz);
         if (primitive != null)
             return primitive.clazz;
         return clazz;
@@ -699,21 +531,53 @@ public class Reflections {
         return wrapClass(clazz).isInstance(obj);
     }
 
+
     /**
-     * 判断对象数组中的元素是否分别是类型数组元素的实例
+     * 判断参数类型是否匹配期望类型列表<br/>
+     * 返回结果等于0表示精确匹配,大于0表示兼容匹配,小于0表示不匹配
      *
-     * @param types
-     * @param args
+     * @param expectedTypes 期望类型列表
+     * @param argTypes      实际参数类型
      * @return
      */
-    public static boolean instanceOfTypes(Class<?>[] types, Object[] args) {
-        if (types.length != args.length)
-            return false;
-        for (int i = 0; i < types.length; i++) {
-            if (!types[i].isInstance(args[i]))
-                return false;
+    private static int typeMatched(Class<?>[] expectedTypes, Class<?>[] argTypes) {
+        if (argTypes.length != argTypes.length) {
+            return -1;
         }
-        return true;
+        int res = 0;
+        for (int i = 0; i < argTypes.length; i++) {
+            if (!expectedTypes[i].isAssignableFrom(argTypes[i])) {
+                return -1;
+            }
+            if (wrapClass(expectedTypes[i]) != wrapClass(argTypes[i])) {
+                res++;
+            }
+        }
+        return res;
+    }
+
+    /**
+     * 判断类型列表是否匹配参数类型<br/>
+     * 返回结果等于0表示精确匹配,大于0表示兼容匹配,小于0表示不匹配
+     *
+     * @param expectedTypes 期望类型
+     * @param args          参数列表
+     * @return
+     */
+    private static int argsMatched(Class<?>[] expectedTypes, Object[] args) {
+        if (args.length != args.length) {
+            return -1;
+        }
+        int res = 0;
+        for (int i = 0; i < args.length; i++) {
+            if (!expectedTypes[i].isInstance(args[i])) {
+                return -1;
+            }
+            if (wrapClass(expectedTypes[i]) != wrapClass(args[i].getClass())) {
+                res++;
+            }
+        }
+        return res;
     }
 
     /**
@@ -755,7 +619,8 @@ public class Reflections {
      * @return
      */
     public static boolean isGetter(Method method) {
-        return !Modifier.isStatic(method.getModifiers())
+        return method.getDeclaringClass() != Object.class
+                && !Modifier.isStatic(method.getModifiers())
                 && method.getReturnType() != Void.TYPE
                 && method.getParameterTypes().length == 0
                 && (method.getName().startsWith("get")
@@ -769,7 +634,8 @@ public class Reflections {
      * 判断setter方法
      */
     public static boolean isSetter(Method method) {
-        return !Modifier.isStatic(method.getModifiers())
+        return method.getDeclaringClass() != Object.class
+                && !Modifier.isStatic(method.getModifiers())
                 && method.getReturnType() == Void.TYPE
                 && method.getParameterTypes().length == 1
                 && method.getName().startsWith("set")
@@ -780,40 +646,5 @@ public class Reflections {
         return Optional.ofNullable(filter).orElse((f) -> true);
     }
 
-    /**
-     * 基本类型
-     */
-    public static enum Primitive {
-        Boolean("boolean", java.lang.Boolean.class),
-        Byte("byte", java.lang.Byte.class),
-        Short("short", java.lang.Short.class),
-        Integer("int", java.lang.Integer.class),
-        Long("long", java.lang.Long.class),
-        Float("float", java.lang.Float.class),
-        Double("double", java.lang.Double.class),
-        Character("char", java.lang.Character.class);
-        String name;
-        Class type;
-        Class clazz;
-
-        Primitive(String name, Class clazz) {
-            try {
-                this.name = name;
-                this.clazz = clazz;
-                this.type = (Class) clazz.getField("TYPE").get(null);
-            } catch (Exception e) {
-                throwException(e);
-            }
-        }
-
-        public static Primitive get(String name) {
-            return Enums.with(Primitive.class, "name", name);
-        }
-
-        public static Primitive get(Class clazz) {
-            return Enums.with(Primitive.class, "clazz", clazz);
-        }
-
-    }
 
 }

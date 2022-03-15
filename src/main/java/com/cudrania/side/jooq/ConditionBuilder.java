@@ -2,6 +2,7 @@ package com.cudrania.side.jooq;
 
 
 import com.cudrania.core.arrays.ArrayUtils;
+import com.cudrania.core.functions.Fn;
 import com.cudrania.core.reflection.Reflections;
 import com.cudrania.core.utils.StringUtils;
 import lombok.AllArgsConstructor;
@@ -139,6 +140,16 @@ public class ConditionBuilder {
         return with(f -> set.contains(f.toLowerCase()), operator);
     }
 
+    /**
+     * 设置匹配字段的查询操作
+     *
+     * @param getter   指定Getter方法, 同时匹配下划线模式
+     * @param operator 查询操作,如果为null则该字段不参与查询
+     * @return
+     */
+    public ConditionBuilder withName(Fn.Function getter, Operator operator) {
+        return withName(getter.name(), operator);
+    }
 
     /**
      * 设置匹配字段的查询操作
@@ -284,7 +295,7 @@ public class ConditionBuilder {
      * @return
      */
     private List<QueryField> getQueryFields(Object queryBean) {
-        List<java.lang.reflect.Field> javaFields = Reflections.getFields(queryBean.getClass(), Object.class, null);
+        List<java.lang.reflect.Field> javaFields = Reflections.getFields(queryBean.getClass());
         List<QueryField> queryFields = new ArrayList<>(javaFields.size());
         for (java.lang.reflect.Field javaField : javaFields) {
             Operator operator = Operator.EQ;
@@ -307,7 +318,7 @@ public class ConditionBuilder {
                 name = nameGenerator.apply(name);
             }
             //获取查询字段值
-            Object fieldValue = Reflections.getFieldValue(queryBean, javaField);
+            Object fieldValue = Reflections.getFieldValue(javaField, queryBean);
             //字段转成数组,用于空值判断和字段类型推断
             Object[] array = ArrayUtils.forceToArray(fieldValue);
             if (array.length == 0) {

@@ -1,7 +1,7 @@
 package com.cudrania.test.bean;
 
-import com.cudrania.core.annotation.Ignore;
-import com.cudrania.core.annotation.Property;
+import com.cudrania.core.reflection.Ignore;
+import com.cudrania.core.reflection.Property;
 import com.cudrania.idea.jdbc.table.Id;
 import com.cudrania.idea.jdbc.table.Table;
 import lombok.Data;

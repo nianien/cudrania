@@ -1,4 +1,4 @@
-package com.cudrania.core.annotation;
+package com.cudrania.core.reflection;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Inherited;
@@ -6,7 +6,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * 用示是否忽略
+ * 用于是否忽略
  *
  * @author skyfalling
  */

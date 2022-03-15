@@ -17,4 +17,8 @@ public class Student extends People {
     private Date admissionTime;
     private Date graduationTime;
 
+    @Override
+    public Long getId() {
+        return super.getId();
+    }
 }

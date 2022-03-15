@@ -1,13 +1,9 @@
 package com.cudrania.idea.jdbc.table;
 
-import com.cudrania.core.annotation.Ignore;
 import com.cudrania.core.log.LoggerFactory;
-import com.cudrania.core.reflection.Reflections;
-import com.cudrania.core.utils.StringUtils;
+import com.cudrania.core.reflection.BeanProperty;
 import lombok.Getter;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,9 +12,7 @@ import java.util.logging.Logger;
 
 import static com.cudrania.core.exception.ExceptionChecker.throwIf;
 import static com.cudrania.core.exception.ExceptionChecker.throwIfNull;
-import static com.cudrania.core.reflection.Reflections.getMethod;
-import static com.cudrania.core.reflection.Reflections.getters;
-import static com.cudrania.core.utils.StringUtils.decapitalize;
+import static com.cudrania.core.reflection.Reflections.beanProperties;
 
 /**
  * 接口{@link DataTable}的默认实现
@@ -56,10 +50,7 @@ class DataTableImpl<T> implements DataTable<T> {
     public DataTableImpl(Class<T> entityClass) {
         this.type = entityClass;
         this.name = TableHelper.getTableName(entityClass);
-        getters(entityClass, method -> {
-            addFieldProperty(method);
-            return false;
-        });
+        beanProperties(entityClass).forEach(this::addFieldProperty);
         if (keyFields.isEmpty() && getField("id") != null) {
             keyFields.add(fieldProperty("id").getName());
         }
@@ -99,26 +90,17 @@ class DataTableImpl<T> implements DataTable<T> {
     /**
      * 添加字段属性方法
      *
-     * @param getter
+     * @param property
      */
-    private void addFieldProperty(Method getter) {
-        if (getter.isAnnotationPresent(Ignore.class)) {
+    private void addFieldProperty(BeanProperty property) {
+        if (property.isIgnore()) {
             return;
         }
-        String getterName = getter.getName();
-        String propertyName = decapitalize(getterName.substring(getterName.startsWith("is") ? 2 : 3));
-        Field field = Reflections.getField(type, propertyName);
-        if (field != null && field.isAnnotationPresent(Ignore.class)) {
-            return;
-        }
-        Column column = TableHelper.getColumnName(getter, field);
+        Column column = TableHelper.getColumnName(property);
         String columnName = column.value();
         throwIf(fieldProperties.containsKey(columnName), "duplicate field declared in table[" + type + "]: " + columnName);
-        String setterName = "set" + StringUtils.capitalize(propertyName);
-        //获取getter对应的setter方法
-        Method setter = getMethod(type, setterName, getter.getReturnType());
-        fieldProperties.put(columnName, new FieldProperty(column, getter.getReturnType(), getter, setter));
-        if (getter.isAnnotationPresent(Id.class) || field.isAnnotationPresent(Id.class)) {
+        fieldProperties.put(columnName, new FieldProperty(column, property.getGetter().getReturnType(), property.getGetter(), property.getSetter()));
+        if (property.getGetter().isAnnotationPresent(Id.class) || property.getField().isAnnotationPresent(Id.class)) {
             this.keyFields.add(columnName);
         }
     }
