@@ -101,34 +101,14 @@ public class ConditionBuilder {
 
 
     /**
-     * 转下划线映射
-     *
-     * @return
-     */
-    public static ConditionBuilder byUnderLine() {
-        return new ConditionBuilder(StringUtils::underscoreCase);
-    }
-
-    /**
-     * 同名映射
+     * 同名映射,自动转下划线
      *
      * @return
      */
     public static ConditionBuilder byName() {
-        return new ConditionBuilder(Function.identity());
+        return new ConditionBuilder(StringUtils::underscoreCase);
     }
 
-
-    /**
-     * 设置SQL方言
-     *
-     * @param sqlDialect
-     * @return
-     */
-    public ConditionBuilder dialect(SQLDialect sqlDialect) {
-        this.sqlDialect = sqlDialect;
-        return this;
-    }
 
     /**
      * 设置匹配字段的查询操作
@@ -140,7 +120,8 @@ public class ConditionBuilder {
     public ConditionBuilder match(String name, Operator operator) {
         Set<String> set = new HashSet<>(Arrays.asList(name.toLowerCase(), underscoreCase(name).toLowerCase()));
         return filter(f -> {
-            if (set.contains(f.getField().getName().toLowerCase())) {
+            String fieldName = f.getField().getName();
+            if (set.contains(fieldName) || fieldName.matches(name)) {
                 f.setOperator(operator);
             }
             return true;

@@ -222,6 +222,7 @@ public class ConditionBuilderTest {
         query.setPrice(new BigDecimal(1111));
         Condition condition = ConditionBuilder.byName()
                 .match(GoodsQuery::getPrice, Operator.LT)
+                .match("(?i).*name.*", Operator.LIKE)
                 .build(query);
 
         System.out.println(dslContext.renderInlined(condition));
