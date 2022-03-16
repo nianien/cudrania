@@ -4,10 +4,13 @@ import com.cudrania.core.arrays.ArrayUtils;
 import lombok.Getter;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static java.util.Optional.ofNullable;
 
@@ -48,14 +51,9 @@ public class BeanProperty {
      * @return
      */
     private String alias() {
-        Property property = ofNullable(getter)
-                .map(m -> m.getAnnotation(Property.class))
-                .filter(p -> !p.value().isEmpty())
-                .orElse(ofNullable(field)
-                        .map(f -> f.getAnnotation(Property.class))
-                        .filter(p -> !p.value().isEmpty())
-                        .orElse(null));
-        return property != null ? property.value() : name;
+        return Arrays.stream(getAnnotations(Property.class)).filter(p -> !p.value().isEmpty())
+                .map(p -> p.value())
+                .findFirst().orElse(name);
     }
 
     /**
@@ -64,13 +62,9 @@ public class BeanProperty {
      * @return
      */
     private boolean ignore() {
-        Ignore ignore = ofNullable(getter)
-                .map(m -> m.getAnnotation(Ignore.class))
-                .orElse(
-                        ofNullable(field)
-                                .map(f -> f.getAnnotation(Ignore.class)).orElse(null)
-                );
-        return ignore != null ? ignore.value() : false;
+        return Arrays.stream(getAnnotations(Ignore.class))
+                .map(p -> p.value())
+                .findFirst().orElse(false);
     }
 
     /**
@@ -89,7 +83,6 @@ public class BeanProperty {
         return null;
     }
 
-
     /**
      * 设置属性值
      *
@@ -105,7 +98,6 @@ public class BeanProperty {
         }
     }
 
-
     /**
      * 获取指定类型的注解
      *
@@ -114,18 +106,11 @@ public class BeanProperty {
      * @return
      */
     public <T extends Annotation> T[] getAnnotations(Class<T> annotationClass) {
-        List<T> list = new ArrayList<>();
-        T t1 = getter.getAnnotation(annotationClass);
-        if (t1 != null) {
-            list.add(t1);
-        }
-        T t2 = field.getAnnotation(annotationClass);
-        if (t2 != null) {
-            list.add(t2);
-        }
-        return ArrayUtils.array(list, annotationClass);
+        return Arrays.asList(getter, field).stream().filter(Objects::nonNull)
+                .map(e -> e.getAnnotation(annotationClass))
+                .filter(Objects::nonNull)
+                .toArray(n -> (T[]) Array.newInstance(annotationClass, n));
     }
-
     @Override
     public String toString() {
         return "BeanProperty{" +
