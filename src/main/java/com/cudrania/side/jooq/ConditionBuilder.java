@@ -6,7 +6,6 @@ import com.cudrania.core.functions.Fn;
 import com.cudrania.core.reflection.BeanProperty;
 import com.cudrania.core.reflection.Reflections;
 import com.cudrania.core.utils.StringUtils;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,8 +19,8 @@ import org.jooq.impl.DefaultDataType;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import static com.cudrania.core.utils.StringUtils.decapitalize;
 import static com.cudrania.core.utils.StringUtils.underscoreCase;
@@ -50,7 +49,8 @@ public class ConditionBuilder {
     /**
      * 查询字段过滤
      */
-    private Predicate<QueryField> filter = (f) -> true;
+    private Consumer<QueryField> filter = (f) -> {
+    };
 
 
     /**
@@ -124,7 +124,6 @@ public class ConditionBuilder {
             if (set.contains(fieldName) || fieldName.matches(name)) {
                 f.setOperator(operator);
             }
-            return true;
         });
 
     }
@@ -144,7 +143,6 @@ public class ConditionBuilder {
             if (f.property.getName().equals(propertyName)) {
                 f.setOperator(operator);
             }
-            return true;
         });
     }
 
@@ -155,8 +153,8 @@ public class ConditionBuilder {
      * @param filter 过滤函数,判断结果为真时作为查询条件,可同时设置查询操作,如果查询操作为null则不参与查询
      * @return
      */
-    public ConditionBuilder filter(Predicate<QueryField> filter) {
-        this.filter = this.filter.and(filter);
+    public ConditionBuilder filter(Consumer<QueryField> filter) {
+        this.filter = this.filter.andThen(filter);
         return this;
     }
 
@@ -171,14 +169,13 @@ public class ConditionBuilder {
         Condition condition = DSL.noCondition();
         List<QueryField> queryFields = getQueryFields(queryBean);
         for (QueryField queryField : queryFields) {
-            if (!filter.test(queryField)
-                    || queryField.operator == null
-                    || queryField.operator == Operator.NONE) {
+            filter.accept(queryField);
+            if (queryField.operator == null || queryField.operator == Operator.NONE) {
                 continue;
             }
-            Condition subCondition = singleCondition(queryField);
-            if (subCondition != null) {
-                condition = condition.and(subCondition);
+            Condition single = singleCondition(queryField);
+            if (single != null) {
+                condition = condition.and(single);
             }
         }
         return condition;
@@ -301,7 +298,7 @@ public class ConditionBuilder {
         if (field == null) {
             return null;
         }
-        return new QueryField(field, array[0].getClass(), fieldValue, operator, property);
+        return new QueryField(field, fieldValue, operator, property);
     }
 
 
@@ -328,28 +325,26 @@ public class ConditionBuilder {
     /**
      * 查询字段
      */
-    @Getter
-    @Setter(AccessLevel.PRIVATE)
+
     @AllArgsConstructor
     public static class QueryField {
         /**
          * 生成的查询字段
          */
+        @Getter
         private final Field field;
-        /**
-         * Java字段类型或集合元素类型
-         */
-        private final Class rawType;
         /**
          * Java字段值
          */
+        @Getter
+        @Setter
         private final Object value;
         /**
          * 匹配操作符
          */
+        @Getter
+        @Setter
         private Operator operator;
-
-        @Getter(AccessLevel.PRIVATE)
         private BeanProperty property;
 
     }

@@ -9,7 +9,6 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.cudrania.core.exception.ExceptionChecker.throwException;
 import static com.cudrania.core.utils.StringUtils.decapitalize;
 
 /**
@@ -406,7 +405,7 @@ public class Reflections {
      * @param valueString
      * @return
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SneakyThrows
     public static <T> T simpleInstance(Class<T> clazz, String valueString) {
         if (clazz.equals(String.class)) {
             return (T) valueString;
@@ -438,11 +437,7 @@ public class Reflections {
         if (clazz.isEnum()) {
             return (T) Enum.valueOf((Class<Enum>) clazz, valueString);
         }
-        try {
-            return clazz.getConstructor(String.class).newInstance(valueString);
-        } catch (Exception e) {
-            throw throwException(e);
-        }
+        return clazz.getConstructor(String.class).newInstance(valueString);
     }
 
     /**

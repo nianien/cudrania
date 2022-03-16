@@ -223,8 +223,12 @@ public class ConditionBuilderTest {
         Condition condition = ConditionBuilder.byName()
                 .match(GoodsQuery::getPrice, Operator.LT)
                 .match("(?i).*name.*", Operator.LIKE)
+                .filter(f -> {
+                    if (f.getField().getName().equals("src_store_name")) {
+                        f.setOperator(Operator.NE);
+                    }
+                })
                 .build(query);
-
         System.out.println(dslContext.renderInlined(condition));
     }
 
