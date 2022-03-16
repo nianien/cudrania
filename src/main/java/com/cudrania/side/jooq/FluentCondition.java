@@ -3,7 +3,6 @@ package com.cudrania.side.jooq;
 import com.cudrania.core.arrays.ArrayUtils;
 import com.cudrania.core.functions.Fluent;
 import com.cudrania.core.functions.Param;
-import com.cudrania.core.functions.Params;
 import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.impl.DSL;
@@ -12,6 +11,8 @@ import java.util.Collection;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
+
+import static com.cudrania.core.functions.Params.notNull;
 
 /**
  * 继承自{@link Fluent}类, 用于{@link Condition}对象的流式组合
@@ -87,7 +88,7 @@ public class FluentCondition extends Fluent<Condition> {
         if (param instanceof Param) {
             return when((Param) param, field);
         }
-        return when(Params.notNull(param), field);
+        return when(notNull(param), field);
     }
 
     /**
@@ -103,7 +104,7 @@ public class FluentCondition extends Fluent<Condition> {
         if (param instanceof Param) {
             return when((Param) param, function);
         }
-        return when(Params.notNull(param), function);
+        return when(notNull(param), function);
     }
 
 
@@ -121,7 +122,7 @@ public class FluentCondition extends Fluent<Condition> {
         if (param instanceof Param) {
             return when((Param) param, field, function);
         }
-        return when(Params.notNull(param), field, function);
+        return when(notNull(param), field, function);
     }
 
     /**
@@ -154,7 +155,7 @@ public class FluentCondition extends Fluent<Condition> {
      * @return
      */
     public <P> FluentCondition when(Param<P> param, Function<P, Condition> function) {
-        return (FluentCondition) this.apply(param, (c, p) -> op.apply(c, function.apply(p)));
+        return (FluentCondition) this.applyIf((c, p) -> op.apply(c, function.apply(p)), param);
     }
 
     /**
@@ -168,7 +169,7 @@ public class FluentCondition extends Fluent<Condition> {
      */
     public <P, F> FluentCondition when(Param<P> param, Field<F> field,
                                        BiFunction<Field<F>, P, Condition> function) {
-        return (FluentCondition) this.apply(param, (c, p) -> op.apply(c, function.apply(field, p)));
+        return (FluentCondition) this.applyIf((c, p) -> op.apply(c, function.apply(field, p)), param);
     }
 
 

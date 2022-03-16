@@ -77,6 +77,22 @@ public class Fluent<T> {
     }
 
     /**
+     * 如参数{@link Param#get()}返回结果有值,则调用函数并绑定返回结果
+     *
+     * @param <P>      参数类型&函数第二个参数类型
+     * @param function 函数表达式
+     * @param param    条件参数
+     * @return
+     */
+    public <P> Fluent<T> applyIf(BiFunction<T, P, T> function, Param<P> param) {
+        if (target != null) {
+            param.get().ifPresent(p -> this.target = function.apply(target, p));
+        }
+        return this;
+    }
+
+
+    /**
      * 执行双参方法，持有返回结果
      */
     public <P1, P2, R> Fluent<R> apply(TriFunction<T, P1, P2, R> function, P1 p1, P2 p2) {

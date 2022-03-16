@@ -1,21 +1,10 @@
 package com.cudrania.core.collection;
 
 import com.cudrania.core.arrays.ArrayUtils;
-import com.cudrania.core.reflection.Reflections;
 import lombok.SneakyThrows;
 import org.apache.commons.beanutils.BeanUtils;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -191,108 +180,6 @@ public class CollectionUtils {
         return list;
     }
 
-    /**
-     * 集合转数组
-     */
-    public static <T> T[] array(Collection<T> list, Class<T> clazz) {
-        return list.stream().toArray(value -> (T[]) Array.newInstance(clazz, list.size()));
-    }
-
-    /**
-     * 集合转数组
-     */
-    public static boolean[] booleans(Collection<Boolean> list) {
-        boolean[] array = new boolean[list.size()];
-        int i = 0;
-        for (boolean t : list) {
-            array[i++] = t;
-        }
-        return array;
-    }
-
-    /**
-     * 集合转数组
-     */
-    public static byte[] bytes(Collection<Byte> list) {
-        byte[] array = new byte[list.size()];
-        int i = 0;
-        for (byte t : list) {
-            array[i++] = t;
-        }
-        return array;
-    }
-
-    /**
-     * 集合转数组
-     */
-    public static char[] chars(Collection<Character> list) {
-        char[] array = new char[list.size()];
-        int i = 0;
-        for (char t : list) {
-            array[i++] = t;
-        }
-        return array;
-    }
-
-    /**
-     * 集合转数组
-     */
-    public static short[] shorts(Collection<Short> list) {
-        short[] array = new short[list.size()];
-        int i = 0;
-        for (short t : list) {
-            array[i++] = t;
-        }
-        return array;
-    }
-
-    /**
-     * 集合转数组
-     */
-    public static int[] ints(Collection<Integer> list) {
-        int[] array = new int[list.size()];
-        int i = 0;
-        for (int t : list) {
-            array[i++] = t;
-        }
-        return array;
-    }
-
-    /**
-     * 集合转数组
-     */
-    public static long[] longs(Collection<Long> list) {
-        long[] array = new long[list.size()];
-        int i = 0;
-        for (long t : list) {
-            array[i++] = t;
-        }
-        return array;
-    }
-
-    /**
-     * 集合转数组
-     */
-    public static float[] floats(Collection<Float> list) {
-        float[] array = new float[list.size()];
-        int i = 0;
-        for (float t : list) {
-            array[i++] = t;
-        }
-        return array;
-    }
-
-    /**
-     * 集合转数组
-     */
-    public static double[] doubles(Collection<Double> list) {
-        double[] array = new double[list.size()];
-        int i = 0;
-        for (double t : list) {
-            array[i++] = t;
-        }
-        return array;
-    }
 
     /**
      * 删除链表从from到to(不包括)索引位置的元素
@@ -451,7 +338,7 @@ public class CollectionUtils {
      */
     @SneakyThrows
     private static Object getProperty(Object obj, String property) {
-        return BeanUtils.getProperty(obj,property);
+        return BeanUtils.getProperty(obj, property);
     }
 
 }

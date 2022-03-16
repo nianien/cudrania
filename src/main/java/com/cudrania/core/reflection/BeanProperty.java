@@ -1,5 +1,6 @@
 package com.cudrania.core.reflection;
 
+import com.cudrania.core.arrays.ArrayUtils;
 import com.cudrania.core.collection.CollectionUtils;
 import lombok.Getter;
 
@@ -101,7 +102,7 @@ public class BeanProperty {
         if (t2 != null) {
             list.add(t2);
         }
-        return CollectionUtils.array(list, annotationClass);
+        return ArrayUtils.array(list, annotationClass);
     }
 
     @Override
