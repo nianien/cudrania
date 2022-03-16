@@ -1,18 +1,13 @@
 package com.cudrania.core.reflection;
 
-import com.cudrania.core.arrays.ArrayUtils;
 import lombok.Getter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-
-import static java.util.Optional.ofNullable;
 
 @Getter
 public class BeanProperty {
@@ -51,7 +46,8 @@ public class BeanProperty {
      * @return
      */
     private String alias() {
-        return Arrays.stream(getAnnotations(Property.class)).filter(p -> !p.value().isEmpty())
+        return Arrays.stream(getAnnotations(Property.class))
+                .filter(p -> !p.value().isEmpty())
                 .map(p -> p.value())
                 .findFirst().orElse(name);
     }
@@ -111,6 +107,7 @@ public class BeanProperty {
                 .filter(Objects::nonNull)
                 .toArray(n -> (T[]) Array.newInstance(annotationClass, n));
     }
+
     @Override
     public String toString() {
         return "BeanProperty{" +
