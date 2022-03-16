@@ -1,4 +1,4 @@
-package com.cudrania.idea.jdbc.sql;
+package com.cudrania.jdbc.sql;
 
 /**
  * 枚举器,Sql语法中的匹配运算符

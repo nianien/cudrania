@@ -20,6 +20,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.cudrania.core.reflection.Reflections.wrapClass;
+
 /**
  * 从Session或Request或ThreadLocal属性中获取参数,并将方法返回值绑定到Session或Request属性中
  *
@@ -222,30 +224,6 @@ public class ScopeAttributeMethodProcessor implements HandlerMethodArgumentResol
         return wrapClass(type).getName() + "#" + name;
     }
 
-    /**
-     * 获取包装类
-     *
-     * @param type
-     * @return
-     */
-    private static Class wrapClass(Class type) {
-        if (type == Boolean.TYPE)
-            return Boolean.class;
-        if (type == Byte.TYPE)
-            return Byte.class;
-        if (type == Short.TYPE)
-            return Short.class;
-        if (type == Integer.TYPE)
-            return Integer.class;
-        if (type == Long.TYPE)
-            return Long.class;
-        if (type == Float.TYPE)
-            return Float.class;
-        if (type == Double.TYPE)
-            return Double.class;
-        if (type == Character.TYPE)
-            return Character.class;
-        return type;
-    }
+
 
 }

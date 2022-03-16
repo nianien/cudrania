@@ -1,15 +1,11 @@
 package com.cudrania.core.reflection;
 
 import com.cudrania.core.exception.ExceptionChecker;
-
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtMethod;
-import javassist.Modifier;
-import javassist.NotFoundException;
+import javassist.*;
 import javassist.bytecode.CodeAttribute;
 import javassist.bytecode.LocalVariableAttribute;
 import javassist.bytecode.MethodInfo;
+import lombok.SneakyThrows;
 
 import java.lang.reflect.Method;
 
@@ -95,20 +91,17 @@ public class Methods {
    * @param paramTypes
    * @return 方法参数名称数组
    */
+  @SneakyThrows
   public static String[] getParameterNames(Class<?> clazz, String methodName,
                                            Class<?>... paramTypes) {
-    try {
-      String[] paramTypeNames = new String[paramTypes.length];
-      for (int i = 0; i < paramTypes.length; i++)
-        paramTypeNames[i] = paramTypes[i].getName();
-      ClassPool pool = ClassPool.getDefault();
-      CtClass cc = pool.get(clazz.getName());
-      CtMethod cm = cc.getDeclaredMethod(methodName, pool
-              .get(paramTypeNames));
-      return getMethodParamNames(cm);
-    } catch (Exception e) {
-      throw ExceptionChecker.throwException(e);
-    }
+    String[] paramTypeNames = new String[paramTypes.length];
+    for (int i = 0; i < paramTypes.length; i++)
+      paramTypeNames[i] = paramTypes[i].getName();
+    ClassPool pool = ClassPool.getDefault();
+    CtClass cc = pool.get(clazz.getName());
+    CtMethod cm = cc.getDeclaredMethod(methodName, pool
+            .get(paramTypeNames));
+    return getMethodParamNames(cm);
   }
 
 

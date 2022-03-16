@@ -1,4 +1,4 @@
-package com.cudrania.idea.jdbc.sql;
+package com.cudrania.jdbc.sql;
 
 import com.cudrania.core.functions.Param;
 import com.cudrania.core.utils.StringUtils;

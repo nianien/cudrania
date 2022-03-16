@@ -1,4 +1,4 @@
-package com.cudrania.idea.jdbc.sql;
+package com.cudrania.jdbc.sql;
 
 /**
  * 类型转换接口声明

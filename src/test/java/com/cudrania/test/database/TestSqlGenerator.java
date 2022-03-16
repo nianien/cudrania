@@ -1,13 +1,11 @@
 package com.cudrania.test.database;
 
 import com.cudrania.core.collection.wrapper.MapWrapper;
-import com.cudrania.core.reflection.Reflections;
-import com.cudrania.idea.jdbc.sql.SqlStatement;
-import com.cudrania.test.bean.Student;
+import com.cudrania.jdbc.sql.SqlStatement;
 import com.cudrania.test.bean.User;
 import org.junit.jupiter.api.Test;
 
-import static com.cudrania.idea.jdbc.sql.SqlGenerator.*;
+import static com.cudrania.jdbc.sql.SqlGenerator.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 

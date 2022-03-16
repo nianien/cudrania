@@ -1,16 +1,16 @@
-package com.cudrania.idea.jdbc.query;
+package com.cudrania.jdbc.query;
 
 import com.cudrania.core.exception.ExceptionChecker;
 import com.cudrania.core.io.Closer;
-import com.cudrania.idea.jdbc.sql.DataField;
-import com.cudrania.idea.jdbc.sql.SqlStatement;
+import com.cudrania.jdbc.sql.DataField;
+import com.cudrania.jdbc.sql.SqlStatement;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
 
-import static com.cudrania.idea.jdbc.sql.SqlGenerator.*;
+import static com.cudrania.jdbc.sql.SqlGenerator.*;
 
 /**
  * 数据库访问接口实现,该类是线程安全的

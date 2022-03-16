@@ -1,10 +1,10 @@
 package com.cudrania.test.database;
 
 import com.cudrania.core.collection.wrapper.MapWrapper;
-import com.cudrania.idea.jdbc.datasource.DataSourceBuilder;
-import com.cudrania.idea.jdbc.query.SqlQueryBuilder;
-import com.cudrania.idea.jdbc.sql.SqlGenerator;
-import com.cudrania.idea.jdbc.sql.SqlStatement;
+import com.cudrania.jdbc.datasource.DataSourceBuilder;
+import com.cudrania.jdbc.query.SqlQueryBuilder;
+import com.cudrania.jdbc.sql.SqlGenerator;
+import com.cudrania.jdbc.sql.SqlStatement;
 import com.cudrania.test.bean.User;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

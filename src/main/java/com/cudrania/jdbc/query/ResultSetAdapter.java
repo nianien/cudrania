@@ -1,11 +1,11 @@
-package com.cudrania.idea.jdbc.query;
+package com.cudrania.jdbc.query;
 
 import com.cudrania.core.collection.map.CaseInsensitiveMap;
 import com.cudrania.core.exception.ExceptionChecker;
 import com.cudrania.core.reflection.Reflections;
-import com.cudrania.idea.jdbc.table.DataTable;
-import com.cudrania.idea.jdbc.table.DataTableFactory;
-import com.cudrania.idea.jdbc.table.FieldProperty;
+import com.cudrania.jdbc.table.DataTable;
+import com.cudrania.jdbc.table.DataTableFactory;
+import com.cudrania.jdbc.table.FieldProperty;
 
 import java.io.InputStream;
 import java.io.Reader;

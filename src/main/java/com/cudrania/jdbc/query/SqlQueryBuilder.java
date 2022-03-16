@@ -1,6 +1,6 @@
-package com.cudrania.idea.jdbc.query;
+package com.cudrania.jdbc.query;
 
-import com.cudrania.idea.jdbc.sql.SqlStatement;
+import com.cudrania.jdbc.sql.SqlStatement;
 
 import javax.sql.DataSource;
 

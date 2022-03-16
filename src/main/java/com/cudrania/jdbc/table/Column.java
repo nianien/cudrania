@@ -1,4 +1,4 @@
-package com.cudrania.idea.jdbc.table;
+package com.cudrania.jdbc.table;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

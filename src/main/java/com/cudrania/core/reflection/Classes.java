@@ -1,12 +1,11 @@
 package com.cudrania.core.reflection;
 
 import com.cudrania.core.io.Files;
+import lombok.SneakyThrows;
 
 import java.net.URL;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
-
-import static com.cudrania.core.exception.ExceptionChecker.throwException;
 
 /**
  * 获取类相关信息的工具类
@@ -21,13 +20,10 @@ public class Classes {
      * @param clazz
      * @return URL
      */
+    @SneakyThrows
     public static URL getClassURL(Class<?> clazz) {
-        try {
-            String classPath = clazz.getName().replace('.', '/') + ".class";
-            return clazz.getClassLoader().getResource(classPath);
-        } catch (Exception e) {
-            throw throwException(e);
-        }
+        String classPath = clazz.getName().replace('.', '/') + ".class";
+        return clazz.getClassLoader().getResource(classPath);
     }
 
     /**
@@ -37,12 +33,9 @@ public class Classes {
      * @param clazz
      * @return clazz文件地址
      */
+    @SneakyThrows
     public static String getClassLocation(Class<?> clazz) {
-        try {
-            return Files.urlToPath(getClassURL(clazz));
-        } catch (Exception e) {
-            throw throwException(e);
-        }
+        return Files.urlToPath(getClassURL(clazz));
     }
 
     /**
@@ -52,16 +45,13 @@ public class Classes {
      * @param clazz
      * @return clazz文件的根目录
      */
+    @SneakyThrows
     public static String getClassRoot(Class<?> clazz) {
-        try {
-            ProtectionDomain pd;
-            CodeSource cs;
-            URL url = (pd = clazz.getProtectionDomain()) == null ? null : (cs = pd.getCodeSource()) == null ? null : cs
-                    .getLocation();
-            return Files.urlToPath(url);
-        } catch (Exception e) {
-            throw throwException(e);
-        }
+        ProtectionDomain pd;
+        CodeSource cs;
+        URL url = (pd = clazz.getProtectionDomain()) == null ? null : (cs = pd.getCodeSource()) == null ? null : cs
+                .getLocation();
+        return Files.urlToPath(url);
     }
 
 }

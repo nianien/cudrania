@@ -2,7 +2,7 @@ package com.cudrania.test.database;
 
 import com.cudrania.core.date.DateFormatter;
 import com.cudrania.core.functions.Params;
-import com.cudrania.idea.jdbc.sql.SqlStatement;
+import com.cudrania.jdbc.sql.SqlStatement;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;

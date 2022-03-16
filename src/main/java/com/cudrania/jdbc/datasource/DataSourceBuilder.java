@@ -1,4 +1,4 @@
-package com.cudrania.idea.jdbc.datasource;
+package com.cudrania.jdbc.datasource;
 
 
 import com.cudrania.core.utils.StringUtils;

@@ -1,4 +1,4 @@
-package com.cudrania.idea.jdbc.query;
+package com.cudrania.jdbc.query;
 
 
 import java.sql.ResultSet;

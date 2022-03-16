@@ -1,4 +1,4 @@
-package com.cudrania.idea.jdbc.table;
+package com.cudrania.jdbc.table;
 
 /**
  * 基于类定义的表结构信息<br/>

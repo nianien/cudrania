@@ -1,7 +1,7 @@
-package com.cudrania.idea.jdbc.sql;
+package com.cudrania.jdbc.sql;
 
 import com.cudrania.core.arrays.ArrayUtils;
-import com.cudrania.idea.jdbc.table.DataTable;
+import com.cudrania.jdbc.table.DataTable;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,18 +10,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.cudrania.core.exception.ExceptionChecker.throwIf;
-import static com.cudrania.idea.jdbc.table.DataTableFactory.get;
+import static com.cudrania.jdbc.table.DataTableFactory.get;
 
 /**
  * SqlStatement对象的生成工具<br/>
  * 根据实体对象或者字段列表构建条件匹配的select,insert,update,delete等SQL语句<br/>
  * 注:这里条件字段只匹配以下运算符: "="(非空字段),"is null"(空值字段),"in"(数组或集合)<br/>
- * 该工具类根据实体类型声明的注解{@link com.cudrania.idea.jdbc.table.Table}和{@link com.cudrania.idea.jdbc.table.Column}获取{@link DataTable}对象,从而获取表名和字段名等信息
+ * 该工具类根据实体类型声明的注解{@link com.cudrania.jdbc.table.Table}和{@link com.cudrania.jdbc.table.Column}获取{@link DataTable}对象,从而获取表名和字段名等信息
  *
  * @author skyfalling
  * @see DataTable
- * @see com.cudrania.idea.jdbc.table.Table
- * @see com.cudrania.idea.jdbc.table.Column
+ * @see com.cudrania.jdbc.table.Table
+ * @see com.cudrania.jdbc.table.Column
  */
 public class SqlGenerator {
 
