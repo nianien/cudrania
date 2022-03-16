@@ -1,5 +1,6 @@
 package com.cudrania.test.functions;
 
+import com.cudrania.core.arrays.ArrayUtils;
 import com.cudrania.core.functions.Fn;
 import com.cudrania.core.functions.Fn.Consumer;
 import com.cudrania.test.bean.User;
@@ -39,11 +40,16 @@ public class TestSFunction implements Serializable {
         System.out.println(user);
 
         f(User::getUserId);
+        System.out.println(Fn.of(TestSFunction::f1).bind(new TestSFunction()).bind(1).bind(2L).bind((float) 3.0).bind(4.0).bind("test").call());
     }
 
 
     public <T, R> void f(Fn.Function<T, R> function) {
         System.out.println(function.name());
+    }
+
+    public String f1(int p1, long p2, float p3, double p4, String p5) {
+        return ArrayUtils.toString(new Object[]{p1, p2, p3, p4, p5}, ",");
     }
 
 
