@@ -31,13 +31,8 @@ public class Reflections {
      * @param <T>
      * @return
      */
-    public static <T extends Annotation> T findAnnotation(AnnotatedElement annotatedElement, Class<T> annotationClass) {
-        try {
-            return annotatedElement.getAnnotation(annotationClass);
-        } catch (Exception e) {
-            //e.printStackTrace();
-            return null;
-        }
+    public static <T extends Annotation> T getAnnotation(AnnotatedElement annotatedElement, Class<T> annotationClass) {
+        return annotatedElement.getAnnotation(annotationClass);
     }
 
     /**
@@ -112,7 +107,7 @@ public class Reflections {
      * 获取getter方法
      *
      * @param clazz
-     * @return getter方法列表
+     * @return getter方法
      */
     public static Method getter(Class<?> clazz, String propertyName) {
         return getters(clazz).stream().filter(m -> propertyName(m).equals(propertyName)).findAny().orElse(null);
@@ -129,10 +124,10 @@ public class Reflections {
     }
 
     /**
-     * 获取getter方法
+     * 获取setter方法
      *
      * @param clazz
-     * @return getter方法列表
+     * @return getter方法
      */
     public static Method setter(Class<?> clazz, String propertyName) {
         return setters(clazz).stream().filter(m -> propertyName(m).equals(propertyName)).findAny().orElse(null);
@@ -158,7 +153,7 @@ public class Reflections {
     public static List<BeanProperty> beanProperties(Class<?> clazz) {
         Map<String, Method> getters = CollectionUtils.map(getters(clazz), m -> propertyName(m));
         Map<String, Method> setters = CollectionUtils.map(setters(clazz), m -> propertyName(m));
-        Map<String, Field> fields = CollectionUtils.map(getFields(clazz, f -> Modifier.isStatic(f.getModifiers())), Field::getName);
+        Map<String, Field> fields = CollectionUtils.map(getFields(clazz), Field::getName);
         Map<String, BeanProperty> propertyMap = new HashMap<>();
         getters.forEach((name, value) -> propertyMap.computeIfAbsent(name, key -> new BeanProperty(key, value, setters.get(key), fields.get(key))));
         fields.forEach((name, value) -> propertyMap.computeIfAbsent(name, key -> new BeanProperty(key, getters.get(key), setters.get(key), value)));
@@ -201,12 +196,22 @@ public class Reflections {
     }
 
     /**
-     * 获取clazz及其父类声明字段
+     * 获取clazz及其父类声明的非静态字段
      *
      * @param clazz
      * @return
      */
     public static List<Field> getFields(Class<?> clazz) {
+        return getFields0(clazz).stream().filter(f -> !Modifier.isStatic(f.getModifiers())).collect(Collectors.toList());
+    }
+
+    /**
+     * 获取clazz及其父类声明字段
+     *
+     * @param clazz
+     * @return
+     */
+    private static List<Field> getFields0(Class<?> clazz) {
         return fieldCache.computeIfAbsent(clazz, key -> {
             List<Field> list = new ArrayList<>();
             for (; key != Object.class; key = key.getSuperclass()) {
