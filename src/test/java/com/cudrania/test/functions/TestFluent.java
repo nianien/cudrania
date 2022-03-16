@@ -1,7 +1,6 @@
 package com.cudrania.test.functions;
 
 import com.cudrania.core.functions.Fluent;
-import com.cudrania.core.functions.Fn.Consumer;
 import com.cudrania.core.utils.StringUtils;
 import com.cudrania.test.bean.Contact;
 import com.cudrania.test.bean.Family;
@@ -60,16 +59,18 @@ public class TestFluent {
                 .accept("name")
                 .consumer(People::setId)
                 .accept(1001L)
-                .consumer((Consumer<People>) System.out::println)
-                .accept()
+                .accept(System.out::println)
                 .function(People::getId)
                 .apply()
                 .accept(System.out::println)
                 .get();
 
+        Family family = new Family();
         of(new Family())
-                .accept(Family::setAddress, "a")
+                .accept(Family::setAddress, family.getAddress())
                 .accept(f -> f.setAddress("b"))
+                .consumer(Family::setAddress)
+                .accept("name")
                 .accept(System.out::println)
                 .get();
     }

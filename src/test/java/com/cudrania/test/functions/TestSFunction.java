@@ -37,6 +37,13 @@ public class TestSFunction implements Serializable {
         Fn.of(User::setUserId).bind(user).bind("222").run();
         System.out.println(Fn.of(User::getUserId).bind(user).call());
         System.out.println(user);
+
+        f(User::getUserId);
+    }
+
+
+    public <T, R> void f(Fn.Function<T, R> function) {
+        System.out.println(function.name());
     }
 
 

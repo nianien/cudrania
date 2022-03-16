@@ -337,7 +337,6 @@ public class ConditionBuilder {
          * Java字段值
          */
         @Getter
-        @Setter
         private final Object value;
         /**
          * 匹配操作符
