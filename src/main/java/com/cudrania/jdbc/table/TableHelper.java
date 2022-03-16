@@ -4,6 +4,7 @@ import com.cudrania.core.reflection.BeanProperty;
 
 import java.lang.annotation.Annotation;
 import java.sql.JDBCType;
+import java.util.Arrays;
 
 import static com.cudrania.core.utils.StringUtils.isNotEmpty;
 import static com.cudrania.core.utils.StringUtils.underscoreCase;
@@ -38,32 +39,25 @@ public class TableHelper {
      * @return Column
      */
     public static Column getColumnName(BeanProperty beanProperty) {
-        Column column = beanProperty.getGetter().getAnnotation(Column.class);
-        if (column != null && !column.value().isEmpty()) {
-            return column;
-        }
-        column = beanProperty.getField().getAnnotation(Column.class);
-        if (column != null && !column.value().isEmpty()) {
-            return column;
-        }
+        return Arrays.stream(beanProperty.getAnnotations(Column.class))
+                .filter(c -> !c.value().isEmpty())
+                .findFirst().orElse(new Column() {
 
-        return new Column() {
+                    @Override
+                    public Class<? extends Annotation> annotationType() {
+                        return Column.class;
+                    }
 
-            @Override
-            public Class<? extends Annotation> annotationType() {
-                return Column.class;
-            }
+                    @Override
+                    public String value() {
+                        return underscoreCase(beanProperty.getAlias());
+                    }
 
-            @Override
-            public String value() {
-                return underscoreCase(beanProperty.getAlias());
-            }
-
-            @Override
-            public JDBCType sqlType() {
-                return JDBCType.JAVA_OBJECT;
-            }
-        };
+                    @Override
+                    public JDBCType sqlType() {
+                        return JDBCType.JAVA_OBJECT;
+                    }
+                });
     }
 
 
