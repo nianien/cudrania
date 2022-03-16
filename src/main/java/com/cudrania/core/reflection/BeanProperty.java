@@ -38,49 +38,71 @@ public class BeanProperty {
         this.getter = getter;
         this.setter = setter;
         this.field = field;
-        Property property = property();
-        this.alias = property != null ? property.value() : name;
-        Ignore ignore = ignore();
-        this.ignore = ignore != null ? ignore.value() : false;
+        this.alias = alias();
+        this.ignore = ignore();
     }
 
-    private Property property() {
-
-        return ofNullable(getter)
+    /**
+     * 根据getter方法或者字段声明的{@link Property}注解获取别名
+     *
+     * @return
+     */
+    private String alias() {
+        Property property = ofNullable(getter)
                 .map(m -> m.getAnnotation(Property.class))
                 .filter(p -> !p.value().isEmpty())
                 .orElse(ofNullable(field)
                         .map(f -> f.getAnnotation(Property.class))
                         .filter(p -> !p.value().isEmpty())
                         .orElse(null));
+        return property != null ? property.value() : name;
     }
 
-    private Ignore ignore() {
-        return ofNullable(getter)
+    /**
+     * 根据getter方法或者字段是否声明{@link Ignore}注解判断是否需要忽略该属性
+     *
+     * @return
+     */
+    private boolean ignore() {
+        Ignore ignore = ofNullable(getter)
                 .map(m -> m.getAnnotation(Ignore.class))
                 .orElse(
                         ofNullable(field)
                                 .map(f -> f.getAnnotation(Ignore.class)).orElse(null)
                 );
+        return ignore != null ? ignore.value() : false;
     }
 
-
+    /**
+     * 获取属性值
+     *
+     * @param owner
+     * @return
+     */
     public Object getValue(Object owner) {
-        return ofNullable(getter)
-                .map(m -> Reflections.invoke(m, owner))
-                .orElse(
-                        ofNullable(field)
-                                .map(f -> Reflections.getFieldValue(f, owner)).orElse(null)
-                );
+        if (getter != null) {
+            return Reflections.invoke(getter, owner);
+        }
+        if (field != null) {
+            return Reflections.getFieldValue(field, owner);
+        }
+        return null;
     }
 
 
+    /**
+     * 设置属性值
+     *
+     * @param owner
+     * @param value
+     */
     public void setValue(Object owner, Object value) {
-        ofNullable(setter)
-                .ifPresentOrElse(m -> Reflections.invoke(m, owner, value),
-                        () -> ofNullable(field)
-                                .ifPresent(f -> Reflections.setFieldValue(f, owner, value))
-                );
+        if (setter != null) {
+            Reflections.invoke(setter, owner, value);
+        }
+        if (field != null) {
+            Reflections.setFieldValue(field, owner, value);
+        }
     }
 
 
