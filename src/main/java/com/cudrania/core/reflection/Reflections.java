@@ -158,7 +158,7 @@ public class Reflections {
     public static List<BeanProperty> beanProperties(Class<?> clazz) {
         Map<String, Method> getters = CollectionUtils.map(getters(clazz), m -> propertyName(m));
         Map<String, Method> setters = CollectionUtils.map(setters(clazz), m -> propertyName(m));
-        Map<String, Field> fields = CollectionUtils.map(getFields(clazz), Field::getName);
+        Map<String, Field> fields = CollectionUtils.map(getFields(clazz, f -> Modifier.isStatic(f.getModifiers())), Field::getName);
         Map<String, BeanProperty> propertyMap = new HashMap<>();
         getters.forEach((name, value) -> propertyMap.computeIfAbsent(name, key -> new BeanProperty(key, value, setters.get(key), fields.get(key))));
         fields.forEach((name, value) -> propertyMap.computeIfAbsent(name, key -> new BeanProperty(key, getters.get(key), setters.get(key), value)));
@@ -585,15 +585,6 @@ public class Reflections {
         return Modifier.isAbstract(clazz.getModifiers());
     }
 
-    /**
-     * 根据类型名称判断是否为原始数据类型
-     *
-     * @param className
-     * @return 如果是返回true, 否则返回false
-     */
-    public static boolean isPrimitive(String className) {
-        return Primitive.get(className) != null;
-    }
 
     /**
      * 查找类对象clazz绑定的genericClass声明的泛型参数
@@ -609,9 +600,6 @@ public class Reflections {
 
     /**
      * 判断getter方法
-     *
-     * @param method
-     * @return
      */
     public static boolean isGetter(Method method) {
         return method.getDeclaringClass() != Object.class

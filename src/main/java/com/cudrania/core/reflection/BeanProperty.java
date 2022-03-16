@@ -1,7 +1,6 @@
 package com.cudrania.core.reflection;
 
 import com.cudrania.core.arrays.ArrayUtils;
-import com.cudrania.core.collection.CollectionUtils;
 import lombok.Getter;
 
 import java.lang.annotation.Annotation;
@@ -9,6 +8,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.util.Optional.ofNullable;
 
 @Getter
 public class BeanProperty {
@@ -44,44 +45,42 @@ public class BeanProperty {
     }
 
     private Property property() {
-        Property property = getter.getAnnotation(Property.class);
-        if (property != null && !property.value().isEmpty()) {
-            return property;
-        }
-        property = field.getAnnotation(Property.class);
-        if (property != null && !property.value().isEmpty()) {
-            return property;
-        }
-        return null;
+
+        return ofNullable(getter)
+                .map(m -> m.getAnnotation(Property.class))
+                .filter(p -> !p.value().isEmpty())
+                .orElse(ofNullable(field)
+                        .map(f -> f.getAnnotation(Property.class))
+                        .filter(p -> !p.value().isEmpty())
+                        .orElse(null));
     }
 
     private Ignore ignore() {
-        Ignore ignore = getter.getAnnotation(Ignore.class);
-        if (ignore != null) {
-            return ignore;
-        }
-        return field.getAnnotation(Ignore.class);
+        return ofNullable(getter)
+                .map(m -> m.getAnnotation(Ignore.class))
+                .orElse(
+                        ofNullable(field)
+                                .map(f -> f.getAnnotation(Ignore.class)).orElse(null)
+                );
     }
 
 
     public Object getValue(Object owner) {
-        if (getter != null) {
-            return Reflections.invoke(getter, owner);
-        }
-        if (field != null) {
-            return Reflections.getFieldValue(field, owner);
-        }
-        return null;
+        return ofNullable(getter)
+                .map(m -> Reflections.invoke(m, owner))
+                .orElse(
+                        ofNullable(field)
+                                .map(f -> Reflections.getFieldValue(f, owner)).orElse(null)
+                );
     }
 
 
     public void setValue(Object owner, Object value) {
-        if (setter != null) {
-            Reflections.invoke(setter, owner, value);
-        }
-        if (field != null) {
-            Reflections.setFieldValue(field, owner, value);
-        }
+        ofNullable(setter)
+                .ifPresentOrElse(m -> Reflections.invoke(m, owner, value),
+                        () -> ofNullable(field)
+                                .ifPresent(f -> Reflections.setFieldValue(f, owner, value))
+                );
     }
 
 
