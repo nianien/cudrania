@@ -1,35 +1,21 @@
 package com.cudrania.test.bean;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Arrays;
 import java.util.List;
 
+@NoArgsConstructor
+@Data
 public class Home {
 
-	private List<User> users;
-	
-	private String address;
+    private String address;
+    private List<User> users;
 
 
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setUsers(List<User> users) {
-		this.users = users;
-	}
-
-	public List<User> getUsers() {
-		return users;
-	}
-
-    @Override
-    public String toString() {
-        return "Home{" +
-                "users=" + users +
-                ", address='" + address + '\'' +
-                '}';
+    public Home(String address, User... users) {
+        this.address = address;
+        this.users = Arrays.asList(users);
     }
 }

@@ -1,8 +1,8 @@
 package com.cudrania.test.bean;
 
-import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
@@ -10,10 +10,11 @@ import java.util.Map;
  * @author skyfalling
  */
 @Data
+@NoArgsConstructor
 //@JsonFilter("sec-filter")
 public class Account {
 
-    private int id;
+    private long id;
 
     private String userName;
 
@@ -23,7 +24,7 @@ public class Account {
     @JsonView({SimpleView.class})
     private String phone;
 
-//    @JsonFilter("sec-filter")
+    //    @JsonFilter("sec-filter")
     private Map<String, String> extras;
 
     public interface FullView extends SimpleView {
@@ -32,4 +33,8 @@ public class Account {
     public interface SimpleView {
     }
 
+    public Account(long id, String userName) {
+        this.id = id;
+        this.userName = userName;
+    }
 }

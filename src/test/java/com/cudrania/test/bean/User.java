@@ -28,8 +28,8 @@ public class User {
     @Ignore
     private Map<String, String> extras;
 
-    public User setUserId2(String userId) {
+    public User(String userId, String userName) {
         this.userId = userId;
-        return this;
+        this.userName = userName;
     }
 }

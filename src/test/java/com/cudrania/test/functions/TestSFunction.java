@@ -26,9 +26,10 @@ public class TestSFunction implements Serializable {
     @SneakyThrows
     public void test() {
         User user = new User();
-
         Map map = new HashMap();
-        Fn.of(map::put);
+        System.out.println(Fn.DecFunction.class.getName());
+        System.out.println(Class.forName(Fn.DecFunction.class.getName()));
+        System.out.println(Class.forName(Fn.of(map::put).lambda().getFunctionalInterfaceClass().replace('/','.')));
         Fn.of(Map<String, String>::put);
         Fn.of((Consumer<Type>) System.out::println).accept(new TypeReference<Consumer<Integer>>() {
         }.getType().getClass());
