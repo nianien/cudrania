@@ -1,8 +1,8 @@
 package com.cudrania.jdbc.sql;
 
+import com.cudrania.core.arrays.ArrayUtils;
 import com.cudrania.core.date.DateFormatter;
 import com.cudrania.core.date.DatePattern;
-import com.cudrania.core.arrays.ArrayUtils;
 
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * 将SQL参数转换为字符串,用于拼装SQL语句<br/>
@@ -71,11 +72,13 @@ public class SqlTypeConverter implements TypeConverter<Object, String> {
      */
     private TypeConverter find(Class type) {
         TypeConverter converter = converters.get(type);
-        if (converter != null)
+        if (converter != null) {
             return converter;
-        for (Class key : converters.keySet()) {
-            if (key.isAssignableFrom(type))
-                return converters.get(key);
+        }
+        for (Entry<Class, TypeConverter<?, String>> e : converters.entrySet()) {
+            if (e.getKey().isAssignableFrom(type)) {
+                return e.getValue();
+            }
         }
         return null;
     }
