@@ -6,10 +6,11 @@ import com.cudrania.core.functions.Fn;
 /**
  * 支持单参处理逻辑
  *
- * @param <Pipe>
+ * @param <Pipe> Pipeline类型
+ * @param <OUT>  Pipeline输出类型
  * @param <IN>   执行参数类型
  */
-public interface StepIn<Pipe, IN> extends StepOut<Pipe> {
+public interface StepIn<Pipe, OUT, IN> extends StepOut<Pipe, OUT> {
 
 
     /**
@@ -17,7 +18,15 @@ public interface StepIn<Pipe, IN> extends StepOut<Pipe> {
      *
      * @return
      */
-    <R> StepIn<Pipe, R> and(Fn.Function<? super IN, ? extends R> ability);
+    <R> StepIn<Pipe, OUT, R> and(Fn.Function<? super IN, ? extends R> ability);
+
+
+    /**
+     * 构建结束,生成相应pipeline
+     *
+     * @return
+     */
+    Pipe end(Fn.Function<? super IN, ? extends OUT> ability);
 
 
     /**
@@ -26,7 +35,7 @@ public interface StepIn<Pipe, IN> extends StepOut<Pipe> {
      * @param name
      * @return
      */
-    <T> StepIn<Pipe, IN> as(Named<T, IN> name);
+    <T> StepIn<Pipe, OUT, IN> as(Named<T, IN> name);
 
 
     /**
@@ -35,5 +44,7 @@ public interface StepIn<Pipe, IN> extends StepOut<Pipe> {
      * @param handler
      * @return
      */
-    StepIn<Pipe, IN> failOver(Fn.Function<? super Exception, IN> handler);
+    StepIn<Pipe, OUT, IN> failOver(Fn.Function<? super Exception, IN> handler);
+
+
 }

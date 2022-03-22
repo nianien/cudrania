@@ -4,6 +4,7 @@ package com.cudrania.test.pipeline;
 import com.cudrania.core.pipeline.Pipeline3;
 import com.cudrania.core.pipeline.Pipelines;
 import com.cudrania.test.bean.Account;
+import com.cudrania.test.bean.Home;
 import com.cudrania.test.bean.User;
 
 public class PipeLineTest {
@@ -14,7 +15,7 @@ public class PipeLineTest {
 
         AllAbilities allAbilities = new AllAbilities();
 
-        Pipeline3<Long, String, String, User> pipeline = Pipelines.<User>of()
+        Pipeline3<Long, String, String, Home> pipeline = Pipelines.<Home>of()
                 // .begin(Long.TYPE,String.class,String.class)
                 .begin(Names::input1, Names::input2, Names::input3)
                 .with(Names::input1, Names::input2)
@@ -28,7 +29,7 @@ public class PipeLineTest {
                 .as(Names::user2)
                 .with(Names::input3, Names::user1, Names::user2)
                 .and(allAbilities::createHome)
-                .end();
+                .end(u -> u);
 
         System.out.println(pipeline.eval(1000001L, "jack.wang", "china.beijing"));
 

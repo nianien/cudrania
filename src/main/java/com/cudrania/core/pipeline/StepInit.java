@@ -16,7 +16,7 @@ public interface StepInit<OUT> {
      * @param <IN1>
      * @return
      */
-    <T, IN1> StepIn<Pipeline<IN1, OUT>, IN1> begin(Named<T, IN1> input);
+    <T, IN1> StepIn<Pipeline<IN1, OUT>, OUT, IN1> begin(Named<T, IN1> input);
 
     /**
      * 设置初始参数类型
@@ -25,7 +25,7 @@ public interface StepInit<OUT> {
      * @param <IN1>
      * @return
      */
-    <IN1> StepIn<Pipeline<IN1, OUT>, IN1> begin(Class<IN1> input);
+    <IN1> StepIn<Pipeline<IN1, OUT>, OUT, IN1> begin(Class<IN1> input);
 
     /**
      * 设置初始参数类型和名称, 自动探测
@@ -37,7 +37,7 @@ public interface StepInit<OUT> {
      * @param <IN2>
      * @return
      */
-    <T, IN1, IN2> StepIn2<Pipeline2<IN1, IN2, OUT>, IN1, IN2> begin(Named<T, IN1> input1, Named<T, IN2> input2);
+    <T, IN1, IN2> StepIn2<Pipeline2<IN1, IN2, OUT>, OUT, IN1, IN2> begin(Named<T, IN1> input1, Named<T, IN2> input2);
 
     /**
      * 设置初始参数类型
@@ -48,7 +48,7 @@ public interface StepInit<OUT> {
      * @param <IN2>
      * @return
      */
-    <IN1, IN2> StepIn2<Pipeline2<IN1, IN2, OUT>, IN1, IN2> begin(Class<IN1> input1, Class<IN2> input2);
+    <IN1, IN2> StepIn2<Pipeline2<IN1, IN2, OUT>, OUT, IN1, IN2> begin(Class<IN1> input1, Class<IN2> input2);
 
 
     /**
@@ -63,7 +63,7 @@ public interface StepInit<OUT> {
      * @param <IN3>
      * @return
      */
-    <T, IN1, IN2, IN3> StepIn3<Pipeline3<IN1, IN2, IN3, OUT>, IN1, IN2, IN3> begin(Named<T, IN1> input1, Named<T, IN2> input2, Named<T, IN3> input3);
+    <T, IN1, IN2, IN3> StepIn3<Pipeline3<IN1, IN2, IN3, OUT>, OUT, IN1, IN2, IN3> begin(Named<T, IN1> input1, Named<T, IN2> input2, Named<T, IN3> input3);
 
     /**
      * 设置初始参数类型
@@ -76,7 +76,7 @@ public interface StepInit<OUT> {
      * @param <IN3>
      * @return
      */
-    <IN1, IN2, IN3> StepIn3<Pipeline3<IN1, IN2, IN3, OUT>, IN1, IN2, IN3> begin(Class<IN1> input1, Class<IN2> input2, Class<IN3> input3);
+    <IN1, IN2, IN3> StepIn3<Pipeline3<IN1, IN2, IN3, OUT>, OUT, IN1, IN2, IN3> begin(Class<IN1> input1, Class<IN2> input2, Class<IN3> input3);
 
 
 }
