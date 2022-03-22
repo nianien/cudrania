@@ -105,7 +105,7 @@ public class PipelineStep<S, IN1, IN2, IN3> extends AbstractStep<PipelineStep> i
      * @param <IN1>
      * @return
      */
-    public static <T, IN1> Pipeline.StepIn<IN1, IN1> of(Named<T, IN1> input) {
+    public static <T, IN1> Pipeline.StepIn<IN1, IN1> begin(Named<T, IN1> input) {
         return new PipelineStep<>().outputName(input);
     }
 
@@ -115,7 +115,7 @@ public class PipelineStep<S, IN1, IN2, IN3> extends AbstractStep<PipelineStep> i
      * @param <IN1> 入参类型
      * @return
      */
-    public static <IN1> Pipeline.StepIn<IN1, IN1> of() {
+    public static <IN1> Pipeline.StepIn<IN1, IN1> begin() {
         return new PipelineStep();
     }
 

@@ -108,7 +108,7 @@ public class Pipeline3Step<S1, S2, S3, IN1, IN2, IN3> extends AbstractStep<Pipel
      * @param <IN1>
      * @return
      */
-    public static <T, IN1, IN2, IN3> Pipeline3.StepIn3<IN1, IN2, IN3, IN1, IN2, IN3> of(Named<T, IN1> input1, Named<T, IN2> input2, Named<T, IN3> input3) {
+    public static <T, IN1, IN2, IN3> Pipeline3.StepIn3<IN1, IN2, IN3, IN1, IN2, IN3> begin(Named<T, IN1> input1, Named<T, IN2> input2, Named<T, IN3> input3) {
         return new Pipeline3Step<>().outputName(input1, input2, input3);
     }
 
@@ -120,7 +120,7 @@ public class Pipeline3Step<S1, S2, S3, IN1, IN2, IN3> extends AbstractStep<Pipel
      * @param <IN3> 参数3类型
      * @return
      */
-    public static <IN1, IN2, IN3> Pipeline3.StepIn3<IN1, IN2, IN3, IN1, IN2, IN3> of() {
+    public static <IN1, IN2, IN3> Pipeline3.StepIn3<IN1, IN2, IN3, IN1, IN2, IN3> begin() {
         return new Pipeline3Step();
     }
 

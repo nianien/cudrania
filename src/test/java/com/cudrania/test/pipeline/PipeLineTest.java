@@ -16,8 +16,8 @@ public class PipeLineTest {
         AllAbilities allAbilities = new AllAbilities();
 
         Pipeline3<Long, String, String, Home> pipeline = Pipelines
-                // .begin(Long.TYPE,String.class,String.class)
-                .begin(Names::input1, Names::input2, Names::input3)
+                 .of(Long.TYPE,String.class,String.class)
+//                .begin(Names::input1, Names::input2, Names::input3)
                 .with(Names::input1, Names::input2)
                 .and(allAbilities::createAccount)
                 .as(Names::account)
@@ -31,8 +31,8 @@ public class PipeLineTest {
                 .and(allAbilities::createHome)
                 .end();
 
-
-        System.out.println(pipeline.eval(1000001L, "jack.wang", "china.beijing"));
+        Home home = pipeline.eval(1000001L, "jack.wang", "china.beijing");
+        System.out.println(home);
 
 
     }

@@ -29,24 +29,24 @@ public class Pipelines<IN1, IN2, IN3, OUT> implements Pipeline<IN1, OUT>, Pipeli
     /**
      * 设置初始参数
      *
-     * @param input 参数名称
+     * @param input pipeline参数名称
      * @param <T>
      * @param <IN>
      * @return
      */
-    public static <T, IN> Pipeline.StepIn<IN, IN> begin(Named<T, IN> input) {
-        return PipelineStep.of(input);
+    public static <T, IN> Pipeline.StepIn<IN, IN> of(Named<T, IN> input) {
+        return PipelineStep.begin(input);
     }
 
     /**
      * 设置初始参数类型
      *
-     * @param input 参数类型
+     * @param input pipeline参数类型
      * @param <IN>
      * @return
      */
-    public static <IN> Pipeline.StepIn<IN, IN> begin(Class<IN> input) {
-        return PipelineStep.of();
+    public static <IN> Pipeline.StepIn<IN, IN> of(Class<IN> input) {
+        return PipelineStep.begin();
     }
 
 
@@ -59,8 +59,8 @@ public class Pipelines<IN1, IN2, IN3, OUT> implements Pipeline<IN1, OUT>, Pipeli
      * @param <IN1>
      * @return
      */
-    public static <T, IN1, IN2> Pipeline2.StepIn2<IN1, IN2, IN1, IN2> begin(Named<T, IN1> input1, Named<T, IN2> input2) {
-        return Pipeline2Step.of(input1, input2);
+    public static <T, IN1, IN2> Pipeline2.StepIn2<IN1, IN2, IN1, IN2> of(Named<T, IN1> input1, Named<T, IN2> input2) {
+        return Pipeline2Step.begin(input1, input2);
     }
 
     /**
@@ -70,8 +70,8 @@ public class Pipelines<IN1, IN2, IN3, OUT> implements Pipeline<IN1, OUT>, Pipeli
      * @param <IN2> pipeline第二个参数类型
      * @return
      */
-    public static <IN1, IN2> Pipeline2.StepIn2<IN1, IN2, IN1, IN2> begin() {
-        return Pipeline2Step.of();
+    public static <IN1, IN2> Pipeline2.StepIn2<IN1, IN2, IN1, IN2> of(Class<IN1> input1, Class<IN2> input2) {
+        return Pipeline2Step.begin();
     }
 
     /**
@@ -86,8 +86,8 @@ public class Pipelines<IN1, IN2, IN3, OUT> implements Pipeline<IN1, OUT>, Pipeli
      * @param <IN3>
      * @return
      */
-    public static <T, IN1, IN2, IN3> Pipeline3.StepIn3<IN1, IN2, IN3, IN1, IN2, IN3> begin(Named<T, IN1> input1, Named<T, IN2> input2, Named<T, IN3> input3) {
-        return Pipeline3Step.of(input1, input2, input3);
+    public static <T, IN1, IN2, IN3> Pipeline3.StepIn3<IN1, IN2, IN3, IN1, IN2, IN3> of(Named<T, IN1> input1, Named<T, IN2> input2, Named<T, IN3> input3) {
+        return Pipeline3Step.begin(input1, input2, input3);
     }
 
     /**
@@ -101,8 +101,8 @@ public class Pipelines<IN1, IN2, IN3, OUT> implements Pipeline<IN1, OUT>, Pipeli
      * @param <IN3>
      * @return
      */
-    public static <IN1, IN2, IN3> Pipeline3.StepIn3<IN1, IN2, IN3, IN1, IN2, IN3> begin(Class<IN1> input1, Class<IN2> input2, Class<IN3> input3) {
-        return Pipeline3Step.of();
+    public static <IN1, IN2, IN3> Pipeline3.StepIn3<IN1, IN2, IN3, IN1, IN2, IN3> of(Class<IN1> input1, Class<IN2> input2, Class<IN3> input3) {
+        return Pipeline3Step.begin();
     }
 
     /**

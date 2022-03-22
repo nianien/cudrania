@@ -106,7 +106,7 @@ public class Pipeline2Step<S1, S2, IN1, IN2, IN3> extends AbstractStep<Pipeline2
      * @param <IN1>
      * @return
      */
-    public static <T, IN1, IN2> Pipeline2.StepIn2<IN1, IN2, IN1, IN2> of(Named<T, IN1> input1, Named<T, IN2> input2) {
+    public static <T, IN1, IN2> Pipeline2.StepIn2<IN1, IN2, IN1, IN2> begin(Named<T, IN1> input1, Named<T, IN2> input2) {
         return new Pipeline2Step<>().outputName(input1, input2);
     }
 
@@ -117,7 +117,7 @@ public class Pipeline2Step<S1, S2, IN1, IN2, IN3> extends AbstractStep<Pipeline2
      * @param <IN2> 参数2类型
      * @return
      */
-    public static <IN1, IN2> Pipeline2.StepIn2<IN1, IN2, IN1, IN2> of() {
+    public static <IN1, IN2> Pipeline2.StepIn2<IN1, IN2, IN1, IN2> begin() {
         return new Pipeline2Step();
     }
 
