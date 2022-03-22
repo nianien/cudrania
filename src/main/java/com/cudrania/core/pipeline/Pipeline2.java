@@ -108,22 +108,23 @@ public interface Pipeline2<IN1, IN2, OUT> {
         /**
          * 指定下一步的参数名称和类型
          *
-         * @param name1 第一个参数名称
-         * @param name2 第二个参数名称
-         * @param <T>   声明参数的对象
-         * @param <IN1> 第一个参数类型
-         * @param <IN2> 第二个参数类型
+         * @param name1 参数1名称
+         * @param name2 参数2名称
+         * @param <T1> 声明参数1的对象
+         * @param <T2> 声明参数2的对象
+         * @param <IN1> 参数1类型
+         * @param <IN2> 参数2类型
          * @return
          */
-        <T, IN1, IN2> StepIn2<S1, S2, IN1, IN2> with(Named<T, IN1> name1, Named<T, IN2> name2);
+        <T1, T2, IN1, IN2> StepIn2<S1, S2, IN1, IN2> with(Named<T1, IN1> name1, Named<T2, IN2> name2);
 
         /**
          * 指定下一步的参数名称和类型
          *
-         * @param name1 第一个参数名称
-         * @param name2 第一个参数名称
-         * @param <IN1> 第一个参数类型
-         * @param <IN2> 第二个参数类型
+         * @param name1 参数1名称
+         * @param name2 参数1名称
+         * @param <IN1> 参数1类型
+         * @param <IN2> 参数2类型
          * @return
          */
         <IN1, IN2> StepIn2<S1, S2, IN1, IN2> with(String name1, String name2);
@@ -132,26 +133,28 @@ public interface Pipeline2<IN1, IN2, OUT> {
         /**
          * 指定下一步的参数名称和类型
          *
-         * @param name1 第一个参数名称
-         * @param name2 第二个参数名称
-         * @param name3 第三个参数名称
-         * @param <T>   声明参数的对象
-         * @param <IN1> 第一个参数类型
-         * @param <IN2> 第二个参数类型
-         * @param <IN3> 第三个参数类型
+         * @param name1 参数1名称
+         * @param name2 参数2名称
+         * @param name3 参数3名称
+         * @param <T1> 声明参数1的对象
+         * @param <T2> 声明参数2的对象
+         * @param <T3> 声明参数3的对象
+         * @param <IN1> 参数1类型
+         * @param <IN2> 参数2类型
+         * @param <IN3> 参数3类型
          * @return
          */
-        <T, IN1, IN2, IN3> StepIn3<S1, S2, IN1, IN2, IN3> with(Named<T, IN1> name1, Named<T, IN2> name2, Named<T, IN3> name3);
+        <T1, T2, T3, IN1, IN2, IN3> StepIn3<S1, S2, IN1, IN2, IN3> with(Named<T1, IN1> name1, Named<T2, IN2> name2, Named<T3, IN3> name3);
 
         /**
          * 指定下一步的参数名称和类型
          *
-         * @param name1 第一个参数名称
-         * @param name2 第二个参数名称
-         * @param name3 第三个参数名称
-         * @param <IN1> 第一个参数类型
-         * @param <IN2> 第二个参数类型
-         * @param <IN3> 第三个参数类型
+         * @param name1 参数1名称
+         * @param name2 参数2名称
+         * @param name3 参数3名称
+         * @param <IN1> 参数1类型
+         * @param <IN2> 参数2类型
+         * @param <IN3> 参数3类型
          * @return
          */
         <IN1, IN2, IN3> StepIn3<S1, S2, IN1, IN2, IN3> with(String name1, String name2, String name3);

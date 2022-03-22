@@ -16,18 +16,18 @@ public class PipeLineTest {
         AllAbilities allAbilities = new AllAbilities();
 
         Pipeline3<Long, String, String, Home> pipeline = Pipelines
-                 .of(Long.TYPE,String.class,String.class)
-//                .begin(Names::input1, Names::input2, Names::input3)
-                .with(Names::input1, Names::input2)
+//                .of(Long.TYPE, String.class, String.class)
+                .of(Inputs::input1, Inputs::input2, Inputs::input3)
+                .with(Inputs::input1, Inputs::input2)
                 .and(allAbilities::createAccount)
-                .as(Names::account)
+                .as(Outputs::account)
                 .and(allAbilities::createUser)
-                .as(Names::user1)
+                .as(Outputs::user1)
                 // .<Account>with("account")
-                .with(Names::account)
+                .with(Outputs::account)
                 .and(allAbilities::createUser)
-                .as(Names::user2)
-                .with(Names::input3, Names::user1, Names::user2)
+                .as(Outputs::user2)
+                .with(Inputs::input3, Outputs::user1, Outputs::user2)
                 .and(allAbilities::createHome)
                 .end();
 
@@ -38,37 +38,23 @@ public class PipeLineTest {
     }
 
 
-//    public void testPipeline2() {
-//
-//        AllAbilities allAbilities = new AllAbilities();
-//        Pipeline2<Long,String> pipeline =
-//        PipelineImpl.begin(Names::input1, Names::input2)
-//                .and(allAbilities::createAccount)
-//                .as(Names::account)
-//                .and(allAbilities::createUser)
-//                .as(Names::user1)
-//                .with(Names::account)
-//                .and(allAbilities::createUser)
-//                .as(Names::user2)
-//                .with(Names::user1, Names::user2)
-//                .and((u1, u2) -> allAbilities.createHome("test", u1, u2))
-//                .end();
-//
-//
-//        Account account = pipeline.eval(1L,"");
-//        System.out.println(account);
-//
-//    }
-
     /**
-     * 用于节点命名
+     * 参数输入
      */
-    public interface Names {
+    public interface Inputs {
+
         Long input1();
 
         String input2();
 
         String input3();
+
+    }
+
+    /**
+     * 存储结果
+     */
+    public interface Outputs {
 
         User user1();
 
@@ -76,7 +62,6 @@ public class PipeLineTest {
 
         Account account();
 
-        User output();
     }
 
 }

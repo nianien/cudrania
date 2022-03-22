@@ -13,11 +13,11 @@ import lombok.Getter;
 /**
  * 流水线步骤实现
  *
- * @param <S1>  流水线第一个参数
- * @param <S2>  流水线第二个参数
- * @param <IN1> 当前步骤第一个参数
- * @param <IN2> 当前步骤第二个参数
- * @param <IN3> 当前步骤第三个参数
+ * @param <S1>  流水线参数1
+ * @param <S2>  流水线参数2
+ * @param <IN1> 当前步骤参数1
+ * @param <IN2> 当前步骤参数2
+ * @param <IN3> 当前步骤参数3
  */
 @Getter
 public class Pipeline2Step<S1, S2, IN1, IN2, IN3> extends AbstractStep<Pipeline2Step> implements StepIn<S1, S2, IN1>, StepIn2<S1, S2, IN1, IN2>, StepIn3<S1, S2, IN1, IN2, IN3> {
@@ -46,7 +46,7 @@ public class Pipeline2Step<S1, S2, IN1, IN2, IN3> extends AbstractStep<Pipeline2
     }
 
     @Override
-    public <T, IN1, IN2> StepIn2<S1, S2, IN1, IN2> with(Named<T, IN1> name1, Named<T, IN2> name2) {
+    public <T1, T2, IN1, IN2> StepIn2<S1, S2, IN1, IN2> with(Named<T1, IN1> name1, Named<T2, IN2> name2) {
         return inputNames(name1, name2);
     }
 
@@ -56,7 +56,7 @@ public class Pipeline2Step<S1, S2, IN1, IN2, IN3> extends AbstractStep<Pipeline2
     }
 
     @Override
-    public <T, IN1, IN2, IN3> StepIn3<S1, S2, IN1, IN2, IN3> with(Named<T, IN1> name1, Named<T, IN2> name2, Named<T, IN3> name3) {
+    public <T1, T2, T3, IN1, IN2, IN3> StepIn3<S1, S2, IN1, IN2, IN3> with(Named<T1, IN1> name1, Named<T2, IN2> name2, Named<T3, IN3> name3) {
         return inputNames(name1, name2, name3);
     }
 
@@ -96,22 +96,23 @@ public class Pipeline2Step<S1, S2, IN1, IN2, IN3> extends AbstractStep<Pipeline2
         return addAbility(ability);
     }
 
-
     /**
-     * 设置初始参数
+     * pipeline的初始参数名称和类型
      *
-     * @param input1 参数1名称
-     * @param input2 参数2名称
-     * @param <T>
+     * @param input1
+     * @param input2
+     * @param <T1>
+     * @param <T2>
      * @param <IN1>
+     * @param <IN2>
      * @return
      */
-    public static <T, IN1, IN2> Pipeline2.StepIn2<IN1, IN2, IN1, IN2> begin(Named<T, IN1> input1, Named<T, IN2> input2) {
+    public static <T1, T2, IN1, IN2> Pipeline2.StepIn2<IN1, IN2, IN1, IN2> begin(Named<T1, IN1> input1, Named<T2, IN2> input2) {
         return new Pipeline2Step<>().outputName(input1, input2);
     }
 
     /**
-     * 设置初始参数类型
+     * pipeline的初始参数名称和类型
      *
      * @param <IN1> 参数1类型
      * @param <IN2> 参数2类型

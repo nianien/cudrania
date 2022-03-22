@@ -20,18 +20,29 @@ public class PipelineContext {
         this.last = last;
     }
 
+    /**
+     * 设置初始数据
+     *
+     * @param first
+     */
     public void setFirst(Object[] first) {
         this.first = first;
         this.last = first;
     }
 
 
+    /**
+     * 保存数据
+     *
+     * @param name
+     * @param value
+     */
     public void put(String name, Object value) {
         store.put(name, value);
     }
 
     /**
-     * 是否包含参数
+     * 是否包含指定数据
      *
      * @param name
      * @return
@@ -41,7 +52,7 @@ public class PipelineContext {
     }
 
     /**
-     * 获取参数
+     * 获取指定数据
      *
      * @param name
      * @return

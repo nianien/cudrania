@@ -14,9 +14,9 @@ import lombok.Getter;
  * 流水线步骤实现
  *
  * @param <S>   流水线入参
- * @param <IN1> 当前步骤第一个参数
- * @param <IN2> 当前步骤第二个参数
- * @param <IN3> 当前步骤第三个参数
+ * @param <IN1> 当前步骤参数1
+ * @param <IN2> 当前步骤参数2
+ * @param <IN3> 当前步骤参数3
  */
 @Getter
 public class PipelineStep<S, IN1, IN2, IN3> extends AbstractStep<PipelineStep> implements StepIn<S, IN1>, StepIn2<S, IN1, IN2>, StepIn3<S, IN1, IN2, IN3> {
@@ -46,7 +46,7 @@ public class PipelineStep<S, IN1, IN2, IN3> extends AbstractStep<PipelineStep> i
     }
 
     @Override
-    public <T, IN1, IN2> StepIn2<S, IN1, IN2> with(Named<T, IN1> name1, Named<T, IN2> name2) {
+    public <T1, T2, IN1, IN2> StepIn2<S, IN1, IN2> with(Named<T1, IN1> name1, Named<T2, IN2> name2) {
         return inputNames(name1, name2);
     }
 
@@ -56,7 +56,7 @@ public class PipelineStep<S, IN1, IN2, IN3> extends AbstractStep<PipelineStep> i
     }
 
     @Override
-    public <T, IN1, IN2, IN3> StepIn3<S, IN1, IN2, IN3> with(Named<T, IN1> name1, Named<T, IN2> name2, Named<T, IN3> name3) {
+    public <T1, T2, T3, IN1, IN2, IN3> StepIn3<S, IN1, IN2, IN3> with(Named<T1, IN1> name1, Named<T2, IN2> name2, Named<T3, IN3> name3) {
         return inputNames(name1, name2, name3);
     }
 
@@ -98,7 +98,7 @@ public class PipelineStep<S, IN1, IN2, IN3> extends AbstractStep<PipelineStep> i
 
 
     /**
-     * 设置初始参数类型和名称, 自动探测
+     * pipeline的初始参数名称和类型
      *
      * @param input 入参名称
      * @param <T>
@@ -110,7 +110,7 @@ public class PipelineStep<S, IN1, IN2, IN3> extends AbstractStep<PipelineStep> i
     }
 
     /**
-     * 设置初始参数类型
+     * pipeline的初始参数名称和类型
      *
      * @param <IN1> 入参类型
      * @return

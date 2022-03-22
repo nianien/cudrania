@@ -53,21 +53,22 @@ public class Pipelines<IN1, IN2, IN3, OUT> implements Pipeline<IN1, OUT>, Pipeli
     /**
      * 设置初始参数类型和名称, 自动探测
      *
-     * @param input1 pipeline第一个参数名称
-     * @param input2 pipeline第二个参数名称
-     * @param <T>
+     * @param input1 pipeline参数1名称
+     * @param input2 pipeline参数2名称
+     * @param <T1>   声明参数1的对象
+     * @param <T2>   声明参数2的对象
      * @param <IN1>
      * @return
      */
-    public static <T, IN1, IN2> Pipeline2.StepIn2<IN1, IN2, IN1, IN2> of(Named<T, IN1> input1, Named<T, IN2> input2) {
+    public static <T1, T2, IN1, IN2> Pipeline2.StepIn2<IN1, IN2, IN1, IN2> of(Named<T1, IN1> input1, Named<T2, IN2> input2) {
         return Pipeline2Step.begin(input1, input2);
     }
 
     /**
      * 设置初始参数类型和名称, 自动探测
      *
-     * @param <IN1> pipeline第一个参数类型
-     * @param <IN2> pipeline第二个参数类型
+     * @param <IN1> pipeline参数1类型
+     * @param <IN2> pipeline参数2类型
      * @return
      */
     public static <IN1, IN2> Pipeline2.StepIn2<IN1, IN2, IN1, IN2> of(Class<IN1> input1, Class<IN2> input2) {
@@ -77,25 +78,27 @@ public class Pipelines<IN1, IN2, IN3, OUT> implements Pipeline<IN1, OUT>, Pipeli
     /**
      * 设置初始参数类型和名称, 自动探测
      *
-     * @param input1 pipeline第一个参数名称
-     * @param input2 pipeline第二个参数名称
-     * @param input3 pipeline第三个参数名称
-     * @param <T>
+     * @param input1 pipeline参数1名称
+     * @param input2 pipeline参数2名称
+     * @param input3 pipeline参数3名称
+     * @param <T1>   声明参数1的对象
+     * @param <T2>   声明参数2的对象
+     * @param <T3>   声明参数3的对象
      * @param <IN1>
      * @param <IN2>
      * @param <IN3>
      * @return
      */
-    public static <T, IN1, IN2, IN3> Pipeline3.StepIn3<IN1, IN2, IN3, IN1, IN2, IN3> of(Named<T, IN1> input1, Named<T, IN2> input2, Named<T, IN3> input3) {
+    public static <T1, T2, T3, IN1, IN2, IN3> Pipeline3.StepIn3<IN1, IN2, IN3, IN1, IN2, IN3> of(Named<T1, IN1> input1, Named<T2, IN2> input2, Named<T3, IN3> input3) {
         return Pipeline3Step.begin(input1, input2, input3);
     }
 
     /**
      * 设置初始参数类型和名称, 自动探测
      *
-     * @param input1 pipeline第一个参数类型
-     * @param input2 pipeline第二个参数类型
-     * @param input3 pipeline第三个参数类型
+     * @param input1 pipeline参数1类型
+     * @param input2 pipeline参数2类型
+     * @param input3 pipeline参数3类型
      * @param <IN1>
      * @param <IN2>
      * @param <IN3>
