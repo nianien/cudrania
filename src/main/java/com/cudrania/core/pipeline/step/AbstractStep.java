@@ -4,9 +4,7 @@ import com.cudrania.core.functions.Fn.Function;
 import com.cudrania.core.functions.Fn.Lambda;
 import com.cudrania.core.pipeline.Named;
 import lombok.Getter;
-import lombok.SneakyThrows;
 
-import java.lang.invoke.SerializedLambda;
 import java.util.Arrays;
 
 /**
@@ -109,13 +107,7 @@ public abstract class AbstractStep<Step extends AbstractStep> {
      * @return
      */
     private String[] toStrings(Named<?, ?>... inputs) {
-        return Arrays.stream(inputs).map(this::resolveName).toArray(n -> new String[n]);
-    }
-
-    @SneakyThrows
-    private String resolveName(Lambda lambda) {
-        SerializedLambda s = lambda.lambda();
-        return Class.forName(s.getImplClass().replace('/', '.')).getSimpleName() + "#" + s.getImplMethodName();
+        return Arrays.stream(inputs).map(Named::name).toArray(n -> new String[n]);
     }
 
 }
