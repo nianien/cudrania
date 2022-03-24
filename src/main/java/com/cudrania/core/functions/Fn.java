@@ -127,7 +127,7 @@ public class Fn {
     }
 
     @FunctionalInterface
-    public interface Consumer<P> extends Lambda, Binder<P, Runnable> {
+    public interface Consumer<P> extends Lambda, Binder<P, Runnable>, java.util.function.Consumer<P> {
         void accept(P p1);
 
         default Runnable bind(P p1) {
@@ -136,7 +136,7 @@ public class Fn {
     }
 
     @FunctionalInterface
-    public interface BiConsumer<P1, P2> extends Lambda, Binder<P1, Consumer<P2>> {
+    public interface BiConsumer<P1, P2> extends Lambda, Binder<P1, Consumer<P2>>, java.util.function.BiConsumer<P1, P2> {
         void accept(P1 p1, P2 p2);
 
         default Consumer<P2> bind(P1 p1) {
@@ -219,7 +219,7 @@ public class Fn {
     }
 
     @FunctionalInterface
-    public interface Function<P, R> extends Lambda, Binder<P, Callable<R>> {
+    public interface Function<P, R> extends Lambda, Binder<P, Callable<R>>, java.util.function.Function<P, R> {
         R apply(P p1);
 
         default Callable<R> bind(P p) {
@@ -228,7 +228,7 @@ public class Fn {
     }
 
     @FunctionalInterface
-    public interface BiFunction<P1, P2, R> extends Lambda, Binder<P1, Function<P2, R>> {
+    public interface BiFunction<P1, P2, R> extends Lambda, Binder<P1, Function<P2, R>>, java.util.function.BiFunction<P1, P2, R> {
         R apply(P1 p1, P2 p2);
 
         default Function<P2, R> bind(P1 p1) {
