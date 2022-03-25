@@ -11,10 +11,11 @@ public interface Pipeline2<IN1, IN2, OUT> {
      */
     OUT eval(IN1 input1, IN2 input2);
 
+
     /**
-     * 单参处理步骤
+     * 进入单参处理步骤
      */
-    interface StepIn<S1, S2, IN> extends StepOut<S1, S2> {
+    interface StepIn<S1, S2, IN> extends StepOut<S1, S2, IN> {
 
         /**
          * 添加执行步骤
@@ -23,6 +24,43 @@ public interface Pipeline2<IN1, IN2, OUT> {
          * @return
          */
         <R> StepIn<S1, S2, R> and(Fn.Function<? super IN, ? extends R> ability);
+
+    }
+
+    /**
+     * 进入双参处理步骤
+     */
+    interface StepIn2<S1, S2, IN1, IN2> extends StepInit<S1, S2> {
+
+        /**
+         * 添加执行步骤
+         *
+         * @param ability 双参函数, 参数可通过方法{@link #with(Named, Named)}或者{@link #with(String, String)}指定
+         * @return
+         */
+        <R> StepIn<S1, S2, R> and(Fn.BiFunction<? super IN1, ? super IN2, ? extends R> ability);
+
+    }
+
+    /**
+     * 进入三参处理步骤
+     */
+    interface StepIn3<S1, S2, IN1, IN2, IN3> extends StepInit<S1, S2> {
+
+        /**
+         * 添加执行步骤
+         *
+         * @param ability 三参函数, 参数可通过方法{@link #with(Named, Named, Named)}或者{@link #with(String, String, String)}指定
+         * @return
+         */
+        <R> StepIn<S1, S2, R> and(Fn.TriFunction<? super IN1, ? super IN2, ? super IN3, ? extends R> ability);
+
+    }
+
+    /**
+     * 退出当前步骤
+     */
+    interface StepOut<S1, S2, IN> extends StepInit<S1, S2> {
 
         /**
          * 构建结束,生成pipeline
@@ -49,41 +87,11 @@ public interface Pipeline2<IN1, IN2, OUT> {
 
     }
 
-    /**
-     * 双参处理步骤
-     */
-    interface StepIn2<S1, S2, IN1, IN2> extends StepOut<S1, S2> {
-
-        /**
-         * 添加执行步骤
-         *
-         * @param ability 双参函数, 参数可通过方法{@link #with(Named, Named)}或者{@link #with(String, String)}指定
-         * @return
-         */
-        <R> StepIn<S1, S2, R> and(Fn.BiFunction<? super IN1, ? super IN2, ? extends R> ability);
-
-    }
 
     /**
-     * 三参处理步骤
+     * 准备下一步骤
      */
-    interface StepIn3<S1, S2, IN1, IN2, IN3> extends StepOut<S1, S2> {
-
-
-        /**
-         * 添加执行步骤
-         *
-         * @param ability 双参函数, 参数可通过方法{@link #with(Named, Named, Named)}或者{@link #with(String, String, String)}指定
-         * @return
-         */
-        <R> StepIn<S1, S2, R> and(Fn.TriFunction<? super IN1, ? super IN2, ? super IN3, ? extends R> ability);
-
-    }
-
-    /**
-     * 构建结束或者继续下一个步骤
-     */
-    interface StepOut<S1, S2> {
+    interface StepInit<S1, S2> {
 
 
         /**
@@ -110,8 +118,8 @@ public interface Pipeline2<IN1, IN2, OUT> {
          *
          * @param name1 参数1名称
          * @param name2 参数2名称
-         * @param <T1> 声明参数1的对象
-         * @param <T2> 声明参数2的对象
+         * @param <T1>  声明参数1的对象
+         * @param <T2>  声明参数2的对象
          * @param <IN1> 参数1类型
          * @param <IN2> 参数2类型
          * @return
@@ -136,9 +144,9 @@ public interface Pipeline2<IN1, IN2, OUT> {
          * @param name1 参数1名称
          * @param name2 参数2名称
          * @param name3 参数3名称
-         * @param <T1> 声明参数1的对象
-         * @param <T2> 声明参数2的对象
-         * @param <T3> 声明参数3的对象
+         * @param <T1>  声明参数1的对象
+         * @param <T2>  声明参数2的对象
+         * @param <T3>  声明参数3的对象
          * @param <IN1> 参数1类型
          * @param <IN2> 参数2类型
          * @param <IN3> 参数3类型
