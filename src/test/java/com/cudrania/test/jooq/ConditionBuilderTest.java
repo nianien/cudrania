@@ -61,7 +61,7 @@ public class ConditionBuilderTest {
 
         @Override
         public Field<?>[] fields() {
-            return fields.toArray(n -> new Field[n]);
+            return fields.stream().toArray(n -> new Field[n]);
         }
 
         @Override

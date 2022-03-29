@@ -23,6 +23,8 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -57,18 +59,6 @@ public class TestCustomSerializer {
         JsonParser parser = new JsonParser();
         ObjectMapper objectMapper = parser.getObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-//        objectMapper.setSerializerFactory(
-//                objectMapper.getSerializerFactory().withSerializerModifier(new BeanSerializerModifier() {
-//                    @Override
-//                    public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
-//                        if (serializer instanceof BeanSerializerBase) {
-//                            return new TypeAsFieldSerializer(
-//                                    (BeanSerializerBase) serializer);
-//                        }
-//                        return serializer;
-//                    }
-//                })
-//        );
         RuleNode ruleNode = NodeParser.parse("(a||b)&&(!c||!d)", false);
         System.out.println(ruleNode);
         String json = parser.toJson(ruleNode);
@@ -79,15 +69,15 @@ public class TestCustomSerializer {
     }
 
 
-    @Test
-    public void testSerializerRuleNodeWrapper() {
+    @ParameterizedTest
+    @CsvSource(value = {"true", "false"})
+    public void testSerializerRuleNodeWrapper(boolean useModule) {
         JsonParser parser = new JsonParser();
         ObjectMapper objectMapper = parser.getObjectMapper();
         objectMapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-        boolean useModule=false;
-        if(useModule){
+        if (useModule) {
             objectMapper.registerModule(new SimpleModule().addSerializer(new NodeWrapperSerializer()));
-        }else{
+        } else {
             objectMapper.setSerializerFactory(
                     objectMapper.getSerializerFactory().withSerializerModifier(new BeanSerializerModifier() {
                         @Override
@@ -166,7 +156,7 @@ public class TestCustomSerializer {
         map.put("balance", "1314.520");
         map.put("email", "18901010001@qq.com");
 
-        User user=new User();
+        User user = new User();
         user.setPassword("1233");
         account.setExtras(map);
         System.out.println(jsonParser.toJson(account));
@@ -219,7 +209,7 @@ public class TestCustomSerializer {
         String full = objectMapper.writerWithView(FullView.class).writeValueAsString(account);
         System.out.println(full);
         //反序列化，使用视图
-        System.out.println((Account)objectMapper.readerWithView(Account.FullView.class).forType(Account.class).readValue(simple));
-        System.out.println((Account)objectMapper.readerWithView(Account.FullView.class).forType(Account.class).readValue(full));
+        System.out.println((Account) objectMapper.readerWithView(Account.FullView.class).forType(Account.class).readValue(simple));
+        System.out.println((Account) objectMapper.readerWithView(Account.FullView.class).forType(Account.class).readValue(full));
     }
 }

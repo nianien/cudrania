@@ -6,7 +6,7 @@ package com.cudrania.test.jackson.node;
  * @author liyifei <liyifei@kuaishou.com>
  */
 
-public interface RuleNode extends JsonTypeInfoRuleNode {
+public interface RuleNode /*extends JsonTypeInfoRuleNode */ {
 
     /**
      * 条件与
