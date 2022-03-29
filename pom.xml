@@ -14,7 +14,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
-        <jackson.version>2.9.7</jackson.version>
+        <jackson.version>2.12.6.1</jackson.version>
         <javassist.version>3.18.1-GA</javassist.version>
         <dom4j.version>1.6.1</dom4j.version>
         <ant.version>1.9.3</ant.version>
