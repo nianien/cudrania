@@ -42,6 +42,8 @@ public class MyTypeIdResolver extends TypeIdResolverBase {
                 return SimpleType.constructUnsafe(OrNode.class);
             case "EXPR":
                 return SimpleType.constructUnsafe(ExprNode.class);
+            case "WRAPPER":
+                throw new UnsupportedOperationException("cannot deSerialize NodeWrapper");
         }
         return super.typeFromId(context, id);
     }

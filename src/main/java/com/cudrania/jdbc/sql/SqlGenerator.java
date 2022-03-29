@@ -13,9 +13,9 @@ import static com.cudrania.core.exception.ExceptionChecker.throwIf;
 import static com.cudrania.jdbc.table.DataTableFactory.get;
 
 /**
- * SqlStatement对象的生成工具<br/>
- * 根据实体对象或者字段列表构建条件匹配的select,insert,update,delete等SQL语句<br/>
- * 注:这里条件字段只匹配以下运算符: "="(非空字段),"is null"(空值字段),"in"(数组或集合)<br/>
+ * SqlStatement对象的生成工具<p>
+ * 根据实体对象或者字段列表构建条件匹配的select,insert,update,delete等SQL语句<p>
+ * 注:这里条件字段只匹配以下运算符: "="(非空字段),"is null"(空值字段),"in"(数组或集合)<p>
  * 该工具类根据实体类型声明的注解{@link com.cudrania.jdbc.table.Table}和{@link com.cudrania.jdbc.table.Column}获取{@link DataTable}对象,从而获取表名和字段名等信息
  *
  * @author skyfalling
@@ -27,7 +27,7 @@ public class SqlGenerator {
 
 
     /**
-     * 构建select语句, 使用主键作为查询条件<br/>
+     * 构建select语句, 使用主键作为查询条件<p>
      *
      * @param entity 实体对象
      * @param <T>
@@ -39,7 +39,7 @@ public class SqlGenerator {
     }
 
     /**
-     * 构建select语句<p/>
+     * 构建select语句<p>
      * 如果条件字段为空, 则按非空属性查询
      *
      * @param entity          实体对象
@@ -54,8 +54,8 @@ public class SqlGenerator {
     }
 
     /**
-     * 构建select语句<p/>
-     * 查询条件conditions是一个{@link DataField}列表,其中{@link DataField#name}作为字段名,{@link DataField#value}作为匹配值<br/>
+     * 构建select语句<p>
+     * 查询条件conditions是一个{@link DataField}列表,其中{@link DataField#name}作为字段名,{@link DataField#value}作为匹配值<p>
      * <ul>
      * <li>
      * 如果value is null,则匹配 name is null;
@@ -122,8 +122,8 @@ public class SqlGenerator {
 
 
     /**
-     * 构建update语句<p/>
-     * 如果条件字段为空,按照主键更新<p/>
+     * 构建update语句<p>
+     * 如果条件字段为空,按照主键更新<p>
      *
      * @param entity 实体对象
      * @param <T>
@@ -135,7 +135,7 @@ public class SqlGenerator {
     }
 
     /**
-     * 构建update语句,其中conditionFields字段列表作为更新条件 <br/>
+     * 构建update语句,其中conditionFields字段列表作为更新条件 <p>
      *
      * @param table           实体表
      * @param entity          实体对象
@@ -155,7 +155,7 @@ public class SqlGenerator {
 
 
     /**
-     * 构建update语句,其中updateFields为待更新字段,conditionFields字段列表作为更新条件<br/>
+     * 构建update语句,其中updateFields为待更新字段,conditionFields字段列表作为更新条件<p>
      *
      * @param tableName       表名
      * @param updateFields    待更新字段
@@ -178,7 +178,7 @@ public class SqlGenerator {
 
 
     /**
-     * 构建delete语句,使用主键作为查询条件<br/>
+     * 构建delete语句,使用主键作为查询条件<p>
      *
      * @param entity 实体对象
      * @param <T>
@@ -191,8 +191,8 @@ public class SqlGenerator {
 
 
     /**
-     * 构建delete语句<p/>
-     * 如果条件字段为空,使用非空属性作为查询条件<br/>
+     * 构建delete语句<p>
+     * 如果条件字段为空,使用非空属性作为查询条件<p>
      *
      * @param entity 实体对象
      * @param <T>
@@ -206,7 +206,7 @@ public class SqlGenerator {
 
 
     /**
-     * 构建delete语句,conditionFields作为删除字段<br/>
+     * 构建delete语句,conditionFields作为删除字段<p>
      *
      * @param tableName
      * @param conditions

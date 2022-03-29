@@ -232,14 +232,14 @@ public class ResultSetAdapter {
     }
 
     /**
-     * 将ResultSet中的记录以指定列为键值映射成Map&lt;Object, T>对象<br>
+     * 将ResultSet中的记录以指定列为键值映射成Map&lt;Object, T&gt;对象<br>
      * 其中key为第index列的值,value为记录对应的实例对象
      *
      * @param <T>
      * @param resultSet
      * @param index
      * @param clazz
-     * @return Map&lt;String, T>
+     * @return Map&lt;String, T&gt;
      */
     public static <T> Map<Object, T> getRowsMap(ResultSet resultSet, int index, Class<T> clazz) {
         try {
@@ -254,14 +254,14 @@ public class ResultSetAdapter {
     }
 
     /**
-     * 将ResultSet中的记录以指定列为键值映射成Map&lt;Object, T>对象<br>
+     * 将ResultSet中的记录以指定列为键值映射成Map&lt;Object, T&gt;对象<br>
      * 其中key为keyField列的值,value为记录对应的实例对象
      *
      * @param <T>
      * @param resultSet
      * @param name
      * @param clazz
-     * @return Map&lt;Object, T>
+     * @return Map&lt;Object, T&gt;
      */
     public static <T> Map<Object, T> getRowsMap(ResultSet resultSet, String name, Class<T> clazz) {
         int index = getColumnIndex(resultSet, name);

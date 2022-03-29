@@ -79,7 +79,7 @@ public class XMLDocument {
     }
 
     /**
-     * 根据文本创建XML文档,并对字符"&"进行转义
+     * 根据文本创建XML文档,并对字符"&amp;"进行转义
      *
      * @param text
      * @return Document对象

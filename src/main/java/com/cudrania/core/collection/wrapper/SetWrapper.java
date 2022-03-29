@@ -1,18 +1,13 @@
 package com.cudrania.core.collection.wrapper;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Spliterator;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- * {@link Set}接口的包装类,包装Set实例以支持链式语法<br/>
- * 如果未提供Set实例,则默认为{@link  HashSet}实现<br/>
+ * {@link Set}接口的包装类,包装Set实例以支持链式语法<p>
+ * 如果未提供Set实例,则默认为{@link  HashSet}实现<p>
  *
  * @author skyfalling
  */

@@ -3,6 +3,7 @@ package com.cudrania.test.jackson.serializer;
 import com.cudrania.test.jackson.node.NodeWrapper;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
 import java.io.IOException;
@@ -23,4 +24,8 @@ public class NodeWrapperSerializer extends StdSerializer<NodeWrapper> {
         gen.writeObject(value.unwrap());
     }
 
+    @Override
+    public void serializeWithType(NodeWrapper value, JsonGenerator gen, SerializerProvider serializers, TypeSerializer typeSer) throws IOException {
+        gen.writeObject(value.unwrap());
+    }
 }

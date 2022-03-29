@@ -17,7 +17,7 @@ public class TestWildCard {
     public void test() {
         assertTrue(Wildcard.match("ab?", "abc"));
         assertTrue(Wildcard.match("ab*", "abc"));
-        assertTrue(Wildcard.matchPath("ab/*/f/**", "ab/c/d/f"));
+        assertTrue(Wildcard.matchPath("ab/**/f/**", "ab/c/d/f"));
     }
 
 

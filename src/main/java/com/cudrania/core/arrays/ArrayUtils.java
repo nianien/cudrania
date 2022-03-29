@@ -1244,7 +1244,7 @@ public class ArrayUtils {
     }
 
     /**
-     * 对象转换数组<br/>
+     * 对象转换数组<p>
      * <ul>
      *     <li>空对象或空字符串转成空数组</li>
      *     <li>{@link Object[]}类型强制转换</li>

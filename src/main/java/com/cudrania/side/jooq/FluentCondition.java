@@ -96,7 +96,7 @@ public class FluentCondition extends Fluent<Condition> {
      *
      * @param param    条件参数
      * @param function 函数表达式
-     * @param <P>      参数类型&函数第二个参数类型
+     * @param <P>      函数第二个参数类型
      * @return
      */
     public <P> FluentCondition with(P param,
@@ -114,7 +114,7 @@ public class FluentCondition extends Fluent<Condition> {
      * @param param    条件参数
      * @param field    表字段
      * @param function 函数表达式
-     * @param <P>      参数类型&函数第二个参数类型
+     * @param <P>      函数第二个参数类型
      * @return
      */
     public <P, F> FluentCondition with(P param, Field<F> field,
@@ -151,7 +151,7 @@ public class FluentCondition extends Fluent<Condition> {
      *
      * @param param    条件参数
      * @param function 表字段连接条件
-     * @param <P>      参数类型&函数第二个参数类型
+     * @param <P>      函数第二个参数类型
      * @return
      */
     public <P> FluentCondition when(Param<P> param, Function<P, Condition> function) {
@@ -164,7 +164,7 @@ public class FluentCondition extends Fluent<Condition> {
      * @param param    条件参数
      * @param field    表字段
      * @param function 函数表达式
-     * @param <P>      参数类型&函数第二个参数类型
+     * @param <P>      函数第二个参数类型
      * @return
      */
     public <P, F> FluentCondition when(Param<P> param, Field<F> field,

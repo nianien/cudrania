@@ -8,7 +8,7 @@ package com.cudrania.core.exception;
 public class ExceptionChecker {
 
     /**
-     * 抛出异常信息<br/>
+     * 抛出异常信息<p>
      * 注意: 这里的返回值只是为了绕过编译器的异常检查,不会真正返回
      *
      * @param e
@@ -22,7 +22,7 @@ public class ExceptionChecker {
     }
 
     /**
-     * 抛出异常信息<br/>
+     * 抛出异常信息<p>
      * 注意: 这里的返回值只是为了绕过编译器的异常检查,不会真正返回
      *
      * @param cause

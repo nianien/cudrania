@@ -12,7 +12,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * 计算文本摘要的工具类<br/>
+ * 计算文本摘要的工具类<p>
  * 该类是线程安全的
  *
  * @author skyfalling

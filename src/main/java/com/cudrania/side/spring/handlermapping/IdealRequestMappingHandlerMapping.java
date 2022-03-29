@@ -14,7 +14,7 @@ import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
 
 /**
- * 扩展基于注解的请求映射处理类,实现自动映射功能和统一配置，具体配置项参考{@link RequestMappingConfiguration}<br/>
+ * 扩展基于注解的请求映射处理类,实现自动映射功能和统一配置，具体配置项参考{@link RequestMappingConfiguration}<p>
  *
  * @author skyfalling
  * @see RequestMappingConfiguration

@@ -15,7 +15,7 @@ import java.security.ProtectionDomain;
 public class Classes {
 
     /**
-     * 获取指定类文件的URL地址<br/>
+     * 获取指定类文件的URL地址<p>
      *
      * @param clazz
      * @return URL
@@ -27,7 +27,7 @@ public class Classes {
     }
 
     /**
-     * 获取指定类文件所在路径<br/>
+     * 获取指定类文件所在路径<p>
      * 如果打包,则返回jar所在路径
      *
      * @param clazz
@@ -39,7 +39,7 @@ public class Classes {
     }
 
     /**
-     * 获取指定类所在目录的根目录,即最外层包所在目录<br/>
+     * 获取指定类所在目录的根目录,即最外层包所在目录<p>
      * 如果打包,则返回jar所在路径
      *
      * @param clazz

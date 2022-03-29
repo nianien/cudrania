@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 
 /**
- * 在每个UT的Setup前自动加载SQL文件<br/>
+ * 在每个UT的Setup前自动加载SQL文件<p>
  * 配合{@link SqlScripts}注解使用,可以实现在类或方法级别上加载SQL文件
  *
  * @author skyfalling.

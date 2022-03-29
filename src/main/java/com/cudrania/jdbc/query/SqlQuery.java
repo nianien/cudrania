@@ -66,7 +66,7 @@ public interface SqlQuery {
 
     /**
      * 获取结果集中的第一行数据<br>
-     * 数据由Map&lt;String, Object>对象表示
+     * 数据由Map&lt;String, Object&gt;对象表示
      *
      * @return
      */
@@ -74,7 +74,7 @@ public interface SqlQuery {
 
     /**
      * 获取结果集中的第一行数据<br>
-     * 数据由Class&lt;T>对象表示
+     * 数据由Class&lt;T&gt;对象表示
      *
      * @param clazz
      * @return
@@ -82,14 +82,14 @@ public interface SqlQuery {
     <T> T getFirstRow(Class<T> clazz);
 
     /**
-     * 获取由Map&lt;String, Object>对象表示的查询结果
+     * 获取由Map&lt;String, Object&gt;对象表示的查询结果
      *
      * @return
      */
     List<Map<String, Object>> getRows();
 
     /**
-     * 获取由Class&lt;T>对象表示的查询结果
+     * 获取由Class&lt;T&gt;对象表示的查询结果
      *
      * @param clazz
      * @return
@@ -125,20 +125,20 @@ public interface SqlQuery {
     int getRowsCount();
 
     /**
-     * 以索引值为index的列为键值,将查询结果映射成Map&lt;Object,T>对象<br>
+     * 以索引值为index的列为键值,将查询结果映射成Map&lt;Object,T&gt;对象<br>
      *
      * @param clazz
      * @param index
-     * @return Map&lt;String, T>
+     * @return Map&lt;String, T&gt;
      */
     <T> Map<Object, T> getRowsMap(Class<T> clazz, int index);
 
     /**
-     * 以名称为name的列为键值,将查询结果映射成Map&lt;Object,T>对象<br>
+     * 以名称为name的列为键值,将查询结果映射成Map&lt;Object,T&gt;对象<br>
      *
      * @param name
      * @param clazz
-     * @return Map&lt;Object, T>
+     * @return Map&lt;Object, T&gt;
      */
     <T> Map<Object, T> getRowsMap(Class<T> clazz, String name);
 

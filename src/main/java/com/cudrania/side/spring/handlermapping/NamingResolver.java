@@ -3,7 +3,7 @@ package com.cudrania.side.spring.handlermapping;
 import org.springframework.util.StringValueResolver;
 
 /**
- * 命名处理类<br/>
+ * 命名处理类<p>
  * 当使用默认类映射规则时，可指定配置路径是否自动转为小写，方法{@link #setUseLowerCase(boolean)}
  *
  * @author skyfalling

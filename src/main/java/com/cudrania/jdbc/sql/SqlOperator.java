@@ -16,19 +16,19 @@ public enum SqlOperator {
      */
     NotEqual("? != ?"),
     /**
-     * ">"
+     * "&gt;"
      */
     GreaterThan("? > ?"),
     /**
-     * "<"
+     * "&lt;"
      */
     LessThan("? < ?"),
     /**
-     * ">="
+     * "&gt;="
      */
     GreaterEqual("? >= ?"),
     /**
-     * "<="
+     * "&lt;="
      */
     LessEqual("? <= ?"),
     /**

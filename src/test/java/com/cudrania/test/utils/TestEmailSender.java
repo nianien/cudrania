@@ -1,5 +1,6 @@
 package com.cudrania.test.utils;
 
+import com.cudrania.core.text.Encryptor;
 import com.cudrania.core.utils.EmailSender;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +11,7 @@ public class TestEmailSender {
 
     @Test
     public void test() throws Exception {
-        new EmailSender("nianien@126.com", "fighting!").subject("邮件发送升级测试2").content("<table border='0' cellspacing='0' cellpadding='8' bgcolor='#FFFFFF' style='text-align:center;width:98%;height:30px'>\n" +
+        new EmailSender(Encryptor.decrypt("01m01h01Z01m01h01d01m01200n00o00s00k01b01n01l"),Encryptor.decrypt("00o01y01y01801h01f01g01s01h01m01f00X")).subject("邮件发送升级测试2").content("<table border='0' cellspacing='0' cellpadding='8' bgcolor='#FFFFFF' style='text-align:center;width:98%;height:30px'>\n" +
                 "\t<tr>\n" +
                 "\t\t<td bgcolor='#FFFFFF' colspan='2' style='border-width:0;'>文件下载失败列表</td>\n" +
                 "\t</tr>\n" +

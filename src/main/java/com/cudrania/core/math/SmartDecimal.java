@@ -21,7 +21,7 @@ public class SmartDecimal extends BigDecimal {
     private final RoundingMode roundingMode;
 
     /**
-     * 构造方法<br/>
+     * 构造方法<p>
      * 默认小数后4位精度,四舍五入
      *
      * @param val
@@ -31,7 +31,7 @@ public class SmartDecimal extends BigDecimal {
     }
 
     /**
-     * 构造方法<br/>
+     * 构造方法<p>
      * 默认四舍五入
      *
      * @param val   初始值

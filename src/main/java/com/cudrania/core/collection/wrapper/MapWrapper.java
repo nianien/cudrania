@@ -10,8 +10,8 @@ import java.util.function.Function;
 
 
 /**
- * {@link Map}接口的包装类,包装Map实例以支持链式语法<br/>
- * 如果未提供Map实例,则默认为{@link HashMap}实现<br/>
+ * {@link Map}接口的包装类,包装Map实例以支持链式语法<p>
+ * 如果未提供Map实例,则默认为{@link HashMap}实现<p>
  *
  * @author skyfalling
  */
@@ -63,7 +63,7 @@ public class MapWrapper<K, V> implements Map<K, V>, Wrapper<Map<K, V>> {
      * @param key
      * @param value
      * @return 返回当前对象
-     * @see Map#put(K, V)
+     * @see Map#put(Object, Object)
      */
     public MapWrapper<K, V> with(K key, V value) {
         map.put(key, value);

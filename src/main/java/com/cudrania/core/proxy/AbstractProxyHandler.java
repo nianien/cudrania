@@ -45,7 +45,6 @@ public abstract class AbstractProxyHandler implements InvocationHandler {
      * 设置被代理对象实例
      *
      * @param target
-     * @return
      */
     public void setTarget(Object target) {
         this.target = target;

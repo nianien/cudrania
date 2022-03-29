@@ -9,10 +9,9 @@ import java.util.Stack;
 import java.util.function.Function;
 
 /**
- * 变量表达式解析类,变量表达式是指由左右边界符和变量名组成的字符串<br/>
- * 如: left="${",right="}",则变量表达式可表示为:"${variable}"<br/>
- * 变量表达式支持嵌套和递归<br/>
- * <code>
+ * 变量表达式解析类,变量表达式是指由左右边界符和变量名组成的字符串<p>
+ * 如: left="${",right="}",则变量表达式可表示为:"${variable}"<p>
+ * 变量表达式支持嵌套和递归<p>
  * <ol>
  * <li>
  * <pre>
@@ -47,7 +46,6 @@ import java.util.function.Function;
  * </pre>
  * </li>
  * </ol>
- * </code>
  *
  * @author skyfalling
  */
@@ -85,7 +83,7 @@ public class Expression {
     }
 
     /**
-     * 构造函数,默认保留未知变量<br/>
+     * 构造函数,默认保留未知变量<p>
      *
      * @param left  表达式的左边界符
      * @param right 表达式的右边界符
@@ -147,11 +145,9 @@ public class Expression {
     }
 
     /**
-     * 代入位置变量计算表达式<br/>
+     * 代入位置变量计算表达式<p>
      * <code>
-     * <pre>
      * new Expression("${","}").resolve("${0}年${1}月${2}日",2012,12,21);//2012年12月21日
-     * </pre>
      * </code>
      *
      * @param expression 变量表达式
@@ -163,15 +159,13 @@ public class Expression {
     }
 
     /**
-     * 代入命名变量计算表达式<br/>
+     * 代入命名变量计算表达式<p>
      * <code>
-     * <pre>
      * Map map=new HashMap();
      * map.put("year",2012);
      * map.put("month",12);
      * map.put("day",21);
      * new Expression("${","}").resolve("${year}年${month}月${day}日",map);//2012年12月21日
-     * </pre>
      * </code>
      *
      * @param expression 含变量的表达式
@@ -183,16 +177,14 @@ public class Expression {
     }
 
     /**
-     * 代入变量计算表达式<br/>
+     * 代入变量计算表达式<p>
      * 如果命名变量与位置变量相同,则取位置变量
      * <code>
-     * <pre>
      * Map map=new HashMap();
      * map.put("0",2012);
      * map.put("1",12);
      * map.put("2",21);
      * new Expression("${","}").resolve("${0}年${1}月${2}日",map,2013);//2013年12月21日
-     * </pre>
      * </code>
      *
      * @param expression       变量表达式
@@ -246,15 +238,13 @@ public class Expression {
 
 
     /**
-     * 利用表达式变量处理对象解析表达式中包含的变量,将形如"${n}"和"{variable}"的表达式代入VariableHandler对象的处理结果<br/>
+     * 利用表达式变量处理对象解析表达式中包含的变量,将形如"${n}"和"{variable}"的表达式代入VariableHandler对象的处理结果<p>
      * <code>
-     * <pre>
      * Function<String,Object> function;
      * function.apply("year"); // return 2013
      * function.apply("month"); // return 12
      * function.apply("day"); // return 21
      * new Expression("${","}").resolve("${year}年${month}月${day}日",function);//2013年12月21日
-     * </pre>
      * </code>
      *
      * @param expression 变量表达式

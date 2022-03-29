@@ -1,24 +1,19 @@
 package com.cudrania.test.jackson;
 
 
+import com.cudrania.core.json.JsonParser;
+import com.cudrania.core.math.SmartDecimal;
+import com.cudrania.test.bean.Color;
+import com.cudrania.test.bean.User;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.ClassStack;
 import com.fasterxml.jackson.databind.type.TypeBindings;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.cudrania.core.json.JsonParser;
-import com.cudrania.test.bean.Color;
-import com.cudrania.test.bean.User;
 import org.junit.jupiter.api.Test;
 
-
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
@@ -27,7 +22,7 @@ public class TestJson {
     @Test
     public void testPrimitive() {
         JsonParser jp = new JsonParser();
-        FinanceDecimal financeDecimal = new FinanceDecimal("3.1415926");
+        SmartDecimal financeDecimal = new SmartDecimal(3.1415926);
         System.out.println(jp.toJson(financeDecimal));
     }
 

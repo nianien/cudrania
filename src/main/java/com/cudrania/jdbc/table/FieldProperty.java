@@ -8,7 +8,7 @@ import java.sql.SQLType;
 import static com.cudrania.core.reflection.Reflections.invoke;
 
 /**
- * 字段相关属性信息,包括名称,sqlType类型,getter和setter方法<br/>
+ * 字段相关属性信息,包括名称,sqlType类型,getter和setter方法<p>
  * 字段的getter和setter方法名必须保持一致,且getter方法的返回类型为setter的参数类型
  */
 

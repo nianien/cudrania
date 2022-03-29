@@ -1,7 +1,5 @@
 package com.cudrania.algorithm;
 
-import com.cudrania.core.reflection.Generics;
-
 import java.lang.reflect.Array;
 import java.util.Comparator;
 
@@ -35,29 +33,32 @@ public class PriorityHeap<T> {
      */
     private Class<T> elementType;
 
+
+    /**
+     * 指定堆的容量和元素类型
+     *
+     * @param capacity
+     * @param elementType
+     * @param <T>
+     * @return
+     */
+    public static <T extends Comparable<T>> PriorityHeap<T> of(int capacity, Class<T> elementType) {
+        return new PriorityHeap<>(capacity, elementType, Comparable::compareTo);
+    }
+
+
     /**
      * 构造方法, 指定堆的容量和元素比较对象
      *
-     * @param capacity   堆容量
-     * @param comparator 元素比较对象, 用于元素优先级的比较
+     * @param capacity    堆容量
+     * @param elementType 元素类型
+     * @param comparator  元素比较器
      */
-
-    @SuppressWarnings("unchecked")
-    public PriorityHeap(int capacity, Comparator<T> comparator) {
+    public PriorityHeap(int capacity, Class<T> elementType, Comparator<T> comparator) {
         this.capacity = capacity;
-        this.elementType = Generics.find(this.getClass(), PriorityHeap.class, 0);
+        this.elementType = elementType;
         this.heap = arrayOfElements(elementType, capacity);
         this.comparator = comparator;
-    }
-
-    /**
-     * 构造方法, 指定堆的容量和元素类型
-     *
-     * @param capacity 堆容量
-     */
-
-    public PriorityHeap(int capacity) {
-        this(capacity, (o1, o2) -> ((Comparable<T>) o1).compareTo(o2));
     }
 
     /**

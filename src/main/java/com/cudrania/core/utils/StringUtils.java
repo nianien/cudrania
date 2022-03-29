@@ -246,7 +246,7 @@ public class StringUtils {
     }
 
     /**
-     * 将字符target按在source中出现的顺序依次用参数数组parameters的元素填充,直到target不再出现或者参数用完<br/>
+     * 将字符target按在source中出现的顺序依次用参数数组parameters的元素填充,直到target不再出现或者参数用完<p>
      *
      * @param source
      * @param target
@@ -271,7 +271,7 @@ public class StringUtils {
     }
 
     /**
-     * 将字符串target按在source中出现的顺序依次用参数数组parameters的元素填充,直到target不再出现或者参数用完<br/>
+     * 将字符串target按在source中出现的顺序依次用参数数组parameters的元素填充,直到target不再出现或者参数用完<p>
      *
      * @param source
      * @param target
@@ -326,12 +326,10 @@ public class StringUtils {
 
 
     /**
-     * 当字符串长度小于指定宽度时,在前面使用指定字符补齐宽度<br/>
-     * 如果补齐字符串超过指定长度时,则对补齐字符串进行截断<br/>
+     * 当字符串长度小于指定宽度时,在前面使用指定字符补齐宽度<p>
+     * 如果补齐字符串超过指定长度时,则对补齐字符串进行截断<p>
      * <code>
-     * <pre>
      * StringUtils.lefPad("!",6,"abc");// abcab!
-     * </pre>
      * </code>
      *
      * @param source
@@ -375,12 +373,10 @@ public class StringUtils {
     }
 
     /**
-     * 当字符串长度小于指定宽度时,在后面使用指定字符补齐宽度<br/>
-     * 如果补齐字符串超过指定长度时,则对补齐字符串进行截断<br/>
+     * 当字符串长度小于指定宽度时,在后面使用指定字符补齐宽度<p>
+     * 如果补齐字符串超过指定长度时,则对补齐字符串进行截断<p>
      * <code>
-     * <pre>
      * StringUtils.lefPad("!",6,"abc");// !abcab
-     * </pre>
      * </code>
      *
      * @param source

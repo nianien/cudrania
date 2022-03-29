@@ -113,7 +113,7 @@ public class Encryptor {
     }
 
     /**
-     * 根据进制基数计算表示一个Unicode字符所需要的位数<br/>
+     * 根据进制基数计算表示一个Unicode字符所需要的位数<p>
      * 如二进制需要16位来表示一个Unicode字符
      *
      * @param base

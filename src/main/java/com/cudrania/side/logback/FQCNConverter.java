@@ -5,25 +5,25 @@ import ch.qos.logback.classic.spi.CallerData;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 
 /**
- * 打印业务日志的方法调用栈信息,包括所属类/方法/行信息,用于解决三方库封装自定义Logger时无法正确打印FQCN的问题<br/>
+ * 打印业务日志的方法调用栈信息,包括所属类/方法/行信息,用于解决三方库封装自定义Logger时无法正确打印FQCN的问题<p>
  * <pre>
- *     &lt;configuration>
- *        &lt;conversionRule conversionWord="CML" converterClass="com.cudrania.side.logback.FQCNConverter">
+ *     &lt;configuration&gt;
+ *        &lt;conversionRule conversionWord="CML" converterClass="com.cudrania.side.logback.FQCNConverter"&gt;
  *        ...
- *        &lt;appender name="console" class="ch.qos.logback.core.ConsoleAppender">
- *            &lt;encoder>
- *               &lt;pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %CML{54} - %msg%n&lt;/pattern>
- *           &lt;/encoder>
- *        &lt;/appender>
+ *        &lt;appender name="console" class="ch.qos.logback.core.ConsoleAppender"&gt;
+ *            &lt;encoder&gt;
+ *               &lt;pattern&gt;%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %CML{54} - %msg%n&lt;/pattern&gt;
+ *           &lt;/encoder&gt;
+ *        &lt;/appender&gt;
  *          ...
- *     &lt;/configuration>
+ *     &lt;/configuration&gt;
  * </pre>
  *
  * @author scorpio
  */
 public class FQCNConverter extends NamedConverter {
 
-    private String postfix = "Logger";
+    private String postfix;
 
     /**
      * 默认Logger类后缀

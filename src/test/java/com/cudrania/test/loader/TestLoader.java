@@ -1,7 +1,6 @@
 package com.cudrania.test.loader;
 
 import com.cudrania.core.loader.FilePathClassLoader;
-
 import org.junit.jupiter.api.Test;
 
 /**
@@ -12,8 +11,8 @@ public class TestLoader {
 
 	@Test
 	public void testLoader() throws Exception {
-		ClassLoader loader = new FilePathClassLoader(".");
-		Class<?> cl = loader.loadClass("com.nianien.test.TestLoader");
+		ClassLoader loader = new FilePathClassLoader("./target/test-classes");
+		Class<?> cl = loader.loadClass(TestLoader.class.getName());
 		cl.getMethod("test0").invoke(null);
 	}
 

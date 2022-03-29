@@ -8,8 +8,8 @@ import java.util.*;
 import java.util.Map.Entry;
 
 /**
- * 支持命名参数的SQL语句,参数形式为 :x,此外可以使用 :n(n=0,1,2...)表示位置参数<br/>
- * 当参数类型为数组和集合时,将根据元素数目扩展为: (?,?...) <br/>
+ * 支持命名参数的SQL语句,参数形式为 :x,此外可以使用 :n(n=0,1,2...)表示位置参数<p>
+ * 当参数类型为数组和集合时,将根据元素数目扩展为: (?,?...) <p>
  * 例如:
  * <pre>
  *     <code>SqlStatement sqlStatement1 = new SqlStatement("select * from users where
@@ -236,7 +236,7 @@ public class SqlStatement {
 
 
     /**
-     * 追加SQL,根据Map键值设置SQL命名参数<br/>
+     * 追加SQL,根据Map键值设置SQL命名参数<p>
      * SQL中含有形如<code>:name</code>的命名参数，则取Map.get("name")作为SQL参数值
      *
      * @param sql        SQL语句,支持命名参数":name"
@@ -248,7 +248,7 @@ public class SqlStatement {
     }
 
     /**
-     * 追加SQL,并设置SQL参数列表<br/>
+     * 追加SQL,并设置SQL参数列表<p>
      * <ul>
      *     <li>如果参数为Map对象，SQL中含有形如<code>:name</code>的命名参数，则取Map.get("name")作为SQL参数值
      *     </li>

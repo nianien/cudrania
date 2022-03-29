@@ -33,13 +33,12 @@ public class ScopeAttributeMethodProcessor implements HandlerMethodArgumentResol
 
 
     /**
-     * 绑定对象到当前线程<br/>
+     * 绑定对象到当前线程<p>
      * 键值为:type#name
      *
      * @param name  对象名称
      * @param type  对象类型
      * @param value
-     * @return
      */
     public static <T> void bind(String name, Class<T> type, T value) {
         bind(nameWithType(name, type), value);
@@ -51,7 +50,6 @@ public class ScopeAttributeMethodProcessor implements HandlerMethodArgumentResol
      *
      * @param name  对象名称,作为键值
      * @param value
-     * @return
      */
     protected static void bind(String name, Object value) {
         localMap.get().put(name, value);

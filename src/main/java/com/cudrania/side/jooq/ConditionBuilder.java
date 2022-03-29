@@ -26,7 +26,7 @@ import static com.cudrania.core.utils.StringUtils.decapitalize;
 import static com.cudrania.core.utils.StringUtils.underscoreCase;
 
 /**
- * 匹配条件构造器<br/>
+ * 匹配条件构造器<p>
  * scm.com Inc.
  * Copyright (c) 2004-2021 All Rights Reserved.
  *

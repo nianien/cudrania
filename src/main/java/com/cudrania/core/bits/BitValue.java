@@ -6,7 +6,7 @@ import com.cudrania.core.utils.StringUtils;
 /**
  * 将整型或者二进制字符串转换成bit数组进行操作的对象
  *
- * @author: skyfalling
+ * @author skyfalling
  */
 public class BitValue {
     private long value;
@@ -17,7 +17,7 @@ public class BitValue {
     /**
      * 构造方法
      *
-     * @param value 指定bit数组对应的Long整型值,value>=0
+     * @param value 指定bit数组对应的Long整型值,value&gt;=0
      */
     public BitValue(long value) {
         this.setValue(value);
@@ -114,7 +114,7 @@ public class BitValue {
     }
 
     /**
-     * 获取bit数组的二进制表示<br/>
+     * 获取bit数组的二进制表示<p>
      *
      * @return
      */

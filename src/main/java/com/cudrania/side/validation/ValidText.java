@@ -1,27 +1,22 @@
 package com.cudrania.side.validation;
 
-import com.cudrania.side.validation.ValidText.StringValidator;
 import com.cudrania.core.utils.StringUtils;
-
-import java.lang.annotation.Documented;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.lang.reflect.Array;
+import com.cudrania.side.validation.ValidText.StringValidator;
 
 import javax.validation.Constraint;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.lang.reflect.Array;
 
-import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * 校验字符串以及元素类型为字符串的集合或数组<br/>
+ * 校验字符串以及元素类型为字符串的集合或数组<p>
  * 对于非集合或数组对象,则校验{@link Object#toString()}
  *
  * @author skyfalling

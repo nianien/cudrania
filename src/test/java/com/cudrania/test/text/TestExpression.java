@@ -2,7 +2,7 @@ package com.cudrania.test.text;
 
 import com.cudrania.core.collection.wrapper.MapWrapper;
 import com.cudrania.core.text.Expression;
-
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -86,22 +86,25 @@ public class TestExpression {
     }
 
     @Test
-    public void test1() throws Exception {
-        Expression expression = new Expression("${", "}");
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("x", "${a}");
-        map.put("a", "[${b}]-[${c}]");
-        map.put("b", "${d}+${c}");
-        map.put("c", "${d}-${equal}");
-        map.put("d", "${a}");
-        map.put("e", "${a}");
-        Map testMap = new HashMap();
-        for (String key : map.keySet()) {
-            String value = map.get(key);
-            testMap.put(key, expression.eval(value, map));
-        }
-        System.out.println(testMap);
-        System.out.println(map);
+    public void test1() {
+        Assertions.assertThrowsExactly(IllegalArgumentException.class, () -> {
+            Expression expression = new Expression("${", "}");
+            Map<String, String> map = new HashMap<String, String>();
+            map.put("x", "${a}");
+            map.put("a", "[${b}]-[${c}]");
+            map.put("b", "${d}+${c}");
+            map.put("c", "${d}-${equal}");
+            map.put("d", "${a}");
+            map.put("e", "${a}");
+            Map testMap = new HashMap();
+            for (String key : map.keySet()) {
+                String value = map.get(key);
+                testMap.put(key, expression.eval(value, map));
+            }
+            System.out.println(map);
+            System.out.println(testMap);
+        });
+
     }
 
 

@@ -25,7 +25,7 @@ public @interface SqlScripts {
 
 
     /**
-     * 是否追加SQL,默认不追加<br/>
+     * 是否追加SQL,默认不追加<p>
      *
      * @return true表示加载继承以及当前SQL列表, false则仅加载当前SQL列表
      */

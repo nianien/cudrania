@@ -110,7 +110,7 @@ public class MultiBitSet {
     }
 
     /**
-     * 获取当前容量,size=2^n,使得n满足2^(n-1)<length<2^n
+     * 获取当前容量,size=2^n,使得n满足2^(n-1)&lt;length&lt;2^n
      *
      * @return
      */

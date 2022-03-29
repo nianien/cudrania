@@ -1,9 +1,10 @@
 package com.cudrania.core.collection.set;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * 当元素类型为String类型时,不区分大小写,但仍保持原有数据不变<br/>
+ * 当元素类型为String类型时,不区分大小写,但仍保持原有数据不变<p>
  *
  * @author skyfalling
  */

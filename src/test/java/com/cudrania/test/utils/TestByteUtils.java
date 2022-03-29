@@ -10,7 +10,9 @@ public class TestByteUtils {
 
     @Test
     public void test() {
-        assert ByteUtils.byte2Hex("中国".getBytes()).equals("d6d0b9fa");
-        assert new String(ByteUtils.hex2Byte("D6D0B9FA".toUpperCase())).equals("中国");
+        String hex = ByteUtils.byte2Hex("中国".getBytes());
+        System.out.println(hex);
+        assert hex.equals("e4b8ade59bbd");
+        assert new String(ByteUtils.hex2Byte(hex.toUpperCase())).equals("中国");
     }
 }

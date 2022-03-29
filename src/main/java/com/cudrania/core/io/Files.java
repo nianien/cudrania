@@ -3,20 +3,7 @@ package com.cudrania.core.io;
 import com.cudrania.core.exception.ExceptionChecker;
 import com.cudrania.core.utils.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import java.io.*;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -46,7 +33,7 @@ public class Files {
 
 
     /**
-     * 将源文件src移动至目标文件dest所表示的路径<br/>
+     * 将源文件src移动至目标文件dest所表示的路径<p>
      * 这里dest对应文件为移动后的路径,如果目标路径存在,则会被覆盖
      *
      * @param src
@@ -65,7 +52,7 @@ public class Files {
     }
 
     /**
-     * 复制源文件src文件至目标我呢就dest所表示的路径,支持目录拷贝<br/>
+     * 复制源文件src文件至目标我呢就dest所表示的路径,支持目录拷贝<p>
      * 这里dest对应文件为复制后的路径,如果目标路径存在,则会被覆盖
      *
      * @param src
@@ -118,7 +105,7 @@ public class Files {
     }
 
     /**
-     * 删除指定文件,支持目录操作<br/>
+     * 删除指定文件,支持目录操作<p>
      * 如果指定路径为文件夹,则递归删除子文件夹及其内容
      *
      * @param file
@@ -572,7 +559,7 @@ public class Files {
     }
 
     /**
-     * 创建指定路径所表示的目录<br/>
+     * 创建指定路径所表示的目录<p>
      * 如果路径指向已存在的非目录文件,则删除该文件并创建目录
      *
      * @param path
@@ -588,7 +575,7 @@ public class Files {
     }
 
     /**
-     * 创建并返回指定文件所在的目录文件<br/>
+     * 创建并返回指定文件所在的目录文件<p>
      *
      * @param file
      * @return 文件对象
@@ -639,7 +626,7 @@ public class Files {
 
 
     /**
-     * 获取路径所在的目录<br/>
+     * 获取路径所在的目录<p>
      * 如果路径本身代表目录,则返回路径本身,否则路径所在目录
      *
      * @param path
@@ -656,7 +643,7 @@ public class Files {
     }
 
     /**
-     * 多个路径组合构建文件对象<br/>
+     * 多个路径组合构建文件对象<p>
      *
      * @param paths
      * @return 组合路径所表示的文件对象. 如果给定路径集合为空,则返回null

@@ -85,7 +85,7 @@ public class Fn {
 
 
     /**
-     * 指定lambda实例，示例: <code>Fn.of(Map&lt;String, String>::put);</code>
+     * 指定lambda实例，示例: <code>Fn.of(Map&lt;String, String&gt;::put);</code>
      */
     public static <P1, P2, P3, R> TriFunction<P1, P2, P3, R> of(TriFunction<P1, P2, P3, R> lambda) {
         return lambda;
@@ -361,7 +361,7 @@ public class Fn {
      * @return
      */
     @SneakyThrows
-    private static SerializedLambda lambda(Serializable lambda) {
+    public static SerializedLambda lambda(Serializable lambda) {
         return cache.computeIfAbsent(lambda, k -> lambda0(k));
     }
 

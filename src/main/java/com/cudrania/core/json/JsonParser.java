@@ -44,7 +44,7 @@ public class JsonParser {
      * 3) 允许数字含有前导符0<br>
      * 4) 允许有不存在的属性<br>
      * 5) 支持以下日期格式:<br>
-     * "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM-dd", "MM-dd","HH:mm:ss", "HH:mm"<br/>
+     * "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM-dd", "MM-dd","HH:mm:ss", "HH:mm"<p>
      */
     public JsonParser() {
         objectMapper = new ObjectMapper()
@@ -105,8 +105,8 @@ public class JsonParser {
      * json转T对象
      * <pre>
      *     String json="{\"key\":[1,2,3]}";
-     *     TypeReference ref = new TypeReference<Map<String,String[]>>() { };
-     *     Map<String,String[]> map=toBean(json,ref)
+     *     TypeReference ref = new TypeReference&lt;Map&lt;String,String[]&gt;&gt;() {};
+     *     Map&lt;String,String[]&gt; map=toBean(json,ref)
      * </pre>
      *
      * @param json
@@ -120,12 +120,12 @@ public class JsonParser {
 
     /**
      * json转Object对象, 根据json字符串的结构自动调整为对应的数据类型, 具体对应关系如下：<br>
-     * 1)字符串->String类型<br>
-     * 2)整数->int类型<br>
-     * 3)长整数->long类型<br>
-     * 4)实数->double类型 <br>
-     * 5)键值对->(LinkedHash)Map类型<br>
-     * 6)数组->(Array)List类型<br>
+     * 1)字符串-&gt;String类型<br>
+     * 2)整数-&gt;int类型<br>
+     * 3)长整数-&gt;long类型<br>
+     * 4)实数-&gt;double类型 <br>
+     * 5)键值对-&gt;(LinkedHash)Map类型<br>
+     * 6)数组-&gt;(Array)List类型<br>
      *
      * @param json
      * @return
@@ -169,7 +169,7 @@ public class JsonParser {
     }
 
     /**
-     * json转List&lt;T>对象
+     * json转List&lt;T&gt;对象
      *
      * @param <T>
      * @param json
@@ -187,7 +187,7 @@ public class JsonParser {
     }
 
     /**
-     * json转Map&lt;K,V>对象
+     * json转Map&lt;K,V&gt;对象
      *
      * @param json
      * @param keyType

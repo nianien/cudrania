@@ -33,7 +33,7 @@ public class TableHelper {
 
     /**
      * 根据getter/setter(或isXXX)方法获取数据库表中字段名称<br>
-     * 优先级: @Column>@Property>getter
+     * 优先级: @Column &gt; @Property &gt; getter
      *
      * @param beanProperty
      * @return Column

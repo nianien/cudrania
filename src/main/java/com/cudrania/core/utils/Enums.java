@@ -14,7 +14,7 @@ public class Enums {
 
 
     /**
-     * 返回名称为name的枚举值<br/>
+     * 返回名称为name的枚举值<p>
      * 如果不存在则返回默认值defaultEnum
      *
      * @param enumClass  枚举类
@@ -29,7 +29,7 @@ public class Enums {
     }
 
     /**
-     * 返回名称为name的枚举值<br/>
+     * 返回名称为name的枚举值<p>
      * 如果不存在则返回null
      *
      * @param enumClass  枚举类
@@ -49,7 +49,7 @@ public class Enums {
 
 
     /**
-     * 返回"value"字段值为value的枚举值<br/>
+     * 返回"value"字段值为value的枚举值<p>
      * 如果不存在则返回默认值defaultEnum
      *
      * @param enumClass  枚举类
@@ -63,7 +63,7 @@ public class Enums {
     }
 
     /**
-     * 返回"value"字段值为value的枚举值<br/>
+     * 返回"value"字段值为value的枚举值<p>
      * 如果不存在则返回null
      *
      * @param enumClass  枚举类
@@ -76,7 +76,7 @@ public class Enums {
     }
 
     /**
-     * 根据字段值返回相应的枚举对象<br/>
+     * 根据字段值返回相应的枚举对象<p>
      * 如果不存在则返回默认值defaultEnum
      *
      * @param enumClass  枚举类
@@ -91,7 +91,7 @@ public class Enums {
     }
 
     /**
-     * 根据字段值返回相应的枚举对象<br/>
+     * 根据字段值返回相应的枚举对象<p>
      * 如果没有对应的字段或字段值返回null
      *
      * @param enumClass  枚举类
@@ -140,7 +140,7 @@ public class Enums {
     }
 
     /**
-     * 取枚举对象除exclude和others之外的实例<br/>
+     * 取枚举对象除exclude和others之外的实例<p>
      * 该方法等价于
      * <pre>
      * <code>List list=Arrays.asList(others);

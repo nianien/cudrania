@@ -5,19 +5,18 @@ import com.cudrania.core.functions.Fn.*;
 
 
 /**
- * 构建Fluent API的Function工具<br/>
+ * 构建Fluent API的Function工具<p>
  * <p>
  * <ul>
  * <li>
- * 执行函数，并持有函数执行结果<br/>
+ * 执行函数，并持有函数执行结果<p>
  * {@link Fluent#apply(Function)}
  * </li>
  * <li>
- * 执行函数，并忽略函数执行结果（持有对象不变）<br/>
+ * 执行函数，并忽略函数执行结果（持有对象不变）<p>
  * {@link Fluent#accept(Consumer)}
  * </li>
  * </ul>
- * </p>
  *
  * @param <T> 输出参数类型
  * @author scorpio
@@ -79,7 +78,7 @@ public class Fluent<T> {
     /**
      * 如参数{@link Param#get()}返回结果有值,则调用函数并绑定返回结果
      *
-     * @param <P>      参数类型&函数第二个参数类型
+     * @param <P>      函数第二个参数类型
      * @param function 函数表达式
      * @param param    条件参数
      * @return
@@ -131,7 +130,7 @@ public class Fluent<T> {
     /**
      * 如参数{@link Param#get()}返回结果有值,则执行函数
      *
-     * @param <P>      参数类型&函数第二个参数类型
+     * @param <P>      函数第二个参数类型
      * @param consumer 函数表达式
      * @param param    条件参数
      * @return

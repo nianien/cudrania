@@ -1,18 +1,14 @@
 package com.cudrania.core.tree;
 
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * 构造树的工具类<p/>
+ * 构造树的工具类<p>
  * 树结构采用孩子兄弟链表表示法
  *
  * @author skyfalling
@@ -20,7 +16,7 @@ import java.util.function.Predicate;
 public class TreeBuilder {
 
     /**
-     * 构建树形结构<br/>
+     * 构建树形结构<p>
      *
      * @param list         节点数据列表,数据节点需要有唯一标识和父节点标识
      * @param idGenerator  获取当前节点标识的函数
@@ -49,7 +45,7 @@ public class TreeBuilder {
 
 
     /**
-     * 构建树形结构<br/>
+     * 构建树形结构<p>
      *
      * @param relation    父子关系图,key表示当前节点数据,value表示父节点数据,数据节点需要有唯一标识
      * @param idGenerator 获取当前节点标识的函数

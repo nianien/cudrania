@@ -3,7 +3,7 @@ package com.cudrania.core.tree;
 import java.util.Objects;
 
 /**
- * 树形结构节点定义<br/>
+ * 树形结构节点定义<p>
  * 采用孩子兄弟链表表示法
  *
  * @param <T>

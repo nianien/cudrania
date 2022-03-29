@@ -6,17 +6,18 @@ import com.cudrania.core.pipeline.Pipelines;
 import com.cudrania.test.bean.Account;
 import com.cudrania.test.bean.Home;
 import com.cudrania.test.bean.User;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class PipeLineTest {
 
 
-    public static void main(String[] args) {
-
+    @Test
+    public void test() {
 
         AllAbilities allAbilities = new AllAbilities();
-
         Pipeline3<Long, String, String, Home> pipeline = Pipelines
-//                .of(Long.TYPE, String.class, String.class)
+                // .of(Long.TYPE, String.class, String.class)
                 .of(Inputs::input1, Inputs::input2, Inputs::input3)
                 .with(Inputs::input1, Inputs::input2)
                 .and(allAbilities::createAccount)
@@ -30,10 +31,11 @@ public class PipeLineTest {
                 .with(Inputs::input3, Outputs::user1, Outputs::user2)
                 .and(allAbilities::createHome)
                 .end();
-
         Home home = pipeline.eval(1000001L, "jack.wang", "china.beijing");
         System.out.println(home);
-
+        Assertions.assertEquals(home.getClass(), Home.class);
+        Assertions.assertEquals(home.getAddress(), "address:china.beijing");
+        Assertions.assertEquals(home.getUsers().size(), 2);
 
     }
 

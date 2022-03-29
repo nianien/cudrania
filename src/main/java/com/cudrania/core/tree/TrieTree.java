@@ -36,7 +36,6 @@ public class TrieTree {
      * 插入数据
      *
      * @param data
-     * @return
      */
     public void insert(String data) {
         TreeNode firstChild = root.firstChild();

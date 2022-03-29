@@ -7,22 +7,18 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import java.util.LinkedHashMap;
 
 /**
- * 可配置的请求映射处理类，满足以下功能：<br/>
+ * 可配置的请求映射处理类，满足以下功能：<p>
  * <ul>
  * <li>
- * 支持{@link org.springframework.web.bind.annotation.RequestMapping}注解和类自动映射，RequestMapping配置优先级高于类映射；<br/>
+ * 支持{@link org.springframework.web.bind.annotation.RequestMapping}注解和类自动映射，RequestMapping配置优先级高于类映射；<p>
  * 当未使用{@link org.springframework.web.bind.annotation.RequestMapping}注解或者未指定映射路径时，则采用类映射
  * <li>采用正则表达式配置类映射规则，见方法{@link #setClassPattern(String)}和{@link #setClassReplacement(String)}</li>
  * <li>采用正则表达式配置包路径映射，见方法{@link #setPackagePattern(String)}和{@link #setPackageReplacement(String)}</li>
  * <li>配置默认{@link RequestMethod}请求方法列表，见方法{@link #setDefaultRequestMethods(String[])}</li>
  * <li>配置{@link RequestMethod}请求方法映射，见方法{@link #setRequestMethodMapping(java.util.LinkedHashMap)}</li>
- * </li>
  * </ul>
- * <pre>
- *      <code>假设存在类com.abc.controller.xyz.XxxController，在未配置{@link org.springframework.web.bind.annotation.RequestMapping}注解的情况下，则默认取Xxx作为映射路径
- *      此时如果配置packagePattern="^com.abc.controller.?"，packageReplacement="/api"，则映射路径为/api/xyz/Xxx<br/>
- *      </code>
- *  </pre>
+ * 假设存在类<code>com.abc.controller.xyz.XxxController</code>，在未配置{@link org.springframework.web.bind.annotation.RequestMapping}注解的情况下，则默认取Xxx作为映射路径<p>
+ * 此时如果配置<code>packagePattern="^com.abc.controller.?"，packageReplacement="/api"</code>，则映射路径为<code>/api/xyz/Xxx</code>
  *
  * @author skyfalling
  */
@@ -102,7 +98,7 @@ public class RequestMappingConfiguration {
     }
 
     /**
-     * 设置匹配类名的替换表达式,默认值"$1"<br/>
+     * 设置匹配类名的替换表达式,默认值"$1"<p>
      * 如果类上标准的{@link RequestMapping#path()}为绝对路径,则不加前缀
      *
      * @param classReplacement

@@ -231,7 +231,7 @@ public class RegexUtils {
 
 
     /**
-     * 调用{@link Function}&lt;{@link String},{@link String}>处理字符串source成功匹配正则式regex的部分, 将使用返回结果进行替换<br>
+     * 调用{@link Function}&lt;{@link String},{@link String}&gt;处理字符串source成功匹配正则式regex的部分, 将使用返回结果进行替换<br>
      *
      * @param source
      * @param regex

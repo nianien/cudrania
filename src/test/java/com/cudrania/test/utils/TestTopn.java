@@ -1,21 +1,20 @@
 package com.cudrania.test.utils;
 
-import java.io.File;
+import com.cudrania.algorithm.PriorityHeap;
+import com.cudrania.core.io.Files;
+import com.cudrania.core.loader.ResourceLoader;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
-import com.cudrania.core.io.Files;
-import com.cudrania.algorithm.PriorityHeap;
 
 public class TestTopn {
 
     @Test
     public void test() throws IOException {
-        List<String> list = Files.readLines(new File("all200000.txt"));
-        PriorityHeap<String> heap = new PriorityHeap<String>(list.size());
+        List<String> list = Files.readLines(ResourceLoader.getFile("all200000.txt"));
+        PriorityHeap<String> heap = PriorityHeap.of(list.size(), String.class);
 
         for (String s : list) {
             heap.add(s);

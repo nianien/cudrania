@@ -196,7 +196,8 @@ public class TestCustomSerializer {
     }
 
 
-    public static void main(String[] args) throws IOException {
+    @Test
+    public void testView() throws IOException {
         Account account = new Account();
         account.setId(1001);
         account.setUserName("jack-wang");

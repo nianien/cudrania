@@ -10,7 +10,7 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 /**
- * {@link java.util.logging.Logger}对象的工厂类,修改{@link LogManager}对象读取日志配置文件的顺序<br/>
+ * {@link java.util.logging.Logger}对象的工厂类,修改{@link LogManager}对象读取日志配置文件的顺序<p>
  * <ol>
  * <li>系统属性(system property):java.util.logging.config.file</li>
  * <li>当前路径下的log.properties文件</li>

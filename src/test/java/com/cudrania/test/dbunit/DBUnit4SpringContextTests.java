@@ -16,7 +16,7 @@
 //import java.util.List;
 //
 ///**
-// * 数据库操作的UT套件,支持自动加载SQL脚本<br/>
+// * 数据库操作的UT套件,支持自动加载SQL脚本<p>
 // * 示例:
 // * <pre>
 // * <code>&nbsp;@SqlScripts(value = {"schema.sql","default.sql"})
