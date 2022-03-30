@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 条件与
  *
- * @author liyifei <liyifei@kuaishou.com>
+ * @author liyifei
  */
 @NoArgsConstructor
 public class AndNode extends TypeNode implements RuleNode {

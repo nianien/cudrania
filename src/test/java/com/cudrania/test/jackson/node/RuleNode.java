@@ -3,7 +3,7 @@ package com.cudrania.test.jackson.node;
 /**
  * 条件节点定义
  *
- * @author liyifei <liyifei@kuaishou.com>
+ * @author liyifei
  */
 
 public interface RuleNode extends JsonTypeInfoRuleNode  {

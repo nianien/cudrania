@@ -10,7 +10,7 @@ import java.util.function.Function;
 /**
  * 规则解析器，用于生成规则节点树
  *
- * @author liyifei <liyifei@kuaishou.com>
+ * @author liyifei
  */
 public class NodeParser {
     private static final int TOK_WORD = 2;

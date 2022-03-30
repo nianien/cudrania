@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 /**
  * 表达式规则
  *
- * @author liyifei <liyifei@kuaishou.com>
+ * @author liyifei
  */
 @Getter
 @NoArgsConstructor

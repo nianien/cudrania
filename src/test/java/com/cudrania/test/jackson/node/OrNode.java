@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * 条件或
  *
- * @author liyifei <liyifei@kuaishou.com>
+ * @author liyifei
  */
 @NoArgsConstructor
 public class OrNode extends TypeNode implements RuleNode {

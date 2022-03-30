@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonAppend.Prop;
 /**
  * 条件节点定义
  *
- * @author liyifei <liyifei@kuaishou.com>
+ * @author liyifei
  */
 @JsonAppend(prepend = true,
         props = {

@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 /**
  * 条件取反
  *
- * @author liyifei <liyifei@kuaishou.com>
+ * @author liyifei
  */
 @NoArgsConstructor
 public class NotNode extends TypeNode  implements RuleNode {

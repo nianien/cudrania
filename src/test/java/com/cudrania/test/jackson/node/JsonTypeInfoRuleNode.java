@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 /**
  * 条件节点定义
  *
- * @author liyifei <liyifei@kuaishou.com>
+ * @author liyifei
  */
 @JsonTypeInfo(use = Id.CUSTOM, property = "type")
 @JsonTypeIdResolver(MyTypeIdResolver.class)
