@@ -2,8 +2,8 @@ package com.cudrania.core.functions;
 
 
 import com.cudrania.core.arrays.ArrayUtils;
+import com.cudrania.core.collection.CollectionUtils;
 import com.cudrania.core.utils.StringUtils;
-import org.apache.commons.collections.CollectionUtils;
 
 import java.util.Collection;
 import java.util.Map;
