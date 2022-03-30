@@ -1,10 +1,10 @@
 package com.cudrania.jdbc.datasource;
 
 
+import com.cudrania.core.reflection.Reflections;
 import com.cudrania.core.utils.StringUtils;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import org.apache.commons.beanutils.BeanUtils;
 
 import javax.sql.DataSource;
 import java.util.*;
@@ -32,10 +32,10 @@ import java.util.function.Predicate;
  *             characterEncoding: UTF8
  *             zeroDateTimeBehavior: round
  *             autoReconnect: true
- *         naudit:
+ *         audit:
  *           username: root
  *           password: root
- *           jdbc-url: jdbc:mysql://127.0.0.01:3306/naudit?autoReconnect=true
+ *           jdbc-url: jdbc:mysql://127.0.0.01:3306/audit?autoReconnect=true
  * </pre>
  *
  * @author scorpio
@@ -95,7 +95,7 @@ public class DataSourceBuilder {
             throw new IllegalArgumentException("datasource type is required!");
         }
         DataSource dataSource = dsClass.getDeclaredConstructor().newInstance();
-        BeanUtils.populate(dataSource, config);
+        Reflections.populate(dataSource, config);
         return dataSource;
     }
 

@@ -1,8 +1,8 @@
 package com.cudrania.core.collection;
 
 import com.cudrania.core.arrays.ArrayUtils;
+import com.cudrania.core.reflection.Reflections;
 import lombok.SneakyThrows;
-import org.apache.commons.beanutils.BeanUtils;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -338,7 +338,10 @@ public class CollectionUtils {
      */
     @SneakyThrows
     private static Object getProperty(Object obj, String property) {
-        return BeanUtils.getProperty(obj, property);
+        if (obj instanceof Map) {
+            return ((Map<?, ?>) obj).get(property);
+        }
+        return Reflections.beanProperty(obj.getClass(), property).getValue(obj);
     }
 
 }

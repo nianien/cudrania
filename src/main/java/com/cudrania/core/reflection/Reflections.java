@@ -290,19 +290,25 @@ public class Reflections {
      * @param from
      * @param to
      */
-    public static void copyProperties(Object to, Object from) {
+    public static void populate(Object to, Object from) {
         Map<String, BeanProperty> setters = CollectionUtils.map(beanProperties(to.getClass()), BeanProperty::getAlias);
-        Map<String, BeanProperty> getters = CollectionUtils.map(beanProperties(from.getClass()), BeanProperty::getAlias);
-
+        Map<String, ?> getters = from instanceof Map ? (Map<String, Object>) from : CollectionUtils.map(beanProperties(from.getClass()), BeanProperty::getAlias);
         setters.forEach(
                 (n, setter) -> {
                     try {
-                        BeanProperty getter = getters.get(n);
                         // 调用setter方法赋值
-                        if (getter != null
-                                && getter.getGetter() != null
-                                && setter.getSetter().getParameterTypes()[0].isAssignableFrom(getter.getGetter().getReturnType())) {
-                            setter.setValue(to, getter.getValue(from));
+                        Object value = getters.get(n);
+                        if (value instanceof BeanProperty) {
+                            BeanProperty property = (BeanProperty) value;
+                            Method getter = ((BeanProperty) value).getGetter();
+                            if (getter != null && setter.getSetter().getParameterTypes()[0].isAssignableFrom(getter.getReturnType())) {
+                                value = property.getValue(from);
+                            } else {
+                                value = null;
+                            }
+                        }
+                        if (value != null) {
+                            setter.setValue(to, value);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

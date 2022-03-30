@@ -1,14 +1,13 @@
 package com.cudrania.test.reflect;
 
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.Test;
-
 import com.cudrania.core.reflection.Reflections;
 import com.cudrania.test.bean.Home;
 import com.cudrania.test.bean.User;
+import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 public class TestReflect {
 
@@ -51,7 +50,7 @@ public class TestReflect {
         h.setAddress("aaa");
         h.setUsers(null);
         Home b = new Home();
-        Reflections.copyProperties(b, h);
+        Reflections.populate(b, h);
         System.out.println(b.getAddress());
 
         Class clazz = Integer.class;
