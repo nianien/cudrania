@@ -187,13 +187,12 @@ public class Calculator {
         while (!os.isEmpty()) {
             Operator op = os.pop();
             if (op == Operator.PAREN_OPEN || op == Operator.PAREN_CLOSE) {
-                throw new IllegalArgumentException("unmatched parentheses!");
+                throw new IllegalArgumentException("Unmatched parenthesis");
             }
-            double e = doOperate(op, es);
-            es.push(e);
+            es.push(doOperate(op, es));
         }
         if (es.isEmpty()) {
-            throw new IllegalArgumentException("illegal expression!");
+            throw new IllegalArgumentException("Missing final operand");
         } else {
             return es.pop();
         }
