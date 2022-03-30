@@ -1,19 +1,11 @@
 package com.cudrania.test.utils;
 
-import com.cudrania.core.collection.map.CounterMap;
 import com.cudrania.algorithm.ConsistentHash;
-
-import org.apache.commons.collections.MultiMap;
-import org.apache.commons.collections.map.MultiValueMap;
+import com.cudrania.core.collection.map.CounterMap;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Random;
 
 public class TestConsistentHash {
 
@@ -38,13 +30,13 @@ public class TestConsistentHash {
     public void testHit() {
         List<String> keys = new ArrayList<String>(Arrays.asList("a", "b", "c", "d", "e"));
         Collection<String> data = new HashSet(getAllData(100000));
-        MultiMap multiMap = new MultiValueMap();
+        Map<String, List<String>> multiMap = new HashMap<>();
         test(data, keys, multiMap);
         keys.remove("2");
         test(data, keys, multiMap);
         int n = 0;
         for (Object key : multiMap.keySet()) {
-            List list = (List) multiMap.get(key);
+            List list = multiMap.get(key);
             if (list.size() > 1 && list.get(0).equals(list.get(1))) {
                 n++;
             }/* else {
@@ -55,15 +47,16 @@ public class TestConsistentHash {
     }
 
 
-    private static void test(Collection<String> list, List<String> keys, MultiMap multiMap) {
+    private static void test(Collection<String> list, List<String> keys, Map<String, List<String>> multiMap) {
         CounterMap<String> counterMap = new CounterMap<String>();
         ConsistentHash<String> hash = new ConsistentHash<>(keys);
         for (String data : list) {
             //判断data在哪个节点上, target is one of keys
             String target = hash.getTarget(data);
             counterMap.increase(target);
-            if (multiMap != null)
-                multiMap.put(data, target);
+            if (multiMap != null) {
+                multiMap.computeIfAbsent(data, k -> new ArrayList<>()).add(target);
+            }
         }
         System.out.println("\nkeys count : " + keys.size() + ", list count : "
                 + list.size() + ", Normal percent : " + (float) 100

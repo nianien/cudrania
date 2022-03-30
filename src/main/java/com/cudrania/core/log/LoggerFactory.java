@@ -22,6 +22,7 @@ import java.util.logging.Logger;
  */
 public class LoggerFactory {
     static {
+        //jul默认支持的属性配置
         if (System.getProperty("java.util.logging.config.file") == null) {
             load("logging.properties");
         }

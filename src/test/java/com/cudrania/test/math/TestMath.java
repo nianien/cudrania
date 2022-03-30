@@ -1,19 +1,23 @@
 package com.cudrania.test.math;
 
-import com.cudrania.algorithm.Calculator;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
-import org.junit.jupiter.api.Test;
+import static com.cudrania.algorithm.Calculator.calculate;
 
 
 public class TestMath {
 
-    @Test
-    public void test() {
-        String a = "(2^1^4)+(2^1)^4";
-        System.out.println(Calculator.calculate("-0-(-1)"));
-        System.out.println(Calculator.calculate(a));
-        System.out.println(Calculator.calculate("(2+3/(1.0*2))-2"));
-
+    @ParameterizedTest
+    @CsvSource({
+            "-0-(-1),1",
+            "2**1**4+(2**1)**4,18",
+            "(2^1^4)+(2^1)^4,14",
+            "(2+3/(1.0*2))-2,1.5",
+    })
+    public void test(String expr, double res) {
+        Assertions.assertEquals(res, calculate(expr));
     }
 
 }

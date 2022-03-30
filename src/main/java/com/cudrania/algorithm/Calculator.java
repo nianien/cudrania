@@ -1,227 +1,360 @@
 package com.cudrania.algorithm;
 
+
+import java.util.ArrayList;
+import java.util.EmptyStackException;
+import java.util.List;
 import java.util.Stack;
+import java.util.function.Function;
 
 /**
- * 计算数学表达式的工具类, 支持的运算符：'+'、'-'、'*'、'/'、'^'、'('、')'<br>
- * 另参见: {@link Calculator.Operator}
+ * 计算数学表达式的工具类,支持的操作符
+ * <ul>
+ * <li>UNARY_MINUS</li>
+ * <li>UNARY_BITWISE_NOT</li>
+ * <li>PLUS</li>
+ * <li>MINUS</li>
+ * <li>MULTIPLY</li>
+ * <li>POWER</li>
+ * <li>REMAINDER</li>
+ * <li>DIVIDE</li>
+ * <li>BITWISE_OR</li>
+ * <li>BITWISE_AND</li>
+ * <li>BITWISE_XOR</li>
+ * <li>SHL</li>
+ * <li>SHR</li>
+ * </ul>
  *
  * @author skyfalling
  */
 public class Calculator {
+    private static final int TOK_WORD = 2;
+    private static final int TOK_OP = 4;
+    private static final int TOK_OPEN = 8;
+    private static final int TOK_CLOSE = 16;
+
 
     /**
-     * 计算数学表达式<br>
-     *
-     * @param expression
+     * @param expression 操作数
      * @return
      */
     public static double calculate(String expression) {
-        // 表达式去正负号
-        expression = expression.replaceAll("(^|\\()(\\+|\\-)", "$1" + 0 + "$2");
-        // 存储运算数的栈
-        Stack<Double> stackOfVariable = new Stack<Double>();
-        // 存储运算符的栈
-        Stack<Operator> stackOfOperator = new Stack<Operator>();
-        // 存储临时变量结果
-        StringBuilder sb = new StringBuilder();
-        // 扫描数学表达式
-        for (char ch : expression.toCharArray()) {
-            if (Operator.isOperator(ch)) {
-                // 遇到运算符时, 操作数入栈
-                if (sb.length() > 0) {
-                    stackOfVariable.push(Double.parseDouble(sb.toString()));
-                    sb.setLength(0);
-                }
-                // 当前操作符
-                Operator current = Operator.valueOf(ch);
-                // 与栈顶操作符的优先级比较
-                int priority = -1;
-                // 如果栈内操作符优先级高, 则优先计算栈内操作
-                while (!stackOfOperator.isEmpty()
-                        && (priority = stackOfOperator.peek().precede(current)) > 0) {
-                    Operator last = stackOfOperator.pop();
-                    double var2 = stackOfVariable.pop();
-                    double var1 = stackOfVariable.pop();
-                    // 运算结果作为操作数入栈
-                    stackOfVariable.push(last.calculate(var1, var2));
-                }
-                if (priority == 0) {
-                    stackOfOperator.pop();
-                } else {
-                    stackOfOperator.push(current);
-                }
-            } else {
-                // 累计操作数
-                sb.append(ch);
-            }
-        }
-        // 最后的操作数入栈
-        if (sb.length() > 0) {
-            stackOfVariable.push(Double.parseDouble(sb.toString()));
-            sb.setLength(0);
-        }
-        // 栈中还有操作符, 则继续计算
-        while (!stackOfOperator.isEmpty()) {
-            Operator lop = stackOfOperator.pop();
-            double var2 = stackOfVariable.pop();
-            double var1 = stackOfVariable.pop();
-            stackOfVariable.push(lop.calculate(var1, var2));
-        }
-        // 返回计算结果
-        return stackOfVariable.pop();
+        return doParse(tokenize(expression), Double::parseDouble);
     }
 
+
     /**
-     * 判断数学表达式是否合法, 具体判断标准为: <br>
-     * 如果调用方法 {@link #calculate(String)}计算表达式不抛异常, 则视为合法
+     * 运算符字符
      *
-     * @param expression
+     * @param c
      * @return
      */
-    public static boolean isValid(String expression) {
-        try {
-            calculate(expression);
-            return true;
-        } catch (Exception e) {
-            return false;
+    private static boolean isOpChar(char c) {
+        return "+-*/%<>=!^&|,(){}[]".indexOf(c) != -1;
+    }
+
+    /**
+     * 解析表达式
+     *
+     * @param input
+     * @return
+     */
+    private static List<String> tokenize(String input) {
+        int pos = 0;
+        int expected = TOK_OPEN | TOK_WORD;
+        List<String> tokens = new ArrayList<>();
+        while (pos < input.length()) {
+            String tok = "";
+            char c = input.charAt(pos);
+            if (Character.isWhitespace(c)) {
+                pos++;
+                continue;
+            }
+            if (!isOpChar(c)) {
+                if ((expected & TOK_WORD) == 0) {
+                    throw new IllegalArgumentException("Unexpected identifier: " + (tok + c));
+                }
+                expected = TOK_OP | TOK_OPEN | TOK_CLOSE;
+                while (!isOpChar(c) && pos < input.length()) {
+                    tok = tok + input.charAt(pos);
+                    pos++;
+                    if (pos < input.length()) {
+                        c = input.charAt(pos);
+                    } else {
+                        c = 0;
+                    }
+                }
+            } else if (c == '(' || c == ')') {
+                tok = tok + c;
+                pos++;
+                if (c == '(' && (expected & TOK_OPEN) != 0) {
+                    expected = TOK_WORD | TOK_OPEN | TOK_CLOSE;
+                } else if (c == ')' && (expected & TOK_CLOSE) != 0) {
+                    expected = TOK_OP | TOK_CLOSE;
+                } else {
+                    throw new IllegalArgumentException("Parens mismatched:" + tok);
+                }
+            } else {
+                if ((expected & TOK_OP) == 0) {
+                    if (c != '-' && c != '!' && c != '~') {
+                        throw new IllegalArgumentException("Missing operand:" + (tok + c));
+                    }
+                    tok = tok + c;
+                    pos++;
+                } else {
+                    String lastOp = null;
+                    while (isOpChar(c) && !Character.isWhitespace(c) && c != '(' && c != ')' && pos < input.length()) {
+                        if (Operator.of(tok + input.charAt(pos)) != null) {
+                            tok = tok + input.charAt(pos);
+                            lastOp = tok;
+                        } else if (lastOp == null) {
+                            tok = tok + input.charAt(pos);
+                        } else {
+                            break;
+                        }
+                        pos++;
+                        if (pos < input.length()) {
+                            c = input.charAt(pos);
+                        } else {
+                            c = 0;
+                        }
+                    }
+                    if (lastOp == null) {
+                        throw new IllegalArgumentException("Bad operator:" + (tok + c));
+                    }
+                }
+                expected = TOK_WORD | TOK_OPEN;
+            }
+            tokens.add(tok);
+        }
+        return tokens;
+    }
+
+
+    /**
+     * 生成规则树
+     *
+     * @param tokens
+     * @param generator 节点生成器
+     * @return
+     */
+    private static double doParse(List<String> tokens, Function<String, Double> generator) {
+        // 变量栈
+        Stack<Double> es = new Stack<>();
+        // 操作符栈
+        Stack<Operator> os = new Stack<>();
+        // 扫描结果
+        for (int i = 0; i < tokens.size(); i++) {
+            String token = tokens.get(i);
+            Operator right = Operator.of(token);
+            //determine op is UNARY_MINUS or MINUS
+            if (right == Operator.UNARY_MINUS) {
+                if (i > 0) {
+                    Operator last = Operator.of(tokens.get(i - 1));
+                    //上一个token是操作数或者右括号
+                    if (last == null || last == Operator.PAREN_CLOSE) {
+                        right = Operator.MINUS;
+                    }
+                }
+            }
+            if (right != null) {
+                Operator left = os.isEmpty() ? null : os.peek();
+                //ordinal越小优先级越高
+                while (left != null && Operator.isPrecede(right, left) < 0) {
+                    es.push(doOperate(left, es));
+                    os.pop();
+                    left = os.isEmpty() ? null : os.peek();
+                }
+                //没有匹配的括号
+                if (left == null && right == Operator.PAREN_CLOSE) {
+                    throw new IllegalArgumentException("Unmatched parenthesis");
+                }
+                //匹配括号
+                if (left != null && Operator.isPrecede(right, left) == 0) {
+                    os.pop();
+                    continue;
+                }
+                //其他情况，操作符入栈
+                if (left == null || Operator.isPrecede(right, left) > 0) {
+                    os.push(right);
+                } else {
+                    os.pop();
+                }
+            } else {
+                es.push(generator.apply(token));
+            }
+        }
+        while (!os.isEmpty()) {
+            Operator op = os.pop();
+            if (op == Operator.PAREN_OPEN || op == Operator.PAREN_CLOSE) {
+                throw new IllegalArgumentException("unmatched parentheses!");
+            }
+            double e = doOperate(op, es);
+            es.push(e);
+        }
+        if (es.isEmpty()) {
+            throw new IllegalArgumentException("illegal expression!");
+        } else {
+            return es.pop();
         }
     }
 
     /**
-     * 运算操作符的枚举类型, 支持以下操作运算: '+'、'-'、'*'、'/'、'^'、'('、')'<br>
-     * 其中操作符'^'为左结合运算, 即a^b^c=a^(b^c)
+     * 节点运算
      *
-     * @author skyfalling
+     * @param op
+     * @param stack
+     * @return
      */
-    public enum Operator {
-        /**
-         * 加法"+"
-         */
-        Add('+', "+-)", "*/^(", "") {
-            @Override
-            public double calculate(double var1, double var2) {
-                return var1 + var2;
+    private static double doOperate(Operator op, Stack<Double> stack) {
+        try {
+            Double b = stack.pop();
+            Double a = null;
+            if (!op.isUnary()) {
+                a = stack.pop();
             }
-        },
-        /**
-         * 减法"-"
-         */
-        Sub('-', "+-)", "*/^(", "") {
-            @Override
-            public double calculate(double var1, double var2) {
-                return var1 - var2;
+            switch (op) {
+                case UNARY_MINUS:
+                    return -b;
+                case UNARY_BITWISE_NOT:
+                    return ~b.intValue();
+                case PLUS:
+                    return a + b;
+                case MINUS:
+                    return a - b;
+                case MULTIPLY:
+                    return a * b;
+                case POWER:
+                    return Math.pow(a, b);
+                case REMAINDER:
+                    return a % b;
+                case DIVIDE:
+                    return a / b;
+                case BITWISE_OR:
+                    return a.intValue() | b.intValue();
+                case BITWISE_AND:
+                    return a.intValue() & b.intValue();
+                case BITWISE_XOR:
+                    return a.intValue() ^ b.intValue();
+                case SHL:
+                    return a.intValue() << b.intValue();
+                case SHR:
+                    return a.intValue() >> b.intValue();
+                default:
+                    //Unsupported Operator
+                    throw new UnsupportedOperationException("Unsupported operator:" + op);
             }
-        },
-        /**
-         * 乘法"*"
-         */
-        Mul('*', "+-*/)", "^(", "") {
-            @Override
-            public double calculate(double var1, double var2) {
-                return var1 * var2;
-            }
-        },
-        /**
-         * 除法"/"
-         */
-        Div('/', "+-*/)", "^(", "") {
-            @Override
-            public double calculate(double var1, double var2) {
-                return var1 / var2;
-            }
-        },
-        /**
-         * 幂运算"^"
-         */
-        Pow('^', "+-*/)", "^(", "") {
-            @Override
-            public double calculate(double var1, double var2) {
-                return Math.pow(var1, var2);
-            }
-        },
-        /**
-         * 左括号"("
-         */
-        Lp('(', "", "+-*/^(", ")"),
-        /**
-         * 右括号")"
-         */
-        Rp(')', "+-*/^)", "", "");
-        /**
-         * 所有操作符
-         */
-        public final static String OPERATORS = "+-*/^()";
-        /**
-         * 运算操作符
-         */
-        public final char symbol;
-        public final String high;
-        public final String low;
-        public final String equal;
+        } catch (EmptyStackException e) {
+            throw new IllegalArgumentException("Missing operand:" + op);
+        }
+    }
+
+
+    /**
+     * 运算符枚举定义
+     *
+     * @author liyifei <liyifei@kuaishou.com>
+     */
+    enum Operator {
+        PAREN_OPEN("("),
+        UNARY_MINUS("-", 1, false),
+        UNARY_LOGICAL_NOT("!", 1, false),
+        UNARY_BITWISE_NOT("~", 1, false),
+
+        POWER("**", 2, false),
+        MULTIPLY("*"),
+        DIVIDE("/"),
+        REMAINDER("%"),
+
+        PLUS("+"),
+        MINUS("-"),
+
+        SHL("<<"),
+        SHR(">>"),
+
+        LT("<"),
+        LE("<="),
+        GT(">"),
+        GE(">="),
+        EQ("=="),
+        NE("!="),
+
+        BITWISE_AND("&"),
+        BITWISE_OR("|"),
+        BITWISE_XOR("^"),
+
+        LOGICAL_AND("&&"),
+        LOGICAL_OR("||"),
+
+        ASSIGN("=", 2, false),
+        COMMA(",", 2, false),
+        PAREN_CLOSE(")");
+
+        private final String expr;
+        private final int argCount;
+        private final boolean leftAssoc;
+
+        Operator(String expr) {
+            this(expr, 2, true);
+        }
+
+        Operator(String expr, int argCount, boolean leftAssoc) {
+            this.expr = expr;
+            this.argCount = argCount;
+            this.leftAssoc = leftAssoc;
+        }
+
+
+        public boolean isUnary() {
+            return argCount == 1;
+        }
+
 
         /**
-         * 构造方法, 指定运算符
+         * 比较运算符优先级
          *
-         * @param ch
+         * @param right
+         * @param left
+         * @return
          */
-        Operator(char ch, String low, String high, String equal) {
-            this.symbol = ch;
-            this.low = low;
-            this.high = high;
-            this.equal = equal;
+        public static int isPrecede(Operator right, Operator left) {
+            //左右括号匹配时，优先级相等，仅此一例
+            if (left == PAREN_OPEN && right == PAREN_CLOSE) {
+                return 0;
+            }
+            //优先计算最右边的"("
+            if (left == PAREN_OPEN) {
+                return 1;
+            }
+            //右括号")"优先级最低
+            if (right == PAREN_CLOSE) {
+                return -1;
+            }
+            //优先级相等判断计算方向
+            if (left == right) {
+                return left.leftAssoc ? -1 : 1;
+            }
+            return right.ordinal() < left.ordinal() ? 1 : -1;
+        }
+
+        @Override
+        public String toString() {
+            return expr;
         }
 
         /**
-         * 判断是否为以下操作符之一: '+'、'-'、'*'、'/'、'^'、'('、')'
+         * 获取对应操作符
          *
-         * @param ch
+         * @param expr
          * @return
          */
-        public static boolean isOperator(char ch) {
-            return OPERATORS.indexOf(ch) != -1;
-        }
-
-        /**
-         * 根据操作符获取相应的枚举类型, 支持的操作符包括: '+'、'-'、'*'、'/'、'^'、'('、')'
-         *
-         * @param ch
-         * @return
-         */
-        public static Operator valueOf(char ch) {
-            for (Operator operator : values()) {
-                if (operator.symbol == ch) {
-                    return operator;
+        public static Operator of(String expr) {
+            for (Operator op : values()) {
+                if (op.expr.equals(expr)) {
+                    return op;
                 }
             }
             return null;
-        }
-
-        /**
-         * 当前操作符与指定操作符比较优先级<br>
-         * 当前操作符为左操作符, 待比较操作符为右操作符, 比较方向从左向右<br>
-         *
-         * @param op
-         * @return 当前操作符优先级高于指定操作符则返回1, 相等则返回0, 小于则返回-1
-         */
-        public int precede(Operator op) {
-            if (low.indexOf(op.symbol) != -1) return 1;
-            if (high.indexOf(op.symbol) != -1) return -1;
-            if (equal.indexOf(op.symbol) != -1) return 0;
-            throw new IllegalArgumentException("cannot compare '"
-                    + this + "' to '" + op + "'");
-        }
-
-        /**
-         * 利用当前运算符计算操作数, 该方法对于{@link Calculator.Operator#Lp}和{@link
-         * Calculator.Operator#Rp} 无效
-         *
-         * @param var1
-         * @param var2
-         * @return
-         */
-        public double calculate(double var1, double var2) {
-            throw new IllegalArgumentException("operator: " + symbol + " not support calculate method!");
         }
     }
 }

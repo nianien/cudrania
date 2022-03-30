@@ -4,6 +4,7 @@ import com.cudrania.test.jackson.node.NodeWrapper;
 import com.cudrania.test.jackson.node.RuleNode;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.impl.BeanAsArraySerializer;
 import com.fasterxml.jackson.databind.ser.impl.ObjectIdWriter;
 import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase;
@@ -24,8 +25,8 @@ public class RuleNodeSerializer extends BeanSerializerBase {
         super(src, objectIdWriter, propertyFilterId);
     }
 
-    public RuleNodeSerializer(RuleNodeSerializer ruleNodeSerializer, Set<String> toIgnore) {
-        super(ruleNodeSerializer, toIgnore);
+    public RuleNodeSerializer(RuleNodeSerializer ruleNodeSerializer, Set<String> toIgnore, Set<String> toInclude) {
+        super(ruleNodeSerializer, toIgnore, toInclude);
     }
 
 
@@ -59,14 +60,20 @@ public class RuleNodeSerializer extends BeanSerializerBase {
     }
 
     @Override
+    protected BeanSerializerBase withProperties(BeanPropertyWriter[] beanPropertyWriters, BeanPropertyWriter[] beanPropertyWriters1) {
+        return null;
+    }
+
+    @Override
     public BeanSerializerBase withObjectIdWriter(ObjectIdWriter objectIdWriter) {
         return new RuleNodeSerializer(this, objectIdWriter, _propertyFilterId);
     }
 
 
     @Override
-    protected BeanSerializerBase withIgnorals(Set<String> toIgnore) {
-        return new RuleNodeSerializer(this, toIgnore);
+    protected BeanSerializerBase withByNameInclusion(Set<String> toIgnore,
+                                                     Set<String> toInclude) {
+        return new RuleNodeSerializer(this, toIgnore, toInclude);
     }
 
 
