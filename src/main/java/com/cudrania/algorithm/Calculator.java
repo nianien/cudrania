@@ -251,8 +251,6 @@ public class Calculator {
 
     /**
      * 运算符枚举定义
-     *
-     * @author liyifei <liyifei@kuaishou.com>
      */
     enum Operator {
         PAREN_OPEN("("),
