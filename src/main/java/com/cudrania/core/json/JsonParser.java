@@ -2,16 +2,20 @@ package com.cudrania.core.json;
 
 import com.cudrania.core.date.DateFormatter;
 import com.cudrania.core.exception.ExceptionChecker;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser.Feature;
+import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import lombok.SneakyThrows;
 
 import java.text.SimpleDateFormat;
@@ -47,19 +51,21 @@ public class JsonParser {
      * "yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM-dd", "MM-dd","HH:mm:ss", "HH:mm"<p>
      */
     public JsonParser() {
-        objectMapper = new ObjectMapper()
+        objectMapper = JsonMapper.builder()
                 //不序列化null值
-                .setSerializationInclusion(Include.NON_NULL)
+                .serializationInclusion(Include.NON_NULL)
+                // 允许数字含有前导0
+                .enable(JsonReadFeature.ALLOW_LEADING_ZEROS_FOR_NUMBERS).build()
                 // 允许字段名不用引号
                 .configure(Feature.ALLOW_UNQUOTED_FIELD_NAMES, true)
                 // 允许使用单引号
                 .configure(Feature.ALLOW_SINGLE_QUOTES, true)
-                // 允许数字含有前导0
-                .configure(Feature.ALLOW_NUMERIC_LEADING_ZEROS, true)
                 .configure(Feature.STRICT_DUPLICATE_DETECTION, true)
                 // 允许未知的属性
                 .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+                .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
+                //支持字段序列化
+                .setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
         this.setDatePatterns(new String[]{"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM-dd", "MM-dd HH:mm"});
     }
 
