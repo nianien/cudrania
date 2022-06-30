@@ -1,12 +1,8 @@
 package com.cudrania.core.json;
 
 import com.cudrania.core.date.DateFormatter;
-import com.cudrania.core.exception.ExceptionChecker;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
@@ -27,13 +23,6 @@ import java.util.*;
  * @author skyfalling
  */
 public class JsonParser {
-
-    /**
-     * 多态接口, 继承该接口的类,可以在序列化时加入类信息,使得反序列化时自动转换成对应类型
-     */
-    @JsonTypeInfo(use = Id.CLASS, include = As.PROPERTY)
-    interface Polymorphous {
-    }
 
     /**
      * 内置的ObjectMapper实例
@@ -96,12 +85,9 @@ public class JsonParser {
     public JsonParser setDatePatterns(final String[] datePatterns) {
         objectMapper.setDateFormat(new SimpleDateFormat(datePatterns[0]) {
             @Override
+            @SneakyThrows
             public Date parse(String source) {
-                try {
-                    return DateFormatter.parseDate(source, datePatterns);
-                } catch (Exception e) {
-                    throw new IllegalArgumentException("date [" + source + "] should comply with one the formats:" + Arrays.toString(datePatterns), e);
-                }
+                return DateFormatter.parseDate(source, datePatterns);
             }
         });
         return this;
@@ -148,12 +134,9 @@ public class JsonParser {
      * @param beanType
      * @return
      */
+    @SneakyThrows
     public <T> T toBean(String json, Class<T> beanType) {
-        try {
-            return readValue(json, objectMapper.getTypeFactory().constructType(beanType));
-        } catch (Exception e) {
-            throw ExceptionChecker.throwException(e);
-        }
+        return readValue(json, objectMapper.getTypeFactory().constructType(beanType));
     }
 
     /**
@@ -163,15 +146,11 @@ public class JsonParser {
      * @param elementType
      * @return
      */
+    @SneakyThrows
     public <T> T[] toArray(String json, Class<T> elementType) {
-        try {
-            return readValue(json,
-                    objectMapper.getTypeFactory()
-                            .constructArrayType(elementType));
-        } catch (Exception e) {
-            throw ExceptionChecker.throwException(e);
-        }
-
+        return readValue(json,
+                objectMapper.getTypeFactory()
+                        .constructArrayType(elementType));
     }
 
     /**
@@ -182,14 +161,11 @@ public class JsonParser {
      * @param elementType
      * @return
      */
+    @SneakyThrows
     public <T> List<T> toList(String json, Class<T> elementType) {
-        try {
-            return readValue(json,
-                    objectMapper.getTypeFactory()
-                            .constructCollectionType(ArrayList.class, elementType));
-        } catch (Exception e) {
-            throw ExceptionChecker.throwException(e);
-        }
+        return readValue(json,
+                objectMapper.getTypeFactory()
+                        .constructCollectionType(ArrayList.class, elementType));
     }
 
     /**
@@ -200,14 +176,11 @@ public class JsonParser {
      * @param valueType
      * @return
      */
+    @SneakyThrows
     public <K, V> Map<K, V> toMap(String json, Class<K> keyType, Class<V> valueType) {
-        try {
-            return readValue(json,
-                    objectMapper.getTypeFactory()
-                            .constructMapType(LinkedHashMap.class, keyType, valueType));
-        } catch (Exception e) {
-            throw ExceptionChecker.throwException(e);
-        }
+        return readValue(json,
+                objectMapper.getTypeFactory()
+                        .constructMapType(LinkedHashMap.class, keyType, valueType));
     }
 
     /**
@@ -236,6 +209,5 @@ public class JsonParser {
         }
         return objectMapper.readValue(json, valueType);
     }
-
 
 }
