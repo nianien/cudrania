@@ -18,23 +18,30 @@ public class MultiBitSet {
     /**
      * 用于表示状态的bit数
      */
-    private int nBit = 1;
+    private int bitNum;
     /**
      * 用于表示状态的最大值
      */
-    private int maxValue = 1;
+    private int maxValue;
 
     /**
-     * 构造方法,指定状态表示所需要的bit数
-     *
-     * @param nbit 用来表示状态的bit数
+     * 构造方法,默认1个bit表示状态
      */
-    public MultiBitSet(int nbit) {
-        if (nbit < 1)
+    public MultiBitSet() {
+        this(1);
+    }
+
+    /**
+     * 构造方法,使用bitNum个bit表示状态
+     *
+     * @param bitNum 用来表示状态的bit数
+     */
+    public MultiBitSet(int bitNum) {
+        if (bitNum < 1)
             throw new IllegalArgumentException(
-                    "the argument of nbit cannot be low than 1: " + nbit);
-        this.nBit = nbit;
-        this.maxValue = (1 << nbit) - 1;
+                    "the argument of bitNum cannot be low than 1: " + bitNum);
+        this.bitNum = bitNum;
+        this.maxValue = (1 << bitNum) - 1;
     }
 
     /**
@@ -59,9 +66,9 @@ public class MultiBitSet {
             throw new IllegalArgumentException(
                     "the argument of value must be between 0 and " + maxValue
                             + ": " + value);
-        boolean[] bits = toBits(value, nBit);
+        boolean[] bits = toBits(value, bitNum);
         for (int i = beginIndex; i < endIndex; i++) {
-            this.set(i * nBit, bits);
+            this.set(i * bitNum, bits);
         }
     }
 
@@ -71,11 +78,11 @@ public class MultiBitSet {
      * @param index
      */
     public int get(int index) {
-        boolean[] bits = new boolean[nBit];
+        boolean[] bits = new boolean[bitNum];
         int n = 0;
         // from index*N to (index+1)*N-1
-        int begin = index * nBit;
-        int end = (index + 1) * nBit;
+        int begin = index * bitNum;
+        int end = (index + 1) * bitNum;
         for (int i = begin; i < end; i++) {
             bits[n++] = bitset.get(i);
         }
@@ -96,7 +103,7 @@ public class MultiBitSet {
      * @param endIndex   结束索引位置(不含)
      */
     public void clear(int beginIndex, int endIndex) {
-        this.bitset.clear(beginIndex * nBit, endIndex * nBit);
+        this.bitset.clear(beginIndex * bitNum, endIndex * bitNum);
     }
 
     /**
@@ -106,7 +113,7 @@ public class MultiBitSet {
      */
     public int length() {
         int length = this.bitset.length();
-        return (length / nBit) + (length % nBit == 0 ? 0 : 1);
+        return (length / bitNum) + (length % bitNum == 0 ? 0 : 1);
     }
 
     /**
@@ -115,7 +122,7 @@ public class MultiBitSet {
      * @return
      */
     public int size() {
-        return this.bitset.size() >> (nBit - 1);
+        return this.bitset.size() >> (bitNum - 1);
     }
 
     /**
@@ -127,8 +134,8 @@ public class MultiBitSet {
         // 非零索引数
         int sum = 0;
         // 步长为N,一个索引占用n个bit
-        for (int i = 0; i < this.bitset.length(); i += nBit) {
-            for (int j = i; j < i + nBit - 1; j++) {
+        for (int i = 0; i < this.bitset.length(); i += bitNum) {
+            for (int j = i; j < i + bitNum - 1; j++) {
                 // 任意一个bit不为零即为非零索引
                 if (this.bitset.get(j)) {
                     sum++;
@@ -144,10 +151,10 @@ public class MultiBitSet {
      *
      * @param fromIndex
      * @return
-     * @see java.util.BitSet#nextSetBit(int) 
+     * @see java.util.BitSet#nextSetBit(int)
      */
     public int nextSetBit(int fromIndex) {
-        return this.bitset.nextSetBit(fromIndex * nBit) / nBit;
+        return this.bitset.nextSetBit(fromIndex * bitNum) / bitNum;
     }
 
     /**
@@ -157,8 +164,9 @@ public class MultiBitSet {
      * @param bits
      */
     private void set(int beginIndex, boolean[] bits) {
-        for (int i = 0; i < bits.length; i++)
+        for (int i = 0; i < bits.length; i++) {
             bitset.set(beginIndex + i, bits[i]);
+        }
     }
 
     /**
