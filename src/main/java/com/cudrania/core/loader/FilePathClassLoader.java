@@ -1,10 +1,10 @@
 package com.cudrania.core.loader;
 
+import com.cudrania.core.exception.ExceptionChecker;
+
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
-
-import com.cudrania.core.exception.ExceptionChecker;
 
 /**
  * 按文件路径进行加载的类加载器
@@ -43,7 +43,7 @@ public class FilePathClassLoader extends URLClassLoader {
 	private static URL classPathToURL(String path) throws Exception {
 		File file = new File(path);
 		// 获取系统上的规范路径
-		String urlString = "file:/" + file.getCanonicalPath();
+		String urlString = "file://" + file.getCanonicalPath();
 		if (file.isFile()) {
 			if (path.toLowerCase().endsWith("zip")) {
 				urlString = "zip:" + urlString + "!/";
