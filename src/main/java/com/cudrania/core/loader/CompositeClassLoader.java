@@ -9,20 +9,28 @@ import java.util.Enumeration;
 import java.util.Stack;
 
 /**
- * 支持多文件类加载器，可以动态增删文件资源
+ * 多个类加载器聚合的classloader，支持动态增删类加载器
  * Created on 2022/10/21
  *
  * @author liyifei
  */
-public class FilesClassLoader extends ClassLoader {
+public class CompositeClassLoader extends ClassLoader {
 
     private ClassLoaderWrapper classLoader;
 
-    public FilesClassLoader() {
+    /**
+     * 默认使用当前上下文类加载器
+     */
+    public CompositeClassLoader() {
         this(Thread.currentThread().getContextClassLoader());
     }
 
-    public FilesClassLoader(ClassLoader classLoader) {
+    /**
+     * 指定默认类加载器
+     *
+     * @param classLoader
+     */
+    public CompositeClassLoader(ClassLoader classLoader) {
         assert classLoader != null;
         if (classLoader instanceof ClassLoaderWrapper) {
             this.classLoader = (ClassLoaderWrapper) classLoader;
@@ -54,7 +62,7 @@ public class FilesClassLoader extends ClassLoader {
      * @param file
      * @return
      */
-    public FilesClassLoader add(String file) {
+    public CompositeClassLoader add(String file) {
         return add(new File(file));
     }
 
@@ -64,8 +72,18 @@ public class FilesClassLoader extends ClassLoader {
      * @param file
      * @return
      */
-    public FilesClassLoader add(File file) {
-        this.classLoader = classLoader.add(new FileClassLoader(file));
+    public CompositeClassLoader add(File file) {
+        return add(new FileClassLoader(file));
+    }
+
+    /**
+     * 添加类加载器
+     *
+     * @param loader
+     * @return
+     */
+    public CompositeClassLoader add(ClassLoader loader) {
+        this.classLoader = classLoader.add(loader);
         return this;
     }
 
@@ -76,7 +94,7 @@ public class FilesClassLoader extends ClassLoader {
      * @return
      */
     @SneakyThrows
-    public FilesClassLoader remove(String file) {
+    public CompositeClassLoader remove(String file) {
         return remove(new File(file));
     }
 
@@ -87,35 +105,33 @@ public class FilesClassLoader extends ClassLoader {
      * @return
      */
     @SneakyThrows
-    public FilesClassLoader remove(File file) {
-        this.classLoader = classLoader.remove(new FileClassLoader(file));
-        return this;
+    public CompositeClassLoader remove(File file) {
+        return remove(new FileClassLoader(file));
     }
 
 
     /**
-     * 获取指定文件的classloader
+     * 移除类加载器
+     *
+     * @param loader
+     * @return
+     */
+    @SneakyThrows
+    public CompositeClassLoader remove(ClassLoader loader) {
+        this.classLoader = classLoader.remove(loader);
+        return this;
+    }
+
+    /**
+     * 查找指定资源的类加载器
      *
      * @param file
      * @return
      */
-    public FileClassLoader get(File file) {
-        ClassLoader cl = this.classLoader;
-        while (cl instanceof ClassLoaderWrapper) {
-            cl = ((ClassLoaderWrapper) cl).unwrap();
-            if (cl instanceof FileClassLoader) {
-                FileClassLoader fcl = (FileClassLoader) cl;
-                if (fcl.getFile().equals(file)) {
-                    return fcl;
-                }
-            }
-            cl = cl.getParent();
-        }
-        if (cl instanceof FileClassLoader) {
-            FileClassLoader fcl = (FileClassLoader) cl;
-            if (fcl.getFile().equals(file)) {
-                return fcl;
-            }
+    public FileClassLoader find(File file) {
+        ClassLoader classLoader = this.classLoader.find(new FileClassLoader(file));
+        if (classLoader instanceof FileClassLoader) {
+            return (FileClassLoader) classLoader;
         }
         return null;
     }
@@ -186,6 +202,26 @@ public class FilesClassLoader extends ClassLoader {
             return new ClassLoaderWrapper(parent, null);
         }
 
+        /**
+         * 查找指定的classloader
+         *
+         * @param loader
+         * @return
+         */
+        public ClassLoader find(ClassLoader loader) {
+            ClassLoader cl = this.classLoader;
+            while (cl instanceof ClassLoaderWrapper) {
+                cl = ((ClassLoaderWrapper) cl).unwrap();
+                if (cl.equals(loader)) {
+                    return cl;
+                }
+                cl = cl.getParent();
+            }
+            if (cl.equals(loader)) {
+                return cl;
+            }
+            return null;
+        }
 
         public ClassLoader unwrap() {
             if (this.classLoader instanceof ClassLoaderWrapper) {
