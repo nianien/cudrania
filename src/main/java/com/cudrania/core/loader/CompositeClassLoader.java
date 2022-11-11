@@ -199,7 +199,7 @@ public class CompositeClassLoader extends ClassLoader {
             while (!cls.empty()) {
                 parent = new ClassLoaderWrapper(cls.pop(), parent);
             }
-            return new ClassLoaderWrapper(parent, null);
+            return parent instanceof ClassLoaderWrapper ? (ClassLoaderWrapper) parent : new ClassLoaderWrapper(parent, null);
         }
 
         /**
