@@ -56,7 +56,7 @@ public class CompositeClassLoader extends ClassLoader {
 
 
     /**
-     * 添加jar文件
+     * 添加指定文件的类加载器
      *
      * @param file
      * @return
@@ -66,7 +66,7 @@ public class CompositeClassLoader extends ClassLoader {
     }
 
     /**
-     * 添加jar文件
+     * 添加指定文件的类加载器
      *
      * @param file
      * @return
@@ -87,7 +87,7 @@ public class CompositeClassLoader extends ClassLoader {
     }
 
     /**
-     * 移除jar文件
+     * 移除指定文件的类加载器
      *
      * @param file
      * @return
@@ -98,7 +98,7 @@ public class CompositeClassLoader extends ClassLoader {
     }
 
     /**
-     * 移除jar文件
+     * 移除指定文件的类加载器
      *
      * @param file
      * @return
@@ -185,14 +185,13 @@ public class CompositeClassLoader extends ClassLoader {
             Stack<ClassLoader> cls = new Stack<>();
             ClassLoader cl = this;
             while (cl instanceof ClassLoaderWrapper) {
-                if (((ClassLoaderWrapper) cl).unwrap().equals(loader)) {
-                    cl = cl.getParent();
-                    continue;
+                ClassLoader origin = ((ClassLoaderWrapper) cl).unwrap();
+                if (!origin.equals(loader)) {
+                    cls.push(origin);
                 }
-                cls.push(cl);
                 cl = cl.getParent();
             }
-            if (cl != null) {
+            if (cl != null && !cl.equals(loader)) {
                 cls.push(cl);
             }
             //here parent loader must be not null
@@ -212,8 +211,9 @@ public class CompositeClassLoader extends ClassLoader {
         public ClassLoader find(ClassLoader loader) {
             ClassLoader cl = this.classLoader;
             while (cl instanceof ClassLoaderWrapper) {
-                if (((ClassLoaderWrapper) cl).unwrap().equals(loader)) {
-                    return ((ClassLoaderWrapper) cl).unwrap();
+                ClassLoader origin = ((ClassLoaderWrapper) cl).unwrap();
+                if (origin.equals(loader)) {
+                    return origin;
                 }
                 cl = cl.getParent();
             }

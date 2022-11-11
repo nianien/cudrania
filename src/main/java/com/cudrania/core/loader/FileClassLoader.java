@@ -22,10 +22,21 @@ public class FileClassLoader extends URLClassLoader {
     private File file;
 
 
+    /**
+     * 加载指定文件
+     *
+     * @param file
+     */
     public FileClassLoader(File file) {
         this(file, Thread.currentThread().getContextClassLoader());
     }
 
+    /**
+     * 加载指定文件,设置父加载器
+     *
+     * @param file
+     * @param parent
+     */
     public FileClassLoader(File file, ClassLoader parent) {
         super(new URL[]{classPathToURL(file.getAbsolutePath())}, parent);
         this.file = file;
@@ -67,6 +78,11 @@ public class FileClassLoader extends URLClassLoader {
     @Override
     public int hashCode() {
         return Objects.hash(file);
+    }
+
+    @Override
+    public String toString() {
+        return getClass() + "@" + Integer.toHexString(super.hashCode());
     }
 }
 
