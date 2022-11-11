@@ -31,7 +31,6 @@ public class CompositeClassLoader extends ClassLoader {
      * @param classLoader
      */
     public CompositeClassLoader(ClassLoader classLoader) {
-        assert classLoader != null;
         if (classLoader instanceof ClassLoaderWrapper) {
             this.classLoader = (ClassLoaderWrapper) classLoader;
         } else {
@@ -157,6 +156,9 @@ public class CompositeClassLoader extends ClassLoader {
 
         public ClassLoaderWrapper(ClassLoader classLoader, ClassLoader parent) {
             super(parent);
+            if (classLoader == null) {
+                throw new NullPointerException("the wrapped classloader cannot be null!");
+            }
             this.classLoader = classLoader;
         }
 
@@ -183,8 +185,7 @@ public class CompositeClassLoader extends ClassLoader {
             Stack<ClassLoader> cls = new Stack<>();
             ClassLoader cl = this;
             while (cl instanceof ClassLoaderWrapper) {
-                cl = ((ClassLoaderWrapper) cl).unwrap();
-                if (cl.equals(loader)) {
+                if (((ClassLoaderWrapper) cl).unwrap().equals(loader)) {
                     cl = cl.getParent();
                     continue;
                 }
@@ -211,13 +212,12 @@ public class CompositeClassLoader extends ClassLoader {
         public ClassLoader find(ClassLoader loader) {
             ClassLoader cl = this.classLoader;
             while (cl instanceof ClassLoaderWrapper) {
-                cl = ((ClassLoaderWrapper) cl).unwrap();
-                if (cl.equals(loader)) {
-                    return cl;
+                if (((ClassLoaderWrapper) cl).unwrap().equals(loader)) {
+                    return ((ClassLoaderWrapper) cl).unwrap();
                 }
                 cl = cl.getParent();
             }
-            if (cl.equals(loader)) {
+            if (cl != null && cl.equals(loader)) {
                 return cl;
             }
             return null;
