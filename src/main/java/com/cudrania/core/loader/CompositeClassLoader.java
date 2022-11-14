@@ -16,7 +16,10 @@ import java.util.Stack;
  */
 public class CompositeClassLoader extends ClassLoader {
 
-    private ClassLoaderWrapper classLoader;
+    /**
+     * 当前classloader的包装对象
+     */
+    private ClassLoaderWrapper classloader;
 
     /**
      * 默认使用当前上下文类加载器
@@ -32,26 +35,26 @@ public class CompositeClassLoader extends ClassLoader {
      */
     public CompositeClassLoader(ClassLoader classLoader) {
         if (classLoader instanceof ClassLoaderWrapper) {
-            this.classLoader = (ClassLoaderWrapper) classLoader;
+            this.classloader = (ClassLoaderWrapper) classLoader;
         } else {
-            this.classLoader = new ClassLoaderWrapper(classLoader, null);
+            this.classloader = new ClassLoaderWrapper(classLoader, classLoader.getParent());
         }
     }
 
     public Class<?> loadClass(String name)
             throws ClassNotFoundException {
-        return classLoader.loadClass(name);
+        return classloader.loadClass(name);
     }
 
 
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
-        return classLoader.getResources(name);
+        return classloader.getResources(name);
     }
 
     @Override
-    public URL findResource(String name) {
-        return classLoader.getResource(name);
+    public URL getResource(String name) {
+        return classloader.getResource(name);
     }
 
 
@@ -82,7 +85,7 @@ public class CompositeClassLoader extends ClassLoader {
      * @return
      */
     public CompositeClassLoader add(ClassLoader loader) {
-        this.classLoader = classLoader.add(loader);
+        this.classloader = this.classloader.add(loader);
         return this;
     }
 
@@ -117,7 +120,7 @@ public class CompositeClassLoader extends ClassLoader {
      */
     @SneakyThrows
     public CompositeClassLoader remove(ClassLoader loader) {
-        this.classLoader = classLoader.remove(loader);
+        this.classloader = this.classloader.remove(loader);
         return this;
     }
 
@@ -128,7 +131,7 @@ public class CompositeClassLoader extends ClassLoader {
      * @return
      */
     public FileClassLoader find(File file) {
-        ClassLoader classLoader = this.classLoader.find(new FileClassLoader(file));
+        ClassLoader classLoader = this.classloader.find(new FileClassLoader(file));
         if (classLoader instanceof FileClassLoader) {
             return (FileClassLoader) classLoader;
         }
@@ -136,12 +139,12 @@ public class CompositeClassLoader extends ClassLoader {
     }
 
     /**
-     * 获取当前classloader
+     * 获取当前包装的classloader
      *
      * @return
      */
-    public ClassLoader get() {
-        return this.classLoader.unwrap();
+    public ClassLoaderWrapper wrapped() {
+        return this.classloader;
     }
 
 
@@ -150,18 +153,30 @@ public class CompositeClassLoader extends ClassLoader {
      *
      * @author liyifei
      */
-    class ClassLoaderWrapper extends ClassLoader {
+    public static class ClassLoaderWrapper extends ClassLoader {
 
-        private ClassLoader classLoader;
+        private ClassLoader classloader;
 
-        public ClassLoaderWrapper(ClassLoader classLoader, ClassLoader parent) {
+        public ClassLoaderWrapper(ClassLoader classloader, ClassLoader parent) {
             super(parent);
-            if (classLoader == null) {
+            if (classloader == null) {
                 throw new NullPointerException("the wrapped classloader cannot be null!");
             }
-            this.classLoader = classLoader;
+            this.classloader = classloader;
         }
 
+
+        /**
+         * 返回原始ClassLoader
+         *
+         * @return
+         */
+        public ClassLoader unwrap() {
+            if (this.classloader instanceof ClassLoaderWrapper) {
+                return ((ClassLoaderWrapper) this.classloader).unwrap();
+            }
+            return this.classloader;
+        }
 
         /**
          * 添加classloader
@@ -169,7 +184,7 @@ public class CompositeClassLoader extends ClassLoader {
          * @param loader
          * @return
          */
-        public ClassLoaderWrapper add(ClassLoader loader) {
+        private ClassLoaderWrapper add(ClassLoader loader) {
             return new ClassLoaderWrapper(loader, this);
         }
 
@@ -181,7 +196,7 @@ public class CompositeClassLoader extends ClassLoader {
          * @return
          */
         @SneakyThrows
-        public ClassLoaderWrapper remove(ClassLoader loader) {
+        private ClassLoaderWrapper remove(ClassLoader loader) {
             Stack<ClassLoader> cls = new Stack<>();
             ClassLoader cl = this;
             while (cl instanceof ClassLoaderWrapper) {
@@ -208,8 +223,8 @@ public class CompositeClassLoader extends ClassLoader {
          * @param loader
          * @return
          */
-        public ClassLoader find(ClassLoader loader) {
-            ClassLoader cl = this.classLoader;
+        private ClassLoader find(ClassLoader loader) {
+            ClassLoader cl = this.classloader;
             while (cl instanceof ClassLoaderWrapper) {
                 ClassLoader origin = ((ClassLoaderWrapper) cl).unwrap();
                 if (origin.equals(loader)) {
@@ -223,12 +238,6 @@ public class CompositeClassLoader extends ClassLoader {
             return null;
         }
 
-        public ClassLoader unwrap() {
-            if (this.classLoader instanceof ClassLoaderWrapper) {
-                return ((ClassLoaderWrapper) this.classLoader).unwrap();
-            }
-            return this.classLoader;
-        }
 
         protected Class<?> loadClass(String name, boolean resolve)
                 throws ClassNotFoundException {
@@ -244,8 +253,8 @@ public class CompositeClassLoader extends ClassLoader {
                         // ClassNotFoundException thrown if class not found
                         // from the non-null parent class loader
                     }
-                    if (c == null && this.classLoader != null) {
-                        c = this.classLoader.loadClass(name);
+                    if (c == null && this.classloader != null) {
+                        c = this.classloader.loadClass(name);
                     }
                 }
                 if (resolve) {
@@ -258,12 +267,12 @@ public class CompositeClassLoader extends ClassLoader {
 
         @Override
         public Enumeration<URL> getResources(String name) throws IOException {
-            return classLoader.getResources(name);
+            return classloader.getResources(name);
         }
 
         @Override
-        public URL findResource(String name) {
-            return classLoader.getResource(name);
+        public URL getResource(String name) {
+            return classloader.getResource(name);
         }
 
     }

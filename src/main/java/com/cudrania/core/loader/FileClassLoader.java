@@ -28,7 +28,7 @@ public class FileClassLoader extends URLClassLoader {
      * @param file
      */
     public FileClassLoader(File file) {
-        this(file, Thread.currentThread().getContextClassLoader());
+        this(file, ClassLoader.getSystemClassLoader());
     }
 
     /**
@@ -37,8 +37,9 @@ public class FileClassLoader extends URLClassLoader {
      * @param file
      * @param parent
      */
+    @SneakyThrows
     public FileClassLoader(File file, ClassLoader parent) {
-        super(new URL[]{classPathToURL(file.getAbsolutePath())}, parent);
+        super(new URL[]{classPathToURL(file.getPath())}, parent);
         this.file = file;
     }
 
@@ -81,8 +82,9 @@ public class FileClassLoader extends URLClassLoader {
     }
 
     @Override
+    @SneakyThrows
     public String toString() {
-        return getClass() + "@" + Integer.toHexString(super.hashCode());
+        return getClass() + "@" + Integer.toHexString(super.hashCode()) + "[" + file.getCanonicalPath() + "]";
     }
 }
 
