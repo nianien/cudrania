@@ -49,7 +49,7 @@ public class TestLoader {
     @SneakyThrows
     public void testLoader3() {
         CompositeClassLoader ccl = new CompositeClassLoader();
-        ccl.add(new File("./src/test/resources/test2.jar"));
+        ccl.insert(new File("./src/test/resources/test2.jar"));
         Class<?> aClass = Class.forName("com.test.jar.TestA", false, ccl);
         System.out.println(aClass.getClassLoader());
         ccl.remove(new File("./src/test/resources/test2.jar"));

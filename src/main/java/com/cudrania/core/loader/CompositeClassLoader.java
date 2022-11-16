@@ -20,6 +20,10 @@ public class CompositeClassLoader extends ClassLoader {
      * 当前classloader的包装对象
      */
     private ClassLoaderWrapper classloader;
+    /**
+     * 根加载器
+     */
+    private ClassLoaderWrapper root;
 
     /**
      * 默认使用当前上下文类加载器
@@ -39,6 +43,7 @@ public class CompositeClassLoader extends ClassLoader {
         } else {
             this.classloader = new ClassLoaderWrapper(classLoader, classLoader.getParent());
         }
+        this.root = this.classloader;
     }
 
     public Class<?> loadClass(String name)
@@ -140,7 +145,7 @@ public class CompositeClassLoader extends ClassLoader {
     /**
      * 类加载的包装类
      */
-    public static class ClassLoaderWrapper extends ClassLoader {
+    public class ClassLoaderWrapper extends ClassLoader {
 
         private ClassLoader classloader;
 
@@ -185,7 +190,7 @@ public class CompositeClassLoader extends ClassLoader {
         private ClassLoaderWrapper insert(ClassLoader loader) {
             Stack<ClassLoader> cls = new Stack<>();
             ClassLoader cl = this;
-            while (cl instanceof ClassLoaderWrapper) {
+            while (cl != root && cl != null) {
                 ClassLoader origin = ((ClassLoaderWrapper) cl).unwrap();
                 cls.push(origin);
                 cl = cl.getParent();
@@ -211,14 +216,16 @@ public class CompositeClassLoader extends ClassLoader {
         private ClassLoaderWrapper remove(ClassLoader loader) {
             Stack<ClassLoader> cls = new Stack<>();
             ClassLoader cl = this;
-            while (cl instanceof ClassLoaderWrapper) {
+            while (cl != root && cl != null) {
                 ClassLoader origin = ((ClassLoaderWrapper) cl).unwrap();
+                cl = cl.getParent();
                 if (!origin.equals(loader)) {
                     cls.push(origin);
+                } else {
+                    break;
                 }
-                cl = cl.getParent();
             }
-            if (cl != null && !cl.equals(loader)) {
+            if (cl != null) {
                 cls.push(cl);
             }
             //here parent loader must be not null
