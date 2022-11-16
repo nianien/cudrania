@@ -59,17 +59,7 @@ public class CompositeClassLoader extends ClassLoader {
 
 
     /**
-     * 添加指定文件的类加载器
-     *
-     * @param file
-     * @return
-     */
-    public CompositeClassLoader add(String file) {
-        return add(new File(file));
-    }
-
-    /**
-     * 添加指定文件的类加载器
+     * 添加类加载器加载指定文件,优先级最低
      *
      * @param file
      * @return
@@ -79,7 +69,7 @@ public class CompositeClassLoader extends ClassLoader {
     }
 
     /**
-     * 添加类加载器
+     * 添加指定类加载器,优先级最低
      *
      * @param loader
      * @return
@@ -89,16 +79,28 @@ public class CompositeClassLoader extends ClassLoader {
         return this;
     }
 
+
     /**
-     * 移除指定文件的类加载器
+     * 添加类加载器加载指定文件,优先级仅次于根加载器
      *
      * @param file
      * @return
      */
-    @SneakyThrows
-    public CompositeClassLoader remove(String file) {
-        return remove(new File(file));
+    public CompositeClassLoader insert(File file) {
+        return insert(new FileClassLoader(file));
     }
+
+    /**
+     * 添加指定类加载器,优先级仅次于根加载器
+     *
+     * @param loader
+     * @return
+     */
+    public CompositeClassLoader insert(ClassLoader loader) {
+        this.classloader = this.classloader.insert(loader);
+        return this;
+    }
+
 
     /**
      * 移除指定文件的类加载器
@@ -124,22 +126,9 @@ public class CompositeClassLoader extends ClassLoader {
         return this;
     }
 
-    /**
-     * 查找指定资源的类加载器
-     *
-     * @param file
-     * @return
-     */
-    public FileClassLoader find(File file) {
-        ClassLoader classLoader = this.classloader.find(new FileClassLoader(file));
-        if (classLoader instanceof FileClassLoader) {
-            return (FileClassLoader) classLoader;
-        }
-        return null;
-    }
 
     /**
-     * 获取当前包装的classloader
+     * 获取当前类加载器的包装对象
      *
      * @return
      */
@@ -149,9 +138,7 @@ public class CompositeClassLoader extends ClassLoader {
 
 
     /**
-     * Created on 2022/10/21
-     *
-     * @author liyifei
+     * 类加载的包装类
      */
     public static class ClassLoaderWrapper extends ClassLoader {
 
@@ -179,7 +166,7 @@ public class CompositeClassLoader extends ClassLoader {
         }
 
         /**
-         * 添加classloader
+         * 添加classloader,作为最后一个classloader的子classloader
          *
          * @param loader
          * @return
@@ -188,6 +175,31 @@ public class CompositeClassLoader extends ClassLoader {
             return new ClassLoaderWrapper(loader, this);
         }
 
+
+        /**
+         * 插入classloader,作为根classloader的子classloader
+         *
+         * @param loader
+         * @return
+         */
+        private ClassLoaderWrapper insert(ClassLoader loader) {
+            Stack<ClassLoader> cls = new Stack<>();
+            ClassLoader cl = this;
+            while (cl instanceof ClassLoaderWrapper) {
+                ClassLoader origin = ((ClassLoaderWrapper) cl).unwrap();
+                cls.push(origin);
+                cl = cl.getParent();
+            }
+            if (cl != null) {
+                cls.push(cl);
+            }
+            //here parent loader must be not null
+            ClassLoader parent = new ClassLoaderWrapper(loader, cls.pop());
+            while (!cls.empty()) {
+                parent = new ClassLoaderWrapper(cls.pop(), parent);
+            }
+            return parent instanceof ClassLoaderWrapper ? (ClassLoaderWrapper) parent : new ClassLoaderWrapper(parent, null);
+        }
 
         /**
          * 移除classloader
@@ -215,27 +227,6 @@ public class CompositeClassLoader extends ClassLoader {
                 parent = new ClassLoaderWrapper(cls.pop(), parent);
             }
             return parent instanceof ClassLoaderWrapper ? (ClassLoaderWrapper) parent : new ClassLoaderWrapper(parent, null);
-        }
-
-        /**
-         * 查找指定的classloader
-         *
-         * @param loader
-         * @return
-         */
-        private ClassLoader find(ClassLoader loader) {
-            ClassLoader cl = this.classloader;
-            while (cl instanceof ClassLoaderWrapper) {
-                ClassLoader origin = ((ClassLoaderWrapper) cl).unwrap();
-                if (origin.equals(loader)) {
-                    return origin;
-                }
-                cl = cl.getParent();
-            }
-            if (cl != null && cl.equals(loader)) {
-                return cl;
-            }
-            return null;
         }
 
 
