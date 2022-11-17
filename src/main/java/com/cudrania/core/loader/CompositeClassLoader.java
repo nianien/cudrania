@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Stack;
 
 /**
@@ -21,9 +23,14 @@ public class CompositeClassLoader extends ClassLoader {
      */
     private ClassLoaderWrapper classloader;
     /**
-     * 根加载器
+     * 根加载器的包装对象
      */
     private ClassLoaderWrapper root;
+
+    /**
+     * 文件到classloader的映射
+     */
+    private Map<File, ClassLoader> filesClassLoader = new HashMap<>();
 
     /**
      * 默认使用当前上下文类加载器
@@ -70,7 +77,12 @@ public class CompositeClassLoader extends ClassLoader {
      * @return
      */
     public CompositeClassLoader add(File file) {
-        return add(new FileClassLoader(file));
+        filesClassLoader.computeIfAbsent(file, k -> {
+            FileClassLoader classLoader = new FileClassLoader(k);
+            CompositeClassLoader.this.add(classLoader);
+            return classLoader;
+        });
+        return this;
     }
 
     /**
@@ -92,7 +104,12 @@ public class CompositeClassLoader extends ClassLoader {
      * @return
      */
     public CompositeClassLoader insert(File file) {
-        return insert(new FileClassLoader(file));
+        filesClassLoader.computeIfAbsent(file, k -> {
+            FileClassLoader classLoader = new FileClassLoader(k);
+            CompositeClassLoader.this.insert(classLoader);
+            return classLoader;
+        });
+        return this;
     }
 
     /**
@@ -115,7 +132,11 @@ public class CompositeClassLoader extends ClassLoader {
      */
     @SneakyThrows
     public CompositeClassLoader remove(File file) {
-        return remove(new FileClassLoader(file));
+        filesClassLoader.computeIfPresent(file, (k,v) -> {
+            CompositeClassLoader.this.remove(v);
+            return null;
+        });
+        return this;
     }
 
 
@@ -219,10 +240,10 @@ public class CompositeClassLoader extends ClassLoader {
             while (cl != root && cl != null) {
                 ClassLoader origin = ((ClassLoaderWrapper) cl).unwrap();
                 cl = cl.getParent();
-                if (!origin.equals(loader)) {
-                    cls.push(origin);
-                } else {
+                if (origin == loader) {
                     break;
+                } else {
+                    cls.push(origin);
                 }
             }
             if (cl != null) {

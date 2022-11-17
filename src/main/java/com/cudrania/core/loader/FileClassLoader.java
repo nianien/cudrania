@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Enumeration;
-import java.util.Objects;
 
 /**
  * 基于文件的类加载器, 仅加载当前文件资源
@@ -68,18 +67,6 @@ public class FileClassLoader extends URLClassLoader {
         return findResources(name);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        FileClassLoader that = (FileClassLoader) o;
-        return file.equals(that.file);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(file);
-    }
 
     @Override
     @SneakyThrows
