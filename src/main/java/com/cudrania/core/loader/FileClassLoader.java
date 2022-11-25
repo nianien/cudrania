@@ -10,7 +10,12 @@ import java.net.URLClassLoader;
 import java.util.Enumeration;
 
 /**
- * 基于文件的类加载器, 仅加载当前文件资源
+ * 基于文件的类加载器<p/>
+ * <ul>
+ *     <li>类加载时满足双亲委派原则</li>
+ *     <li>资源加载时仅加载当前文件资源</li>
+ *     <li>资源查找时优先查找当前文件</li>
+ * ul/>
  * Created on 2022/10/21
  *
  * @author liyifei
@@ -63,10 +68,21 @@ public class FileClassLoader extends URLClassLoader {
 
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
-        //这里直接调用findResources,不加载父loader的资源
+        //资源扫描时,不查找父加载器中的资源
         return findResources(name);
     }
 
+    @Override
+    public URL getResource(String name) {
+        //查找资源时, 优先查找当前文件中的资源
+        URL url = findResource(name);
+        if (url == null) {
+            if (getParent() != null) {
+                url = getParent().getResource(name);
+            }
+        }
+        return url;
+    }
 
     @Override
     @SneakyThrows

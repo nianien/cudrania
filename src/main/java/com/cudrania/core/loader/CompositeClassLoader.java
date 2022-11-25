@@ -166,7 +166,7 @@ public class CompositeClassLoader extends ClassLoader {
     /**
      * 类加载的包装类
      */
-    public class ClassLoaderWrapper extends ClassLoader {
+    private class ClassLoaderWrapper extends ClassLoader {
 
         private ClassLoader classloader;
 
