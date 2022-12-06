@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -22,6 +23,7 @@ public class Reflections {
     private final static Map<Class, List<Field>> fieldCache = new WeakHashMap<>();
     public final static Predicate<Method> IS_SETTER = Reflections::isSetter;
     public final static Predicate<Method> IS_GETTER = Reflections::isGetter;
+
 
     /**
      * 获取指定类型的注解
@@ -320,21 +322,38 @@ public class Reflections {
     /**
      * 执行指定方法,返回执行结果
      *
-     * @param method
+     * @param method     待执行方法
      * @param owner      声明该方法的实例对象
      * @param parameters 方法的参数
      * @return 方法的执行结果
      */
     @SneakyThrows
     public static Object invoke(Method method, Object owner, Object... parameters) {
+        return invoke(method, owner, null, parameters);
+    }
+
+    /**
+     * 执行指定方法,返回执行结果
+     *
+     * @param method        待执行方法
+     * @param owner         声明该方法的实例对象
+     * @param typeConverter 参数类型转换
+     * @param parameters    方法的参数
+     * @return 方法的执行结果
+     */
+    @SneakyThrows
+    public static Object invoke(Method method, Object owner, BiFunction<Object, Class, Object> typeConverter, Object... parameters) {
         method.setAccessible(true);
-        return method.invoke(owner, parameters);
+        Object[] castParams = parameters;
+        if (typeConverter != null) {
+            castParams = convert(parameters, method.getParameterTypes(), typeConverter);
+        }
+        return method.invoke(owner, castParams);
     }
 
 
     /**
      * 根据方法名和参数调用指定方法<p>
-     * 如果方法名称以及参数长度匹配且唯一，此时若类型不匹配，则会尝试类型转换<p>
      *
      * @param methodName 方法名称
      * @param owner      方法关联的对象
@@ -358,46 +377,25 @@ public class Reflections {
                             + Arrays.toString(parameters));
         }
         Method method = methods.get(0);
-        // 构造参数转型
-        Object[] castParams = cast(parameters, method.getParameterTypes());
-        return invoke(method, owner, castParams);
+        return invoke(method, owner, parameters);
     }
 
-    /**
-     * 根据方法名称和参数类型调用指定方法
-     * 如果方法名称以及参数长度匹配且唯一，此时若类型不匹配，则会尝试类型转换<p>
-     *
-     * @param methodName     方法名称
-     * @param bean           方法关联的对象
-     * @param parameters     实际参数值
-     * @param parameterTypes 方法参数类型
-     * @return
-     */
-    public static Object invoke(String methodName, Object bean, Object[] parameters, Class[] parameterTypes) {
-        if (parameterTypes.length != parameters.length) {
-            throw new IllegalArgumentException("parameters and parameterTypes must have same size!");
-        }
-        Class beanClass = bean.getClass();
-        Method method = getMethod(beanClass, methodName, parameterTypes);
-        // 构造参数转型
-        Object[] castParams = cast(parameters, parameterTypes);
-        return invoke(method, bean, castParams);
-    }
 
     /**
-     * 批量类型转换
+     * 参数类型转换
      *
-     * @param parameters
-     * @param parameterTypes
+     * @param parameters     原始参数类型
+     * @param parameterTypes 目标参数类型
+     * @param typeConverter  类型转化器
      * @return
      */
-    private static Object[] cast(Object[] parameters, Class[] parameterTypes) {
+    public static Object[] convert(Object[] parameters, Class[] parameterTypes, BiFunction<Object, Class, Object> typeConverter) {
         Object[] castParams = new Object[parameters.length];
         for (int i = 0; i < parameterTypes.length; i++) {
             if (parameterTypes[i].isInstance(parameters[i])) {
                 castParams[i] = parameters[i];
             } else {
-                castParams[i] = simpleInstance(parameterTypes[i], parameters[i].toString());
+                castParams[i] = convert(parameters[i], parameterTypes[i], typeConverter);
             }
         }
         return castParams;
@@ -409,46 +407,55 @@ public class Reflections {
      * 1) 如果是原始类型,返回对应的值<p>
      * 2) 如果是枚举类型,获取对应名称的实例<p>
      * 3) 如果是字符串类型,返回字符串<p>
-     * 4) 其他类型,则将字符串作为构造参数以获取实例
+     * 4) 否则进行类型转换
      *
      * @param <T>
      * @param clazz
-     * @param valueString
+     * @param value
      * @return
      */
     @SneakyThrows
-    public static <T> T simpleInstance(Class<T> clazz, String valueString) {
-        if (clazz.equals(String.class)) {
-            return (T) valueString;
+    private static <T> T convert(Object value, Class<T> clazz, BiFunction<Object, Class, T> typeConverter) {
+        if (value == null) {
+            return null;
         }
-        if (clazz.equals(Boolean.TYPE) || clazz.equals(Boolean.class)) {
-            return (T) Boolean.valueOf(valueString);
+        if (value instanceof String) {
+            String valueString = (String) value;
+            if (clazz.equals(String.class)) {
+                return (T) valueString;
+            }
+            if (clazz.equals(Boolean.TYPE) || clazz.equals(Boolean.class)) {
+                return (T) Boolean.valueOf(valueString);
+            }
+            if (clazz.equals(Byte.TYPE) || clazz.equals(Byte.class)) {
+                return (T) Byte.valueOf(valueString);
+            }
+            if (clazz.equals(Short.TYPE) || clazz.equals(Short.class)) {
+                return (T) Short.valueOf(valueString);
+            }
+            if (clazz.equals(Integer.TYPE) || clazz.equals(Integer.class)) {
+                return (T) Integer.valueOf(valueString);
+            }
+            if (clazz.equals(Long.TYPE) || clazz.equals(Long.class)) {
+                return (T) Long.valueOf(valueString);
+            }
+            if (clazz.equals(Float.TYPE) || clazz.equals(Float.class)) {
+                return (T) Float.valueOf(valueString);
+            }
+            if (clazz.equals(Double.TYPE) || clazz.equals(Double.class)) {
+                return (T) Double.valueOf(valueString);
+            }
+            if (clazz.equals(Character.TYPE) || clazz.equals(Character.class)) {
+                return (T) Character.valueOf(valueString.charAt(0));
+            }
+            if (clazz.isEnum()) {
+                return (T) Enum.valueOf((Class<Enum>) clazz, valueString);
+            }
         }
-        if (clazz.equals(Byte.TYPE) || clazz.equals(Byte.class)) {
-            return (T) Byte.valueOf(valueString);
+        if (typeConverter == null) {
+            return clazz.getConstructor(value.getClass()).newInstance(value);
         }
-        if (clazz.equals(Short.TYPE) || clazz.equals(Short.class)) {
-            return (T) Short.valueOf(valueString);
-        }
-        if (clazz.equals(Integer.TYPE) || clazz.equals(Integer.class)) {
-            return (T) Integer.valueOf(valueString);
-        }
-        if (clazz.equals(Long.TYPE) || clazz.equals(Long.class)) {
-            return (T) Long.valueOf(valueString);
-        }
-        if (clazz.equals(Float.TYPE) || clazz.equals(Float.class)) {
-            return (T) Float.valueOf(valueString);
-        }
-        if (clazz.equals(Double.TYPE) || clazz.equals(Double.class)) {
-            return (T) Double.valueOf(valueString);
-        }
-        if (clazz.equals(Character.TYPE) || clazz.equals(Character.class)) {
-            return (T) Character.valueOf(valueString.charAt(0));
-        }
-        if (clazz.isEnum()) {
-            return (T) Enum.valueOf((Class<Enum>) clazz, valueString);
-        }
-        return clazz.getConstructor(String.class).newInstance(valueString);
+        return typeConverter.apply(value, clazz);
     }
 
     /**

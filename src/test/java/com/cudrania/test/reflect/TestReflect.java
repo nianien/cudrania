@@ -56,8 +56,6 @@ public class TestReflect {
         Class clazz = Integer.class;
         int r = (Integer) clazz.getConstructor(String.class).newInstance("1");
         assert r == 1;
-        int n = Reflections.simpleInstance(Integer.TYPE, "1");
-        assert n == 1;
 
     }
 
