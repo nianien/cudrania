@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TestEnums {
 
-    static enum Goat {
+    enum Goat {
         A('A'), B('B'), C('C'), D('D'), E('E');
         int value;
 

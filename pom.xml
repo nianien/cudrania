@@ -11,8 +11,8 @@
     <url>https://github.com/nianien/cudrania</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
-        <lombok.version>1.18.2</lombok.version>
+        <java.version>17</java.version>
+        <lombok.version>1.18.26</lombok.version>
         <javassist.version>3.18.1-GA</javassist.version>
         <jackson.version>2.12.6.1</jackson.version>
         <logback.version>1.2.10</logback.version>
@@ -130,6 +130,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>16</source>
+                    <target>16</target>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

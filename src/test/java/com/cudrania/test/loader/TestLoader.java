@@ -64,7 +64,6 @@ public class TestLoader {
         Assertions.assertNotEquals(bClass, cClass);
     }
 
-
     @Test
     @SneakyThrows
     public void testLoader4() {
