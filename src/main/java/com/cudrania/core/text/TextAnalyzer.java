@@ -1,8 +1,9 @@
 package com.cudrania.core.text;
 
-import com.cudrania.core.comparator.StringComparator;
 import com.cudrania.core.arrays.ArrayUtils;
 import com.cudrania.core.collection.CollectionUtils;
+import com.cudrania.core.comparator.StringComparator;
+import com.cudrania.core.utils.StringUtils;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -81,7 +82,7 @@ public class TextAnalyzer {
         }
 
         public String toString(String text) {
-            return toString() + content(text);
+            return this + content(text);
         }
 
     }
@@ -112,7 +113,7 @@ public class TextAnalyzer {
      * @return
      */
     public static List<Fragment> analyze(String text, char[] targets) {
-        List<Fragment> list = new ArrayList<Fragment>();
+        List<Fragment> list = new ArrayList<>();
         int lastIndex = 0;
         for (int i = 0; i < text.length(); i++) {
             char ch = text.charAt(i);
@@ -142,7 +143,7 @@ public class TextAnalyzer {
      * @return
      */
     public static List<Fragment> analyze(String text, String regex) {
-        List<Fragment> list = new ArrayList<Fragment>();
+        List<Fragment> list = new ArrayList<>();
         if (regex == null || regex.isEmpty()) {
             list.add(new Fragment(0, text.length(), false));
             return list;
@@ -180,13 +181,14 @@ public class TextAnalyzer {
      */
     public static List<Fragment> analyze(String text, Iterable<String> targets,
                                          boolean ignoreCase) {
-        List<Fragment> list = new ArrayList<Fragment>();
-        list.add(new Fragment(0, text.length(), false));
-        if (ignoreCase)
+        if (ignoreCase) {
             text = text.toLowerCase();
+        }
         targets = filterEmpty(targets, ignoreCase);
+        List<Fragment> list = new ArrayList<>();
+        list.add(new Fragment(0, text.length(), false));
         for (String target : targets) {
-            List<Fragment> tempList = new ArrayList<Fragment>();
+            List<Fragment> tempList = new ArrayList<>();
             for (Fragment fragment : list) {
                 if (fragment.isMatched()) {
                     tempList.add(fragment);
@@ -227,10 +229,11 @@ public class TextAnalyzer {
     public static List<Fragment> analyzeOccur(String text,
                                               Iterable<String> targets, boolean ignoreCase) {
         // 忽略大小写
-        if (ignoreCase)
+        if (ignoreCase) {
             text = text.toLowerCase();
+        }
         targets = filterEmpty(targets, ignoreCase);
-        List<Fragment> list = new ArrayList<Fragment>();
+        List<Fragment> list = new ArrayList<>();
         int lastIndex = 0;
         while (lastIndex < text.length()) {
             //最先出现文本片段的索引位置
@@ -275,14 +278,16 @@ public class TextAnalyzer {
      * @return
      */
     public static String replace(String text, final Map<String, String> map) {
-        if (text == null || text.isEmpty())
+        if (StringUtils.isEmpty(text)) {
             return text;
-        if (map.containsKey(text))
+        }
+        if (map.containsKey(text)) {
             return map.get(text);
+        }
         List<String> list = CollectionUtils.list(map.keySet());
         Collections.sort(list, StringComparator.LengthDesc);
-        return rebuild(text, analyze(text, list, false), (text1, fragment) -> {
-            String value = fragment.content(text1);
+        return rebuild(text, analyze(text, list, false), (s, fragment) -> {
+            String value = fragment.content(s);
             return fragment.isMatched() ? map.get(value) : value;
         });
     }
@@ -362,9 +367,9 @@ public class TextAnalyzer {
      */
     private static List<String> filterEmpty(Iterable<String> targets,
                                             boolean ignoreCase) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for (String target : targets) {
-            if (target != null && !target.isEmpty()) {
+            if (StringUtils.isNotEmpty(target)) {
                 list.add(ignoreCase ? target.toLowerCase() : target);
             }
         }
