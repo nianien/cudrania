@@ -3,7 +3,6 @@ package com.cudrania.jdbc.datasource;
 
 import com.cudrania.core.reflection.Reflections;
 import com.cudrania.core.utils.StringUtils;
-import lombok.Setter;
 import lombok.SneakyThrows;
 
 import javax.sql.DataSource;
@@ -50,7 +49,6 @@ public class DataSourceBuilder {
     /**
      * 数据源配置
      */
-    @Setter
     private final Map<String, Map<String, Object>> properties = new LinkedHashMap<>();
 
     /**

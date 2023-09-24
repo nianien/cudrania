@@ -95,6 +95,7 @@ public class SmartDecimal extends BigDecimal {
     }
 
     @Override
+    @Deprecated(since="9")
     public SmartDecimal divide(BigDecimal divisor, int scale, int roundingMode) {
         return of(super.divide(divisor, scale, roundingMode));
     }
@@ -258,7 +259,7 @@ public class SmartDecimal extends BigDecimal {
      * @return
      */
     private SmartDecimal[] of(BigDecimal[] bigDecimals) {
-        return Arrays.stream(bigDecimals).map(this::of).toArray(n -> new SmartDecimal[n]);
+        return Arrays.stream(bigDecimals).map(this::of).toArray(SmartDecimal[]::new);
     }
 
 }

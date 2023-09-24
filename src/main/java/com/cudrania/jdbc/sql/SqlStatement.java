@@ -164,7 +164,7 @@ public class SqlStatement {
      * @return
      */
     public SqlStatement append(SqlStatement statement) {
-        return append(statement.preparedSql(), statement.preparedParameters());
+        return append(statement.preparedSql(), (Object[]) statement.preparedParameters());
     }
 
     /**

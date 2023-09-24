@@ -29,6 +29,8 @@ public class TestSqlStatement {
         SqlStatement sqlStatement3 = new SqlStatement("select * from users where 1=1")
                 .append("and (userName,password) in ?", notNull(new Object[][]{{"userName1", "password1"}, {"userName2", "password2"}})
                         .when(e -> e.length > 1));
+        System.out.println(new SqlStatement()
+                .append(sqlStatement1).renderSql());
         System.out.println(sqlStatement3.renderSql());
     }
 
