@@ -1,8 +1,7 @@
 package com.cudrania.core.proxy;
 
-import com.cudrania.core.exception.ExceptionChecker;
+import lombok.SneakyThrows;
 
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 /**
@@ -18,14 +17,10 @@ public class ProxyFactory {
      * @param handler ProxyHandler对象
      * @return 代理实例
      */
-    public static Object proxy(Object target, AbstractProxyHandler handler) {
-        try {
-            handler.setTarget(target);
-            return Proxy.newProxyInstance(target.getClass().getClassLoader(), target.getClass().getInterfaces(),
-                    handler);
-        } catch (Exception e) {
-            return ExceptionChecker.throwException(e);
-        }
+    @SneakyThrows
+    public static <T> Object proxy(T target, ProxyHandler<T> handler) {
+        return Proxy.newProxyInstance(target.getClass().getClassLoader(), target.getClass().getInterfaces(),
+                (proxy, method, args) -> handler.proxy(proxy, target, method, args));
     }
 
     /**
@@ -37,26 +32,23 @@ public class ProxyFactory {
      */
     public static Object proxy(Object target, final Interceptor interceptor) {
 
-        return interceptor == null ? target : Proxy.newProxyInstance(target.getClass().getClassLoader(), target.getClass().getInterfaces(),
-                new AbstractProxyHandler(target) {
-
-                    @Override
-                    public Object proxy(Object target, Method method, Object... args) {
-                        Object result;
-                        // 代理前的处理
-                        interceptor.before(target, method, args);
-                        try {
-                            // 执行被代理的方法
-                            result = method.invoke(target, args);
-                        } catch (Exception ex) {
-                            result = interceptor.exception(ex, target, method, args);
-                        }
-                        // 代理之后的处理
-                        interceptor.after(target, method, args);
-                        return result;
-                    }
-
-                });
+        if (interceptor == null) {
+            return target;
+        }
+        return proxy(target, (proxy, target1, method, args) -> {
+            Object result;
+            // 代理前的处理
+            interceptor.before(target1, method, args);
+            try {
+                // 执行被代理的方法
+                result = method.invoke(target1, args);
+            } catch (Exception ex) {
+                result = interceptor.exception(ex, target1, method, args);
+            }
+            // 代理之后的处理
+            interceptor.after(target1, method, args);
+            return result;
+        });
     }
 
 }

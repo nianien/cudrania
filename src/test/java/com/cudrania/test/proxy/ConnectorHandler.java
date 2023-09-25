@@ -1,6 +1,6 @@
 package com.cudrania.test.proxy;
 
-import com.cudrania.core.proxy.AbstractProxyHandler;
+import com.cudrania.core.proxy.ProxyHandler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 /**
  * @author skyfalling
  */
-public class ConnectorHandler extends AbstractProxyHandler {
+public class ConnectorHandler implements ProxyHandler<Connector> {
 
     private ConnectorManager manager;
 
@@ -17,9 +17,9 @@ public class ConnectorHandler extends AbstractProxyHandler {
     }
 
     @Override
-    public Object proxy(Object target, Method method, Object... args) {
+    public Object proxy(Object proxy, Connector target, Method method, Object... args) {
         if (method.getName().equals("close")) {
-            close(manager, (Connector) target);
+            close(manager, target);
             return null;
         }
         try {

@@ -2,29 +2,21 @@ package com.cudrania.test.proxy;
 
 import com.cudrania.core.proxy.Interceptor;
 import com.cudrania.core.proxy.ProxyFactory;
-import com.cudrania.core.proxy.AbstractProxyHandler;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 public class TestProxy {
 
     @Test
     public void test() {
-        Interceptor interceptor = null;
-        ITask u = (ITask) ProxyFactory.proxy(new Task(), interceptor);
+        ITask u = (ITask) ProxyFactory.proxy(new Task(), (Interceptor) null);
         u.doIt();
 
         final ConnectorManager manager = new ConnectorManager();
         create(manager).close();
         System.out.println("===============");
-        create(manager, new ConnectorCloser() {
-            @Override
-            public void close(ConnectorManager manager, Connector connector) {
-                manager.close(connector);
-            }
-        }).close();
+        create(manager, (manager1, connector) -> manager1.close(connector)).close();
     }
 
     public Connector create(ConnectorManager manager) {
@@ -33,24 +25,20 @@ public class TestProxy {
 
     public Connector create(final ConnectorManager manager, final ConnectorCloser connectorCloser) {
         Connector connector = manager.getConnector();
-        return (Connector) ProxyFactory.proxy(connector, new AbstractProxyHandler(connector) {
-            @Override
-            public Object proxy(Object target, Method method, Object... args) {
+        return (Connector) ProxyFactory.proxy(connector, (proxy, target, method, args) -> {
 
-                if (method.getName().equals("close") && method.getParameterTypes().length == 0 && method.getReturnType() == Void.TYPE) {
-                    connectorCloser.close(manager, (Connector) target);
-                    return null;
-                }
-                try {
-                    return method.invoke(target, args);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                }
+            if (method.getName().equals("close") && method.getParameterTypes().length == 0 && method.getReturnType() == Void.TYPE) {
+                connectorCloser.close(manager, target);
                 return null;
             }
-
+            try {
+                return method.invoke(target, args);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+            return null;
         });
     }
 }
