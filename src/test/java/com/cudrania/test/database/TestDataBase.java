@@ -1,6 +1,6 @@
 package com.cudrania.test.database;
 
-import com.cudrania.core.collection.wrapper.MapWrapper;
+import com.cudrania.core.collection.wrapper.Wrappers;
 import com.cudrania.jdbc.datasource.DataSourceBuilder;
 import com.cudrania.jdbc.query.SqlQueryBuilder;
 import com.cudrania.jdbc.sql.SqlGenerator;
@@ -24,12 +24,13 @@ public class TestDataBase {
 
     @BeforeAll
     public static void setUpAll() {
-        Map<String, Object> map = new MapWrapper<String, Object>()
-                .with("driverClass", "org.h2.Driver")
-                .with("type", com.zaxxer.hikari.HikariDataSource.class)
-                .with("jdbcUrl", "jdbc:h2:mem:test")
-                .with("user", "sa")
-                .with("password", "sa");
+        Map<String, Object> map = Wrappers.<String, Object>map()
+                .$put("driverClass", "org.h2.Driver")
+                .$put("driverClass", "org.h2.Driver")
+                .$put("type", com.zaxxer.hikari.HikariDataSource.class)
+                .$put("jdbcUrl", "jdbc:h2:mem:test")
+                .$put("user", "sa")
+                .$put("password", "sa");
         DataSourceBuilder builder = new DataSourceBuilder();
         builder.addProperties(map);
         queryBuilder = new SqlQueryBuilder(builder.build());
@@ -91,7 +92,7 @@ public class TestDataBase {
     @Test
     public void testBase() {
         String sql = "select * from users where (user_id,user_name) in :p";
-        SqlStatement sqlStatement = new SqlStatement(sql, new MapWrapper("p", new Object[]{new String[]{"nianien", "落地飞天"}, new String[]{"wuhao1", "wuhao1"}}));
+        SqlStatement sqlStatement = new SqlStatement(sql, Wrappers.map("p", new Object[]{new String[]{"nianien", "落地飞天"}, new String[]{"wuhao1", "wuhao1"}}));
         System.out.println(sqlStatement.preparedSql());
         assertEquals(sqlStatement.preparedSql(), ("select * from users where (user_id,user_name) in ((?,?),(?,?))"));
         List<Map<String, Object>> list = queryBuilder.build(sqlStatement).getRows();
