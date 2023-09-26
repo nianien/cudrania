@@ -1,15 +1,13 @@
 package com.cudrania.core.collection.wrapper;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
- * {@link Set}接口的包装类,包装Set实例以支持链式语法<p>
- * 如果未提供Set实例,则默认为{@link  HashSet}实现<p>
+ * 继承自{@link Set}的增强类，支持链式调用
  *
  * @author skyfalling
  */
-public interface SetWrapper<E> extends Set<E>, CollectionWrapper<E> {
+public interface SetWrapper<E> extends Set<E>, IterSupplier<E, Set<E>> {
 
 
     /**
@@ -18,6 +16,7 @@ public interface SetWrapper<E> extends Set<E>, CollectionWrapper<E> {
      * @param value
      * @return 返回当前对象
      */
+    @Delegate("add")
     SetWrapper<E> $add(E value);
 
     /**
@@ -26,6 +25,7 @@ public interface SetWrapper<E> extends Set<E>, CollectionWrapper<E> {
      * @param key
      * @return 返回当前对象
      */
+    @Delegate("remove")
     SetWrapper<E> $remove(E key);
 
 
@@ -34,12 +34,8 @@ public interface SetWrapper<E> extends Set<E>, CollectionWrapper<E> {
      *
      * @return
      */
+    @Delegate("clear")
     SetWrapper<E> $clear();
 
-    /**
-     * 返回原生对象
-     *
-     * @return
-     */
-    Set<E> $this();
+
 }

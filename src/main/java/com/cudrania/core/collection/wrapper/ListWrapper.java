@@ -1,15 +1,13 @@
 package com.cudrania.core.collection.wrapper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@link List}接口的包装类,包装List实例以支持链式语法<p>
- * 如果未提供List实例,则默认为{@link ArrayList}实现<p>
+ * 继承自{@link List}的增强类，支持链式调用
  *
- * @author skyfalling
+ * @param <E>
  */
-public interface ListWrapper<E> extends List<E>, CollectionWrapper<E> {
+public interface ListWrapper<E> extends List<E>, IterSupplier<E, List<E>> {
 
     /**
      * 代理{@link List#add(Object)}方法
@@ -17,6 +15,7 @@ public interface ListWrapper<E> extends List<E>, CollectionWrapper<E> {
      * @param value
      * @return 返回当前对象
      */
+    @Delegate("add")
     ListWrapper<E> $add(E value);
 
     /**
@@ -25,6 +24,7 @@ public interface ListWrapper<E> extends List<E>, CollectionWrapper<E> {
      * @param value
      * @return 返回当前对象
      */
+    @Delegate("add")
     ListWrapper<E> $add(int index, E value);
 
     /**
@@ -33,6 +33,7 @@ public interface ListWrapper<E> extends List<E>, CollectionWrapper<E> {
      * @param key
      * @return 返回当前对象
      */
+    @Delegate("remove")
     ListWrapper<E> $remove(E key);
 
 
@@ -42,6 +43,7 @@ public interface ListWrapper<E> extends List<E>, CollectionWrapper<E> {
      * @param index
      * @return 返回当前对象
      */
+    @Delegate("remove")
     ListWrapper<E> $remove(int index);
 
 
@@ -50,13 +52,7 @@ public interface ListWrapper<E> extends List<E>, CollectionWrapper<E> {
      *
      * @return
      */
+    @Delegate("clear")
     ListWrapper<E> $clear();
-
-    /**
-     * 返回原生对象
-     *
-     * @return
-     */
-    List<E> $this();
 
 }

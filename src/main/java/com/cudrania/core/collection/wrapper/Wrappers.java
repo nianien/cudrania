@@ -2,9 +2,10 @@ package com.cudrania.core.collection.wrapper;
 
 import java.lang.reflect.Proxy;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
- * 包装对象
+ * 提供{@link List}/{@link Set}/{@link Map}增强对象的工具类
  *
  * @author scorpio
  * @version 1.0.0
@@ -124,27 +125,22 @@ public class Wrappers {
     private static Object proxy(final Object target, Class clazz) {
         return Proxy.newProxyInstance(Wrappers.class.getClassLoader(),
                 new Class[]{clazz}, (proxy, method, args) -> {
-                    String name = method.getName();
-                    if (name.startsWith("$")) {
-                        name = name.substring(1);
-                        if (name.equals("this")) {
-                            return target;
-                        }
-                        method = clazz.getMethod(name, method.getParameterTypes());
-                        method.invoke(target, args);
+                    Delegate delegate = method.getDeclaredAnnotation(Delegate.class);
+                    if (delegate != null) {
+                        String name = delegate.value();
+                        clazz.getMethod(name, method.getParameterTypes()).invoke(target, args);
                         return proxy;
                     }
-//                    Delegate delegate = method.getDeclaredAnnotation(Delegate.class);
-//                    if (delegate != null) {
-//                        String name = delegate.method();
-//                        if (name.startsWith("$")) {
-//                            return target;
-//                        }
-//                        clazz.getMethod(name, method.getParameterTypes()).invoke(target, args);
-//                        return proxy;
-//                    }
-                    if (method.getDeclaringClass() == CollectionWrapper.class) {
-                        return method.invoke((CollectionWrapper) () -> (Collection) target, args);
+                    if (Supplier.class.isAssignableFrom(method.getDeclaringClass())) {
+                        Object newTarget;
+                        if (method.getDeclaringClass() == IterSupplier.class) {
+                            newTarget = (IterSupplier) () -> (Iterable) target;
+                        } else if (method.getDeclaringClass() == MapSupplier.class) {
+                            newTarget = (MapSupplier) () -> (Map) target;
+                        } else {
+                            newTarget = (Supplier) () -> target;
+                        }
+                        return method.invoke(newTarget, args);
                     }
                     return method.invoke(target, args);
                 });

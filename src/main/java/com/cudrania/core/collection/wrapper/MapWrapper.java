@@ -1,15 +1,13 @@
 package com.cudrania.core.collection.wrapper;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
- * {@link Map}接口的包装类,包装Map实例以支持链式语法<p>
- * 如果未提供Map实例,则默认为{@link HashMap}实现<p>
+ * 继承自{@link Map}的增强类，支持链式调用
  *
  * @author skyfalling
  */
-public interface MapWrapper<K, V> extends Map<K, V> {
+public interface MapWrapper<K, V> extends Map<K, V>, MapSupplier<K, V> {
 
 
     /**
@@ -19,6 +17,7 @@ public interface MapWrapper<K, V> extends Map<K, V> {
      * @param value
      * @return 返回当前对象
      */
+    @Delegate("put")
     MapWrapper<K, V> $put(K key, V value);
 
     /**
@@ -27,6 +26,7 @@ public interface MapWrapper<K, V> extends Map<K, V> {
      * @param key
      * @return 返回当前对象
      */
+    @Delegate("remove")
     MapWrapper<K, V> $remove(K key);
 
 
@@ -36,6 +36,7 @@ public interface MapWrapper<K, V> extends Map<K, V> {
      * @param key
      * @return 返回当前对象
      */
+    @Delegate("remove")
     MapWrapper<K, V> $remove(K key, V value);
 
 
@@ -44,13 +45,8 @@ public interface MapWrapper<K, V> extends Map<K, V> {
      *
      * @return
      */
+    @Delegate("clear")
     MapWrapper<K, V> $clear();
 
-    /**
-     * 返回原生对象
-     *
-     * @return
-     */
-    Map<K, V> $this();
 
 }
