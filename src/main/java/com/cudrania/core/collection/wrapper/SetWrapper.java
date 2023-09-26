@@ -7,7 +7,7 @@ import java.util.Set;
  *
  * @author skyfalling
  */
-public interface SetWrapper<E> extends Set<E>, IterSupplier<E, Set<E>> {
+public interface SetWrapper<E> extends Set<E>, IterSupplier<E> {
 
 
     /**
@@ -37,5 +37,6 @@ public interface SetWrapper<E> extends Set<E>, IterSupplier<E, Set<E>> {
     @Delegate("clear")
     SetWrapper<E> $clear();
 
-
+    @Delegate("this")
+    Set<E> get();
 }

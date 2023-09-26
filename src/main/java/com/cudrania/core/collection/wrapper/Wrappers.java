@@ -13,6 +13,30 @@ import java.util.function.Supplier;
 public class Wrappers {
 
     /**
+     * 绑定{@link Iterable}实例
+     *
+     * @param target
+     * @param <E>
+     * @return
+     */
+    public static <E> IterSupplier<E> of(Iterable<E> target) {
+        return () -> target;
+    }
+
+
+    /**
+     * 绑定指定{@link Map}实例
+     *
+     * @param target
+     * @param <K>
+     * @param <V>
+     * @return
+     */
+    public static <K, V> MapSupplier<K, V> of(Map<K, V> target) {
+        return () -> target;
+    }
+
+    /**
      * 代理指定{@link Map}实例
      *
      * @param target
@@ -21,7 +45,7 @@ public class Wrappers {
      * @return
      */
     public static <K, V> MapWrapper<K, V> map(Map<K, V> target) {
-        return (MapWrapper) proxy(target, MapWrapper.class);
+        return proxy(target, MapWrapper.class);
     }
 
 
@@ -58,7 +82,7 @@ public class Wrappers {
      * @return
      */
     public static <E> ListWrapper<E> list(List<E> target) {
-        return (ListWrapper) proxy(target, ListWrapper.class);
+        return proxy(target, ListWrapper.class);
     }
 
 
@@ -91,7 +115,7 @@ public class Wrappers {
      * @return
      */
     public static <E> SetWrapper<E> set(Set<E> target) {
-        return (SetWrapper) proxy(target, SetWrapper.class);
+        return proxy(target, SetWrapper.class);
     }
 
 
@@ -122,12 +146,15 @@ public class Wrappers {
      * @param clazz
      * @return
      */
-    private static Object proxy(final Object target, Class clazz) {
-        return Proxy.newProxyInstance(Wrappers.class.getClassLoader(),
+    private static <T> T proxy(final Object target, Class<T> clazz) {
+        return (T) Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
                 new Class[]{clazz}, (proxy, method, args) -> {
                     Delegate delegate = method.getDeclaredAnnotation(Delegate.class);
                     if (delegate != null) {
                         String name = delegate.value();
+                        if (name.equals("this")) {
+                            return target;
+                        }
                         clazz.getMethod(name, method.getParameterTypes()).invoke(target, args);
                         return proxy;
                     }

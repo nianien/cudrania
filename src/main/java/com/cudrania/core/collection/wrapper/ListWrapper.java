@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @param <E>
  */
-public interface ListWrapper<E> extends List<E>, IterSupplier<E, List<E>> {
+public interface ListWrapper<E> extends List<E>, IterSupplier<E> {
 
     /**
      * 代理{@link List#add(Object)}方法
@@ -55,4 +55,6 @@ public interface ListWrapper<E> extends List<E>, IterSupplier<E, List<E>> {
     @Delegate("clear")
     ListWrapper<E> $clear();
 
+    @Delegate("this")
+    List<E> get();
 }

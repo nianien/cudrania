@@ -47,6 +47,4 @@ public interface MapWrapper<K, V> extends Map<K, V>, MapSupplier<K, V> {
      */
     @Delegate("clear")
     MapWrapper<K, V> $clear();
-
-
 }

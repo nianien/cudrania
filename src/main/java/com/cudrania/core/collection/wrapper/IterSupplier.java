@@ -11,9 +11,8 @@ import java.util.function.Supplier;
  * 定义绑定到{@link Iterable<E>}对象的函数集合
  *
  * @param <E>
- * @param <T>
  */
-public interface IterSupplier<E, T extends Iterable<E>> extends Supplier<T> {
+public interface IterSupplier<E> extends Supplier<Iterable<E>> {
 
 
     /**

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.function.Function;
 
 public class TestWrapper {
 
@@ -57,5 +58,37 @@ public class TestWrapper {
         Wrappers.set(set)
                 .$clear();
         Assertions.assertTrue(set.isEmpty());
+    }
+
+
+
+    @Test
+    public void testLambdaMap() {
+        List<String> list = List.of("abc", "defg", "hijk");
+
+        Map<String, Integer> map = Wrappers.of(list).map(Function.identity(), String::length);
+        System.out.println(map);
+
+        Map<Integer, String> map2 = Wrappers.of(list).map(String::length);
+        System.out.println(map2);
+    }
+
+
+    @Test
+    public void testLambdaBatch() {
+        List res = new ArrayList();
+        List<String> list = List.of("abc", "defg", "hijk", "lmn", "opq", "rst", "uvw", "xyz");
+        System.out.println(Wrappers.of(list).grouped(3));
+        Map<String, String> map = Map.of("1", "a", "2", "b", "3", "c", "4", "d", "5", "e", "6", "f", "7", "g", "8", "h", "9", "i", "10", "j");
+        System.out.println(Wrappers.of(map).invert());
+        Wrappers.of(map).doBatch(4, System.out::println);
+    }
+
+
+    @Test
+    public void testLambdaGroup() {
+        List<String> list = List.of("abc", "defg", "hijk", "lmn", "opq", "rst", "uvw", "xyz");
+        System.out.println(Wrappers.of(list).groupBy(String::length));
+
     }
 }
