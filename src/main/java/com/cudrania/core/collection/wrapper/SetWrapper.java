@@ -1,6 +1,7 @@
 package com.cudrania.core.collection.wrapper;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * {@link Set}接口的包装类,包装Set实例以支持链式语法<p>
@@ -8,7 +9,7 @@ import java.util.*;
  *
  * @author skyfalling
  */
-public interface SetWrapper<E> extends Set<E> {
+public interface SetWrapper<E> extends Set<E>, CollectionWrapper<E> {
 
 
     /**
@@ -34,6 +35,7 @@ public interface SetWrapper<E> extends Set<E> {
      * @return
      */
     SetWrapper<E> $clear();
+
     /**
      * 返回原生对象
      *

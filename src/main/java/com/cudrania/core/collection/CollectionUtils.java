@@ -154,7 +154,6 @@ public class CollectionUtils {
      * @return 属性列表
      */
     public static <T, V> List<T> list(Iterable<V> iterable, Function<V, T> func) {
-
         List<T> list;
         if (iterable instanceof Collection) {
             list = new ArrayList<>(((Collection) iterable).size());

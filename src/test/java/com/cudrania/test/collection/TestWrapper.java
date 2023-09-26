@@ -1,6 +1,8 @@
 package com.cudrania.test.collection;
 
+import com.cudrania.core.collection.wrapper.ListWrapper;
 import com.cudrania.core.collection.wrapper.MapWrapper;
+import com.cudrania.core.collection.wrapper.SetWrapper;
 import com.cudrania.core.collection.wrapper.Wrappers;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,7 +26,9 @@ public class TestWrapper {
 
     @Test
     public void testList() {
-        List<String> list = Wrappers.list("a").$add("b").$add("c").$this();
+        ListWrapper<String> wrapper = Wrappers.list("a").$add("b").$add("c");
+        wrapper.doBatch(2, System.out::println);
+        List<String> list = wrapper.$this();
         Assertions.assertEquals(list.getClass(), ArrayList.class);
         Assertions.assertTrue(list.contains("a") && list.contains("b") && list.contains("c"));
         Wrappers.list(list).$remove("a");
@@ -36,7 +40,10 @@ public class TestWrapper {
 
     @Test
     public void testSet() {
-        Set<String> set = Wrappers.set("a").$add("b").$add("c").$this();
+        SetWrapper<String> wrapper = Wrappers.set("a").$add("b").$add("c").$add("c");
+        wrapper.doBatch(2, System.out::println);
+        System.out.println(wrapper.map(a->"$"+a));
+        Set<String> set = wrapper.$this();
         Assertions.assertEquals(set.getClass(), HashSet.class);
         Assertions.assertTrue(set.contains("a") && set.contains("b") && set.contains("c"));
         Wrappers.set(set).$remove("a");

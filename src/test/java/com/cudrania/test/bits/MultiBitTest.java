@@ -1,4 +1,4 @@
-package com.cudrania.test;
+package com.cudrania.test.bits;
 
 import com.cudrania.core.bits.MultiBit;
 import org.junit.jupiter.api.Test;

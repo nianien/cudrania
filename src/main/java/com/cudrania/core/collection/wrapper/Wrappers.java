@@ -134,7 +134,20 @@ public class Wrappers {
                         method.invoke(target, args);
                         return proxy;
                     }
+//                    Delegate delegate = method.getDeclaredAnnotation(Delegate.class);
+//                    if (delegate != null) {
+//                        String name = delegate.method();
+//                        if (name.startsWith("$")) {
+//                            return target;
+//                        }
+//                        clazz.getMethod(name, method.getParameterTypes()).invoke(target, args);
+//                        return proxy;
+//                    }
+                    if (method.getDeclaringClass() == CollectionWrapper.class) {
+                        return method.invoke((CollectionWrapper) () -> (Collection) target, args);
+                    }
                     return method.invoke(target, args);
                 });
     }
+
 }

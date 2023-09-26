@@ -1,6 +1,7 @@
 package com.cudrania.core.collection.wrapper;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * {@link List}接口的包装类,包装List实例以支持链式语法<p>
@@ -8,7 +9,7 @@ import java.util.*;
  *
  * @author skyfalling
  */
-public interface ListWrapper<E> extends List<E> {
+public interface ListWrapper<E> extends List<E>, CollectionWrapper<E> {
 
     /**
      * 代理{@link List#add(Object)}方法
@@ -57,4 +58,5 @@ public interface ListWrapper<E> extends List<E> {
      * @return
      */
     List<E> $this();
+
 }
