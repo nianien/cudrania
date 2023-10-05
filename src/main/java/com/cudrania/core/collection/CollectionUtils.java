@@ -1,8 +1,6 @@
 package com.cudrania.core.collection;
 
 import com.cudrania.core.arrays.ArrayUtils;
-import com.cudrania.core.reflection.Reflections;
-import lombok.SneakyThrows;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -61,29 +59,6 @@ public class CollectionUtils {
             consumer.accept(subList);
         }
     }
-
-    /**
-     * 分批处理{@link Iterator}元素
-     *
-     * @param iterator 迭代器
-     * @param limit    批量处理元素数量限制
-     * @param consumer 元素处理对象
-     */
-    public static <E> void doBatch(Iterator<E> iterator, int limit, Consumer<List<E>> consumer) {
-        List<E> subList = new ArrayList<>(limit);
-        while (iterator.hasNext()) {
-            E e = iterator.next();
-            subList.add(e);
-            if (subList.size() == limit) {
-                consumer.accept(subList);
-                subList = new ArrayList<>(limit);
-            }
-        }
-        if (subList.size() > 0) {
-            consumer.accept(subList);
-        }
-    }
-
 
     /**
      * 将Iterator对象转化成Enumeration对象
@@ -319,15 +294,5 @@ public class CollectionUtils {
         return (List<T>) Arrays.asList(ArrayUtils.toObjectArray(source));
     }
 
-    /**
-     * 获取对象属性
-     */
-    @SneakyThrows
-    private static Object getProperty(Object obj, String property) {
-        if (obj instanceof Map) {
-            return ((Map<?, ?>) obj).get(property);
-        }
-        return Reflections.beanProperty(obj.getClass(), property).getValue(obj);
-    }
 
 }
