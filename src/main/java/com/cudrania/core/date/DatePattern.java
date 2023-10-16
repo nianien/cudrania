@@ -27,7 +27,7 @@ public final class DatePattern {
      */
     public static final String DateTime12 = "yyyy-MM-dd ah:mm:ss";
     /**
-     * 24 小时制
+     * 24小时制
      */
     public static final String Time24 = "HH:mm:ss";
     /**
