@@ -13,7 +13,7 @@ public final class DatePattern {
     /**
      * 日期时间(12)星期
      */
-    public static final String DateTime12Week = "yyyy-MM-dd ahh:mm:ss E";
+    public static final String DateTime12Week = "yyyy-MM-dd ah:mm:ss E";
     /**
      * 日期
      */
