@@ -49,7 +49,7 @@ public class FQCNConverter extends NamedConverter {
             }
             return cda[0].getClassName() + "." + cda[0].getMethodName() + ":" + cda[0].getLineNumber();
         } else {
-            return CallerData.NA;
+            return CallerData.CALLER_DATA_NA;
         }
     }
 

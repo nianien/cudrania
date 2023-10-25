@@ -3,7 +3,7 @@ package com.cudrania.side.spring.resolver;
 import com.cudrania.core.exception.DefinedException;
 import com.cudrania.core.utils.StringUtils;
 import com.cudrania.side.spring.resolver.ErrorResponse.ErrorField;
-
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -19,14 +19,7 @@ import org.springframework.web.servlet.support.RequestContextUtils;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.*;
 
 /**
  * 全局异常统一处理类,将错误信息转换成合适的JSON格式返回。
@@ -73,7 +66,7 @@ public class GlobalHandlerExceptionResolver extends AbstractHandlerExceptionReso
      * 处理异常，返回null则不进行处理
      */
     @Override
-    protected ModelAndView doResolveException(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+    protected ModelAndView doResolveException(jakarta.servlet.http.HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response, Object handler, Exception ex) {
         //忽略的异常,被其他程序处理
         if (isIgnoreException(ex))
             return null;
@@ -196,4 +189,6 @@ public class GlobalHandlerExceptionResolver extends AbstractHandlerExceptionReso
         }
         return false;
     }
+
+
 }
