@@ -14,11 +14,11 @@
         <java.version>17</java.version>
         <lombok.version>1.18.26</lombok.version>
         <javassist.version>3.29.2-GA</javassist.version>
-        <jackson.version>2.12.6.1</jackson.version>
+        <jackson.version>2.15.1</jackson.version>
         <logback.version>1.4.7</logback.version>
         <janino.version>3.1.9</janino.version>
         <dom4j.version>1.6.1</dom4j.version>
-        <ant.version>1.9.16</ant.version>
+        <ant.version>1.10.13</ant.version>
         <mail.version>1.4.7</mail.version>
         <spring.version>6.0.9</spring.version>
         <jakarta.servlet-api.servlet-api.version>6.0.0</jakarta.servlet-api.servlet-api.version>
@@ -214,12 +214,6 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-            <version>${validation-api.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
@@ -231,36 +225,12 @@
             <version>${janino.version}</version>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${spring.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>${spring.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>${jakarta.servlet-api.servlet-api.version}</version>
-            <scope>provided</scope>
-        </dependency>
 
         <!--for test begin-->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit-jupiter.version}</version>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <version>${spring.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>

@@ -26,7 +26,7 @@ public interface SqlQuery {
      * @param rsh
      * @return
      */
-    public <T> T executeQuery(ResultSetHandler<T> rsh);
+    <T> T executeQuery(ResultSetHandler<T> rsh);
 
     /**
      * 获取结果集中索引值为index的列

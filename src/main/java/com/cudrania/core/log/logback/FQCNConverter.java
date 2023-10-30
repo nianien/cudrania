@@ -1,4 +1,4 @@
-package com.cudrania.side.logback;
+package com.cudrania.core.log.logback;
 
 import ch.qos.logback.classic.pattern.NamedConverter;
 import ch.qos.logback.classic.spi.CallerData;

@@ -2,7 +2,7 @@
 <configuration>
 
     <!--针对封装的第三方Logger, 正确打印业务方法类所在行-->
-    <conversionRule conversionWord="CML" converterClass="com.cudrania.side.logback.FQCNConverter"/>
+    <conversionRule conversionWord="CML" converterClass="com.cudrania.core.log.logback.FQCNConverter"/>
     <if condition='isNull("APP_NAME")'>
         <then>
             <property name="APP_NAME" value="application"/>
