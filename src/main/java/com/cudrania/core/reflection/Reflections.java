@@ -279,7 +279,7 @@ public class Reflections {
      * @param method
      * @return
      */
-    private static String propertyName(Method method) {
+    public static String propertyName(Method method) {
         String name = method.getName();
         return decapitalize(name.substring(name.startsWith("is") ? 2 : 3));
     }
