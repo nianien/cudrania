@@ -1,6 +1,7 @@
 package com.cudrania.test.loader;
 
 import com.cudrania.core.loader.CompositeClassLoader;
+import com.cudrania.core.loader.FileClassLoader;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
