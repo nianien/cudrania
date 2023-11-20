@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.ClassStack;
 import com.fasterxml.jackson.databind.type.TypeBindings;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
@@ -31,31 +32,37 @@ public class TestJson {
         JsonParser jp = new JsonParser();
         String json = "[1,2]";
         Object obj = jp.toObject(json);
-        System.out.println(obj.getClass());
+        Assertions.assertEquals(obj.getClass(), ArrayList.class);
         json = "{name:'lining'}";
         obj = jp.toObject(json);
-        System.out.println(obj.getClass());
+        Assertions.assertEquals(obj.getClass(), LinkedHashMap.class);
         json = "1";
         obj = jp.toObject(json);
         System.out.println(obj.getClass());
+        Assertions.assertEquals(obj.getClass(), Integer.class);
         json = "1.0";
-        obj = jp.toObject(json);
+        obj = jp.toBean(json, Double.class);
         System.out.println(obj.getClass());
+        Assertions.assertEquals(obj.getClass(), Double.class);
         json = "10000000000000000";
         obj = jp.toObject(json);
-        System.out.println(obj.getClass());
+        Assertions.assertEquals(obj.getClass(), Long.class);
         json = "'1984-10-24'";
         obj = jp.toBean(json, Date.class);
         System.out.println(obj);
-        System.out.println(obj.getClass());
+
+        Assertions.assertEquals(obj.getClass(), Date.class);
         jp.setDatePatterns(new String[]{"yyyy年MM月dd日"});
         System.out.println(jp.toJson(new Date()));
-
         System.out.println(jp.toJson(Color.BLACK));
         obj = jp.toBean("\"BLACK\"", Color.class);
         System.out.println(obj);
+        Assertions.assertEquals(obj.getClass(), Color.class);
         obj = jp.toBean("" + Color.BLACK.ordinal(), Color.class);
         System.out.println(obj);
+
+        obj = jp.toObject("'JD.com International Limited'");
+        Assertions.assertEquals(obj.getClass(), String.class);
     }
 
 

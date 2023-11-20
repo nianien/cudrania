@@ -32,4 +32,16 @@ public class User {
         this.userId = userId;
         this.userName = userName;
     }
+
+    /**
+     *
+     * @param userId ddd
+     */
+    record A( String userId){
+
+    }
+
+    public static void main(String[] args) {
+       A a= new A("");
+    }
 }

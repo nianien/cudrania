@@ -12,6 +12,7 @@ import ch.qos.logback.core.status.Status;
  * &lt;conversionRule conversionWord="CML" converterClass="com.cudrania.core.log.logback.FQCNConverter"/&gt;
  * </pre>
  *
+ * SPI配置: META-INF/services/ch.qos.logback.classic.spi.Configurator
  * @author : skyfalling
  * @created : 2023/11/3, 星期五
  * Copyright (c) 2004-2029 All Rights Reserved.
@@ -24,7 +25,7 @@ public class CmlConfigurator implements Configurator {
 
     @Override
     public ExecutionStatus configure(LoggerContext loggerContext) {
-        return null;
+        return ExecutionStatus.NEUTRAL;
     }
 
     @Override
