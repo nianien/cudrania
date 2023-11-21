@@ -1,4 +1,4 @@
-package com.cudrania.test.jackson.serializer;
+package com.cudrania.core.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -8,8 +8,22 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.std.MapProperty;
 
 /**
- * 支持POJO & Map脱敏
- * Created on 2022/1/25
+ * 支持POJO & Map脱敏<p/>
+ * <pre>
+ *  Sensitive sensitive = new Sensitive("(?i).*(password|balance|phone|id_?card).*");
+ *
+ *  objectMapper.setFilterProvider(
+ *
+ *    new SimpleFilterProvider().addFilter(filterName, new SecurityPropertyFilter(sensitive))
+ *    );
+ *
+ *   objectMapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
+ *       <code>@Override</code>
+ *        public Object findFilterId(Annotated a) {
+ *           return filterName;
+ *       }
+ *   });
+ * </pre>
  *
  * @author liyifei
  */

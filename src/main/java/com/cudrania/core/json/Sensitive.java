@@ -1,11 +1,10 @@
-package com.cudrania.test.jackson.serializer;
+package com.cudrania.core.json;
 
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
  * 敏感字段校验类
- * Created on 2022/1/26
  *
  * @author liyifei
  */

@@ -1,13 +1,18 @@
 package com.cudrania.test.jackson;
 
 import com.cudrania.core.json.JsonParser;
+import com.cudrania.core.json.SecurityPropertyFilter;
+import com.cudrania.core.json.SecurityPropertyWriter;
+import com.cudrania.core.json.Sensitive;
 import com.cudrania.test.bean.Account;
 import com.cudrania.test.bean.Account.FullView;
 import com.cudrania.test.bean.Account.SimpleView;
 import com.cudrania.test.bean.User;
 import com.cudrania.test.jackson.node.NodeParser;
 import com.cudrania.test.jackson.node.RuleNode;
-import com.cudrania.test.jackson.serializer.*;
+import com.cudrania.test.jackson.serializer.DescriptionPropertyWriter;
+import com.cudrania.test.jackson.serializer.NodeWrapperSerializer;
+import com.cudrania.test.jackson.serializer.RuleNodeSerializer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.BeanDescription;
@@ -116,7 +121,7 @@ public class TestCustomSerializer {
         Account account = new Account();
         account.setId(1001);
         account.setUserName("jack-wang");
-        account.setPassword("pwd12345");
+        account.setPassword("http://www.baidu.com");
         account.setPhone("18901010001");
         //map无法脱敏
         Map<String, String> map = new HashMap<>();
