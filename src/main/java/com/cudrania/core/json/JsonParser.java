@@ -84,6 +84,21 @@ public class JsonParser {
         return objectMapper;
     }
 
+    public JsonParser config(Function<ObjectMapper, ObjectMapper> config) {
+        this.objectMapper = config.apply(this.objectMapper);
+        return this;
+    }
+
+    /**
+     * 注册模块
+     *
+     * @param module
+     * @return
+     */
+    public JsonParser registerModule(Module module) {
+        objectMapper.registerModule(module);
+        return this;
+    }
 
     /**
      * 设置字段可见性
@@ -114,6 +129,25 @@ public class JsonParser {
         return this;
     }
 
+    /**
+     * 设置字段序列化过滤器
+     *
+     * @param propertyFilter 字段过滤器, 可重写序列化内容
+     * @return
+     */
+    public JsonParser withPropertyFilter(PropertyFilter propertyFilter) {
+        String filterName = "filter-" + propertyFilter.getClass().getSimpleName();
+        objectMapper.setFilterProvider(
+                new SimpleFilterProvider().addFilter(filterName, propertyFilter)
+        );
+        objectMapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
+            @Override
+            public Object findFilterId(Annotated a) {
+                return filterName;
+            }
+        });
+        return this;
+    }
 
     /**
      * 设置字段序列化改写器
@@ -121,7 +155,7 @@ public class JsonParser {
      * @param serModifier 序列化改写器, 可重写序列化内容
      * @return
      */
-    public JsonParser withSerModifier(BeanSerializerModifier serModifier) {
+    public JsonParser withSerializerModifier(BeanSerializerModifier serModifier) {
         objectMapper.setSerializerFactory(
                 objectMapper.getSerializerFactory().withSerializerModifier(serModifier)
         );
@@ -135,7 +169,7 @@ public class JsonParser {
      * @return
      */
     public JsonParser modifyPropertyWriter(Function<BeanPropertyWriter, BeanPropertyWriter> rewriter) {
-        return withSerModifier(new BeanSerializerModifier() {
+        return withSerializerModifier(new BeanSerializerModifier() {
             @Override
             public List<BeanPropertyWriter> changeProperties(SerializationConfig config,
                                                              BeanDescription beanDesc,
@@ -155,33 +189,12 @@ public class JsonParser {
      * @return
      */
     public JsonParser modifySerializer(Function<JsonSerializer, JsonSerializer> rewriter) {
-        return withSerModifier(new BeanSerializerModifier() {
+        return withSerializerModifier(new BeanSerializerModifier() {
             @Override
             public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
                 return rewriter.apply(serializer);
             }
         });
-    }
-
-
-    /**
-     * 设置字段序列化过滤器
-     *
-     * @param propertyFilter 字段过滤器, 可重写序列化内容
-     * @return
-     */
-    public JsonParser withSerFilter(PropertyFilter propertyFilter) {
-        String filterName = "filter-" + propertyFilter.getClass().getSimpleName();
-        objectMapper.setFilterProvider(
-                new SimpleFilterProvider().addFilter(filterName, propertyFilter)
-        );
-        objectMapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
-            @Override
-            public Object findFilterId(Annotated a) {
-                return filterName;
-            }
-        });
-        return this;
     }
 
 
@@ -192,7 +205,7 @@ public class JsonParser {
      * @return
      */
     public JsonParser withSerEncryptor(SerEncryptor encryptor) {
-        return withSerFilter(new SecurityPropertyFilter(encryptor));
+        return withPropertyFilter(new SecurityPropertyFilter(encryptor));
     }
 
     /**
@@ -313,14 +326,4 @@ public class JsonParser {
     }
 
 
-    /**
-     * 注册模块
-     *
-     * @param module
-     * @return
-     */
-    public JsonParser registerModule(Module module) {
-        objectMapper.registerModule(module);
-        return this;
-    }
 }

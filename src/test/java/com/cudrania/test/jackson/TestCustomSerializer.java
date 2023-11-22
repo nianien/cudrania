@@ -80,7 +80,7 @@ public class TestCustomSerializer {
     @SneakyThrows
     public void testByFilter() {
         JsonParser jsonParser = new JsonParser()
-                .withSerFilter(
+                .withPropertyFilter(
                         new SecurityPropertyFilter(
                                 new RegexSerEncryptor(ENCRYPT_REGEX)));
         Account account = new Account();
