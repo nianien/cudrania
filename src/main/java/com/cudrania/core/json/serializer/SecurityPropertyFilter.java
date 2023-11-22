@@ -1,23 +1,25 @@
-package com.cudrania.core.json;
+package com.cudrania.core.json.serializer;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.PropertyWriter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.databind.ser.std.MapProperty;
 
 /**
- * 支持POJO & Map脱敏<p/>
+ * 支持JSON序列化时对POJO和& Map对象加密<p/>
  * <pre>
- *  Sensitive sensitive = new Sensitive("(?i).*(password|balance|phone|id_?card).*");
+ *  {@link RegexSerEncryptor} sensitive = new {@link RegexSerEncryptor}("(?i).*(password|balance|phone|id_?card).*");
  *
  *  objectMapper.setFilterProvider(
  *
- *    new SimpleFilterProvider().addFilter(filterName, new SecurityPropertyFilter(sensitive))
+ *    new {@link SimpleFilterProvider }().addFilter(filterName, new {@link  SecurityPropertyFilter}(sensitive))
  *    );
  *
- *   objectMapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
+ *   objectMapper.setAnnotationIntrospector(new {@link JacksonAnnotationIntrospector}() {
  *       <code>@Override</code>
  *        public Object findFilterId(Annotated a) {
  *           return filterName;
@@ -29,13 +31,16 @@ import com.fasterxml.jackson.databind.ser.std.MapProperty;
  */
 public class SecurityPropertyFilter extends SimpleBeanPropertyFilter {
 
-    private Sensitive sensitive;
+    /**
+     * 加密器
+     */
+    private SerEncryptor encryptor;
 
     /**
-     * @param sensitive
+     * @param encryptor
      */
-    public SecurityPropertyFilter(Sensitive sensitive) {
-        this.sensitive = sensitive;
+    public SecurityPropertyFilter(SerEncryptor encryptor) {
+        this.encryptor = encryptor;
     }
 
 
@@ -48,17 +53,17 @@ public class SecurityPropertyFilter extends SimpleBeanPropertyFilter {
         if (writer instanceof MapProperty) {
             MapProperty mw = (MapProperty) writer;
             Object value = mw.getValue();
-            if (sensitive.shouldEncrypt(name, value)) {
-                mw.setValue(sensitive.encrypt(name, value));
+            if (encryptor.shouldEncrypt(name, value)) {
+                mw.setValue(encryptor.encrypt(name, value));
             }
             super.serializeAsField(pojo, jgen, provider, writer);
             return;
         } else if (writer instanceof BeanPropertyWriter) {
             BeanPropertyWriter bw = (BeanPropertyWriter) writer;
             Object value = bw.get(pojo);
-            if (sensitive.shouldEncrypt(name, value)) {
+            if (encryptor.shouldEncrypt(name, value)) {
                 //注意: 这里没有直接调用父类方法,是为了不修改pojo对象
-                value = sensitive.encrypt(name, value);
+                value = encryptor.encrypt(name, value);
                 jgen.writeObjectField(name, value);
                 return;
             }
@@ -70,8 +75,8 @@ public class SecurityPropertyFilter extends SimpleBeanPropertyFilter {
     @Override
     public void serializeAsElement(Object elementValue, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) throws Exception {
         if (writer instanceof MapProperty) {
-            if (sensitive.shouldEncrypt(writer.getName(), elementValue)) {
-                ((MapProperty) writer).setValue(sensitive.encrypt(writer.getName(), elementValue));
+            if (encryptor.shouldEncrypt(writer.getName(), elementValue)) {
+                ((MapProperty) writer).setValue(encryptor.encrypt(writer.getName(), elementValue));
             }
         }
         super.serializeAsElement(elementValue, jgen, provider, writer);

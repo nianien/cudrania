@@ -1,5 +1,6 @@
 package com.cudrania.test.bean;
 
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ public class Account {
 
     private long id;
 
+    @JsonPropertyDescription("用户名")
     private String userName;
 
     @JsonView({FullView.class})

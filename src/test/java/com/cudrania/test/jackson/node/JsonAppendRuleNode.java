@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import com.fasterxml.jackson.databind.annotation.JsonAppend.Prop;
 
 /**
- * 条件节点定义
+ * 继承该接口, 序列化时自动追加属性
  *
  * @author liyifei
  */

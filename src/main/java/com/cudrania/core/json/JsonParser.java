@@ -1,21 +1,29 @@
 package com.cudrania.core.json;
 
 import com.cudrania.core.date.DateFormatter;
+import com.cudrania.core.functions.Fn.Function;
+import com.cudrania.core.json.serializer.SecurityPropertyFilter;
+import com.cudrania.core.json.serializer.SerEncryptor;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.introspect.Annotated;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
+import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
+import com.fasterxml.jackson.databind.ser.PropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import lombok.SneakyThrows;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * JSON与Java对象相互转换的工具类
@@ -55,7 +63,7 @@ public class JsonParser {
                 .configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false)
                 //支持字段序列化
                 .setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
-        this.setDatePatterns(new String[]{"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM-dd", "MM-dd HH:mm"});
+        this.withDatePatterns(new String[]{"yyyy-MM-dd HH:mm:ss", "yyyy-MM-dd HH:mm", "yyyy-MM-dd", "MM-dd HH:mm"});
     }
 
     /**
@@ -76,13 +84,26 @@ public class JsonParser {
         return objectMapper;
     }
 
+
+    /**
+     * 设置字段可见性
+     *
+     * @param accessor
+     * @param visibility
+     * @return
+     */
+    public JsonParser setVisibility(PropertyAccessor accessor, Visibility visibility) {
+        objectMapper.setVisibility(accessor, visibility);
+        return this;
+    }
+
     /**
      * 设置识别的日期格式集合
      *
      * @param datePatterns
      * @return
      */
-    public JsonParser setDatePatterns(final String[] datePatterns) {
+    public JsonParser withDatePatterns(final String[] datePatterns) {
         objectMapper.setDateFormat(new SimpleDateFormat(datePatterns[0]) {
             @Override
             @SneakyThrows
@@ -91,6 +112,87 @@ public class JsonParser {
             }
         });
         return this;
+    }
+
+
+    /**
+     * 设置字段序列化改写器
+     *
+     * @param serModifier 序列化改写器, 可重写序列化内容
+     * @return
+     */
+    public JsonParser withSerModifier(BeanSerializerModifier serModifier) {
+        objectMapper.setSerializerFactory(
+                objectMapper.getSerializerFactory().withSerializerModifier(serModifier)
+        );
+        return this;
+    }
+
+    /**
+     * 修改字段序列化器
+     *
+     * @param rewriter 字段序列化器, 可重写序列化内容
+     * @return
+     */
+    public JsonParser modifyPropertyWriter(Function<BeanPropertyWriter, BeanPropertyWriter> rewriter) {
+        return withSerModifier(new BeanSerializerModifier() {
+            @Override
+            public List<BeanPropertyWriter> changeProperties(SerializationConfig config,
+                                                             BeanDescription beanDesc,
+                                                             List<BeanPropertyWriter> beanProperties) {
+                //修改原有的BeanPropertyWriter列表
+                return beanProperties.stream().map(rewriter)
+                        .collect(Collectors.toList());
+            }
+        });
+    }
+
+
+    /**
+     * 修改字段序列化器
+     *
+     * @param rewriter 字段序列化器, 可重写序列化内容
+     * @return
+     */
+    public JsonParser modifySerializer(Function<JsonSerializer, JsonSerializer> rewriter) {
+        return withSerModifier(new BeanSerializerModifier() {
+            @Override
+            public JsonSerializer<?> modifySerializer(SerializationConfig config, BeanDescription beanDesc, JsonSerializer<?> serializer) {
+                return rewriter.apply(serializer);
+            }
+        });
+    }
+
+
+    /**
+     * 设置字段序列化过滤器
+     *
+     * @param propertyFilter 字段过滤器, 可重写序列化内容
+     * @return
+     */
+    public JsonParser withSerFilter(PropertyFilter propertyFilter) {
+        String filterName = "filter-" + propertyFilter.getClass().getSimpleName();
+        objectMapper.setFilterProvider(
+                new SimpleFilterProvider().addFilter(filterName, propertyFilter)
+        );
+        objectMapper.setAnnotationIntrospector(new JacksonAnnotationIntrospector() {
+            @Override
+            public Object findFilterId(Annotated a) {
+                return filterName;
+            }
+        });
+        return this;
+    }
+
+
+    /**
+     * 设置字段序列化加密器
+     *
+     * @param encryptor 字段加密器
+     * @return
+     */
+    public JsonParser withSerEncryptor(SerEncryptor encryptor) {
+        return withSerFilter(new SecurityPropertyFilter(encryptor));
     }
 
     /**
@@ -210,4 +312,15 @@ public class JsonParser {
         return objectMapper.readValue(json, valueType);
     }
 
+
+    /**
+     * 注册模块
+     *
+     * @param module
+     * @return
+     */
+    public JsonParser registerModule(Module module) {
+        objectMapper.registerModule(module);
+        return this;
+    }
 }

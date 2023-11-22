@@ -1,5 +1,6 @@
 package com.cudrania.test.jackson.node;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.util.function.Predicate;
  */
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class ExprNode extends TypeNode implements RuleNode {
 
     /**

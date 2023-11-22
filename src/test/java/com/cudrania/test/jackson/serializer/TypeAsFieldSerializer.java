@@ -8,6 +8,9 @@ import com.fasterxml.jackson.databind.ser.std.BeanSerializerBase;
 
 import java.io.IOException;
 
+/**
+ * 序列化时重写序列化字段
+ */
 public class TypeAsFieldSerializer extends BeanSerializer {
 
 

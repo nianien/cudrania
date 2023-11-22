@@ -1,4 +1,4 @@
-package com.cudrania.test.jackson.serializer;
+package com.cudrania.core.json.serializer;
 
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -6,13 +6,39 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 
 /**
- * 提供字段描述
+ * 支持JSON序列化时对POJO提供字段描述<p/>
+ * <pre>
+ *    objectMapper.setSerializerFactory(
+ *
+ *      objectMapper.getSerializerFactory()
+ *
+ *      .withSerializerModifier(new BeanSerializerModifier() {
+ *
+ *          <code>@Override</code>
+ *          public List<BeanPropertyWriter> changeProperties(SerializationConfig config,
+ *              BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties) {
+ *
+ *                  //修改原有的BeanPropertyWriter列表
+ *                  return beanProperties
+ *                          .stream()
+ *                          .map(writer -> new DescriptionPropertyWriter(writer))
+ *                          .collect(Collectors.toList());
+ *              }
+ *      }
+ *    )
+ * );
+ * </pre>
  */
 public class DescriptionPropertyWriter extends BeanPropertyWriter {
 
 
     private final BeanPropertyWriter writer;
 
+    /**
+     * 根据{@link JsonPropertyDescription}添加序列化字段
+     *
+     * @param writer
+     */
     public DescriptionPropertyWriter(BeanPropertyWriter writer) {
         super(writer);
         this.writer = writer;

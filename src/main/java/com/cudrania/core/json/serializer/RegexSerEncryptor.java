@@ -1,14 +1,14 @@
-package com.cudrania.core.json;
+package com.cudrania.core.json.serializer;
 
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
- * 敏感字段校验类
+ * 基于正则式进行加密字段判断和加密处理
  *
  * @author liyifei
  */
-public class Sensitive {
+public class RegexSerEncryptor implements SerEncryptor<Object> {
 
     /**
      * 敏感字段判断
@@ -27,12 +27,13 @@ public class Sensitive {
 
 
     /**
-     * 提供字段判断和字段转换
+     * 加密字段判断和字段值转换
      *
      * @param validator
+     * @param converter
      * @param castAsString
      */
-    public Sensitive(Predicate<String> validator, boolean castAsString, BiFunction<String, Object, String> converter) {
+    public RegexSerEncryptor(Predicate<String> validator, BiFunction<String, Object, String> converter, boolean castAsString) {
         this.validator = validator;
         this.castAsString = castAsString;
         this.converter = converter;
@@ -44,8 +45,8 @@ public class Sensitive {
      *
      * @param regex
      */
-    public Sensitive(String regex) {
-        this(s -> s.matches(regex), true, (k, v) -> "****");
+    public RegexSerEncryptor(String regex) {
+        this(s -> s.matches(regex), (k, v) -> "****", true);
     }
 
 

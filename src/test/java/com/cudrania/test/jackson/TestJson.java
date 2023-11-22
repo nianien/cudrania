@@ -52,7 +52,7 @@ public class TestJson {
         System.out.println(obj);
 
         Assertions.assertEquals(obj.getClass(), Date.class);
-        jp.setDatePatterns(new String[]{"yyyy年MM月dd日"});
+        jp.withDatePatterns(new String[]{"yyyy年MM月dd日"});
         System.out.println(jp.toJson(new Date()));
         System.out.println(jp.toJson(Color.BLACK));
         obj = jp.toBean("\"BLACK\"", Color.class);
