@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ser.std.MapProperty;
 /**
  * 支持JSON序列化时对POJO和& Map对象加密<p/>
  * <pre>
- *  {@link RegexSerEncryptor} sensitive = new {@link RegexSerEncryptor}("(?i).*(password|balance|phone|id_?card).*");
+ *  {@link SimpleSerEncryptor} sensitive = new {@link SimpleSerEncryptor}("(?i).*(password|balance|phone|id_?card).*");
  *
  *  objectMapper.setFilterProvider(
  *

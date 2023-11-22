@@ -4,11 +4,11 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
- * 基于正则式进行加密字段判断和加密处理
+ * 字段判断和加密处理的默认实现
  *
  * @author liyifei
  */
-public class RegexSerEncryptor implements SerEncryptor<Object> {
+public class SimpleSerEncryptor implements SerEncryptor {
 
     /**
      * 敏感字段判断
@@ -21,19 +21,19 @@ public class RegexSerEncryptor implements SerEncryptor<Object> {
     private BiFunction<String, Object, String> converter;
 
     /**
-     * 是否进行类型转换
+     * 是否将加密字段强制转换成字符串
      */
     private boolean castAsString;
 
 
     /**
-     * 加密字段判断和字段值转换
+     * 支持自定义的加密字段判断和处理
      *
      * @param validator
      * @param converter
      * @param castAsString
      */
-    public RegexSerEncryptor(Predicate<String> validator, BiFunction<String, Object, String> converter, boolean castAsString) {
+    public SimpleSerEncryptor(Predicate<String> validator, BiFunction<String, Object, String> converter, boolean castAsString) {
         this.validator = validator;
         this.castAsString = castAsString;
         this.converter = converter;
@@ -41,33 +41,18 @@ public class RegexSerEncryptor implements SerEncryptor<Object> {
 
 
     /**
-     * 提供字段判断
+     * 基于正则式实现的加密字段判断和处理
      *
      * @param regex
      */
-    public RegexSerEncryptor(String regex) {
+    public SimpleSerEncryptor(String regex) {
         this(s -> s.matches(regex), (k, v) -> "****", true);
     }
 
-
-    /**
-     * 检查字段是否敏感字段
-     *
-     * @param name
-     * @param value
-     * @return
-     */
     public boolean shouldEncrypt(String name, Object value) {
         return validator.test(name) && (castAsString || value instanceof String);
     }
 
-    /**
-     * 处理敏感字段
-     *
-     * @param name
-     * @param value
-     * @return
-     */
     public String encrypt(String name, Object value) {
         return converter.apply(name, value);
     }

@@ -2,9 +2,9 @@ package com.cudrania.test.jackson;
 
 import com.cudrania.core.json.JsonParser;
 import com.cudrania.core.json.serializer.DescriptionPropertyWriter;
-import com.cudrania.core.json.serializer.RegexSerEncryptor;
 import com.cudrania.core.json.serializer.SecurityPropertyFilter;
 import com.cudrania.core.json.serializer.SecurityPropertyWriter;
+import com.cudrania.core.json.serializer.SimpleSerEncryptor;
 import com.cudrania.test.bean.Account;
 import com.cudrania.test.bean.Account.FullView;
 import com.cudrania.test.bean.Account.SimpleView;
@@ -34,7 +34,7 @@ public class TestCustomSerializer {
      */
     @Test
     public void testBySerEncryptor() {
-        JsonParser parser = new JsonParser().withSerEncryptor(new RegexSerEncryptor(ENCRYPT_REGEX));
+        JsonParser parser = new JsonParser().withSerEncryptor(new SimpleSerEncryptor(ENCRYPT_REGEX));
         Account account = new Account();
         account.setId(1001);
         account.setUserName("jack-wang");
@@ -57,7 +57,7 @@ public class TestCustomSerializer {
     @Test
     public void testByModifier() {
         JsonParser parser = new JsonParser()
-                .modifyPropertyWriter(w -> new SecurityPropertyWriter(w, new RegexSerEncryptor(ENCRYPT_REGEX)));
+                .modifyPropertyWriter(w -> new SecurityPropertyWriter(w, new SimpleSerEncryptor(ENCRYPT_REGEX)));
         Account account = new Account();
         account.setId(1001);
         account.setUserName("jack-wang");
@@ -82,7 +82,7 @@ public class TestCustomSerializer {
         JsonParser jsonParser = new JsonParser()
                 .withPropertyFilter(
                         new SecurityPropertyFilter(
-                                new RegexSerEncryptor(ENCRYPT_REGEX)));
+                                new SimpleSerEncryptor(ENCRYPT_REGEX)));
         Account account = new Account();
         account.setId(1001);
         account.setUserName("jack-wang");

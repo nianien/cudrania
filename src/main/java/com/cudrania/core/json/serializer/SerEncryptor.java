@@ -9,21 +9,22 @@ package com.cudrania.core.json.serializer;
 public interface SerEncryptor<T> {
 
     /**
-     * 检查字段是否敏感字段
+     * 判定是否需要加密
      *
-     * @param name
-     * @param value
+     * @param name  字段名
+     * @param value 字段值
      * @return
      */
-    boolean shouldEncrypt(String name, Object value);
+    boolean shouldEncrypt(String name, T value);
 
     /**
-     * 对JSON字段进行加密
+     * 对字段进行加密处理
      *
-     * @param value
+     * @param name  字段名
+     * @param value 字段值
      * @return
      */
-    String encrypt(String key, T value);
+    String encrypt(String name, T value);
 
 
 }
