@@ -1,10 +1,7 @@
 package com.cudrania.test.jackson;
 
 import com.cudrania.core.json.JsonParser;
-import com.cudrania.core.json.serializer.DescriptionPropertyWriter;
-import com.cudrania.core.json.serializer.SecurityPropertyFilter;
-import com.cudrania.core.json.serializer.SecurityPropertyWriter;
-import com.cudrania.core.json.serializer.SimpleSerEncryptor;
+import com.cudrania.core.json.serializer.*;
 import com.cudrania.test.bean.Account;
 import com.cudrania.test.bean.Account.FullView;
 import com.cudrania.test.bean.Account.SimpleView;
@@ -26,15 +23,15 @@ public class TestCustomSerializer {
 
 
     //通过正则表达式判断是否为敏感字段
-    static String ENCRYPT_REGEX = new String("(?i).*(password|balance|phone|id_?card).*");
 
+    static SerEncryptor encryptor = new SimpleSerEncryptor("(?i).*(password|balance|phone|id_?card).*", "****");
 
     /**
      * 序列化字段加密
      */
     @Test
     public void testBySerEncryptor() {
-        JsonParser parser = new JsonParser().withSerEncryptor(new SimpleSerEncryptor(ENCRYPT_REGEX));
+        JsonParser parser = new JsonParser().withSerEncryptor(encryptor);
         Account account = new Account();
         account.setId(1001);
         account.setUserName("jack-wang");
@@ -57,7 +54,7 @@ public class TestCustomSerializer {
     @Test
     public void testByModifier() {
         JsonParser parser = new JsonParser()
-                .modifyPropertyWriter(w -> new SecurityPropertyWriter(w, new SimpleSerEncryptor(ENCRYPT_REGEX)));
+                .modifyPropertyWriter(w -> new SecurityPropertyWriter(w, encryptor));
         Account account = new Account();
         account.setId(1001);
         account.setUserName("jack-wang");
@@ -81,8 +78,7 @@ public class TestCustomSerializer {
     public void testByFilter() {
         JsonParser jsonParser = new JsonParser()
                 .withPropertyFilter(
-                        new SecurityPropertyFilter(
-                                new SimpleSerEncryptor(ENCRYPT_REGEX)));
+                        new SecurityPropertyFilter(encryptor));
         Account account = new Account();
         account.setId(1001);
         account.setUserName("jack-wang");

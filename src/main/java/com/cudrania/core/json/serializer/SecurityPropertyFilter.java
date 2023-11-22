@@ -12,11 +12,11 @@ import com.fasterxml.jackson.databind.ser.std.MapProperty;
 /**
  * 支持JSON序列化时对POJO和& Map对象加密<p/>
  * <pre>
- *  {@link SimpleSerEncryptor} sensitive = new {@link SimpleSerEncryptor}("(?i).*(password|balance|phone|id_?card).*");
+ *  {@link SimpleSerEncryptor} encryptor = new {@link SimpleSerEncryptor}("(?i).*(password|balance|phone|id_?card).*");
  *
  *  objectMapper.setFilterProvider(
  *
- *    new {@link SimpleFilterProvider }().addFilter(filterName, new {@link  SecurityPropertyFilter}(sensitive))
+ *    new {@link SimpleFilterProvider }().addFilter(filterName, new {@link  SecurityPropertyFilter}(encryptor))
  *    );
  *
  *   objectMapper.setAnnotationIntrospector(new {@link JacksonAnnotationIntrospector}() {
@@ -53,7 +53,7 @@ public class SecurityPropertyFilter extends SimpleBeanPropertyFilter {
         if (writer instanceof MapProperty) {
             MapProperty mw = (MapProperty) writer;
             Object value = mw.getValue();
-            if (encryptor.shouldEncrypt(name, value)) {
+            if (encryptor.shouldEncrypt(name)) {
                 mw.setValue(encryptor.encrypt(name, value));
             }
             super.serializeAsField(pojo, jgen, provider, writer);
@@ -61,7 +61,7 @@ public class SecurityPropertyFilter extends SimpleBeanPropertyFilter {
         } else if (writer instanceof BeanPropertyWriter) {
             BeanPropertyWriter bw = (BeanPropertyWriter) writer;
             Object value = bw.get(pojo);
-            if (encryptor.shouldEncrypt(name, value)) {
+            if (encryptor.shouldEncrypt(name)) {
                 //注意: 这里没有直接调用父类方法,是为了不修改pojo对象
                 value = encryptor.encrypt(name, value);
                 jgen.writeObjectField(name, value);
@@ -75,7 +75,7 @@ public class SecurityPropertyFilter extends SimpleBeanPropertyFilter {
     @Override
     public void serializeAsElement(Object elementValue, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) throws Exception {
         if (writer instanceof MapProperty) {
-            if (encryptor.shouldEncrypt(writer.getName(), elementValue)) {
+            if (encryptor.shouldEncrypt(writer.getName())) {
                 ((MapProperty) writer).setValue(encryptor.encrypt(writer.getName(), elementValue));
             }
         }

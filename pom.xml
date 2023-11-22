@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.nianien</groupId>
     <artifactId>cudrania</artifactId>
-    <version>1.2.1-jdk17</version>
+    <version>1.2.2-jdk17</version>
     <name>cudrania</name>
     <description>support tools for java development</description>
     <url>https://github.com/nianien/cudrania</url>

@@ -1,7 +1,7 @@
 package com.cudrania.core.json.serializer;
 
 /**
- * 序列化加密接口定义
+ * JSON字段序列化加密接口定义
  * Created on 2022/2/18
  *
  * @author liyifei
@@ -9,16 +9,15 @@ package com.cudrania.core.json.serializer;
 public interface SerEncryptor<T> {
 
     /**
-     * 判定是否需要加密
+     * 判定是否需要处理
      *
-     * @param name  字段名
-     * @param value 字段值
+     * @param name 字段名
      * @return
      */
-    boolean shouldEncrypt(String name, T value);
+    boolean shouldEncrypt(String name);
 
     /**
-     * 对字段进行加密处理
+     * 对字段内容进行处理
      *
      * @param name  字段名
      * @param value 字段值

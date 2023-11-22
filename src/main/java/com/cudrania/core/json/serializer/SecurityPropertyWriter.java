@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 /**
  * 支持JSON序列化时对POJO对象加密<p/>
  * <pre>
- *  {@link SimpleSerEncryptor} sensitive = new {@link SimpleSerEncryptor}("(?i).*(password|balance|phone|id_?card).*");
+ *  {@link SimpleSerEncryptor} encryptor = new {@link SimpleSerEncryptor}("(?i).*(password|balance|phone|id_?card).*");
  *  objectMapper.setSerializerFactory(
  *
  *       objectMapper.getSerializerFactory()
@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
  *            //修改原有的BeanPropertyWriter列表
  *            return beanProperties
  *                  .stream()
- *                  .map(writer -> new {@link  SecurityPropertyFilter}(writer, sensitive))
+ *                  .map(writer -> new {@link  SecurityPropertyFilter}(writer, encryptor))
  *                  .collect(Collectors.toList());
  *          }
  *      })
@@ -58,7 +58,7 @@ public class SecurityPropertyWriter extends BeanPropertyWriter {
         if (value == null) {
             return;
         }
-        if (encryptor.shouldEncrypt(name, value)) {
+        if (encryptor.shouldEncrypt(name)) {
             value = encryptor.encrypt(name, value);
         }
         gen.writeObjectField(name, value);
