@@ -16,12 +16,12 @@ public class SimpleSerEncryptor implements SerEncryptor {
     private Predicate<String> validator;
 
     /**
-     * 字段转换函数
+     * 内容转换函数
      */
-    private BiFunction<String, Object, String> converter;
+    private BiFunction<String, Object, Object> converter;
 
     /**
-     * 是否将加密字段强制转换成字符串
+     * 是否支持字段强制转换成字符串
      */
     private boolean castAsString;
 
@@ -29,11 +29,11 @@ public class SimpleSerEncryptor implements SerEncryptor {
     /**
      * 支持自定义的加密字段判断和处理
      *
-     * @param validator
-     * @param converter
-     * @param castAsString
+     * @param validator    判断字段是否需要加密
+     * @param converter    字段内容转换函数
+     * @param castAsString 是否支持字段强制转换成字符串
      */
-    public SimpleSerEncryptor(Predicate<String> validator, BiFunction<String, Object, String> converter, boolean castAsString) {
+    public SimpleSerEncryptor(Predicate<String> validator, BiFunction<String, Object, Object> converter, boolean castAsString) {
         this.validator = validator;
         this.castAsString = castAsString;
         this.converter = converter;
@@ -53,7 +53,7 @@ public class SimpleSerEncryptor implements SerEncryptor {
         return validator.test(name) && (castAsString || value instanceof String);
     }
 
-    public String encrypt(String name, Object value) {
+    public Object encrypt(String name, Object value) {
         return converter.apply(name, value);
     }
 }

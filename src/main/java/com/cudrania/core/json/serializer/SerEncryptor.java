@@ -24,7 +24,7 @@ public interface SerEncryptor<T> {
      * @param value 字段值
      * @return
      */
-    String encrypt(String name, T value);
+    Object encrypt(String name, T value);
 
 
 }
