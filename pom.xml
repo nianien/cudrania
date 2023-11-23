@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.github.nianien</groupId>
     <artifactId>cudrania</artifactId>
-    <version>1.2.3-jdk17</version>
+    <version>1.2.3</version>
     <name>cudrania</name>
     <description>support tools for java development</description>
     <url>https://github.com/nianien/cudrania</url>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>17</java.version>
+        <java.version>11</java.version>
         <lombok.version>1.18.26</lombok.version>
         <javassist.version>3.29.2-GA</javassist.version>
         <jackson.version>2.15.1</jackson.version>
