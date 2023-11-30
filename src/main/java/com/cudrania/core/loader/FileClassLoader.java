@@ -53,7 +53,7 @@ public class FileClassLoader extends URLClassLoader {
 
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
-        //资源扫描时,有限加载当前文件中的资源
+        //资源扫描时,优先加载当前文件中的资源
         Enumeration<URL> enumeration = findResources(name);
         if (enumeration.hasMoreElements()) {
             return enumeration;
