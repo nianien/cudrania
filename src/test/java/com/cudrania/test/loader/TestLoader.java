@@ -16,24 +16,27 @@ import java.io.File;
 public class TestLoader {
 
     @Test
-    public void testLoader() throws Exception {
-        ClassLoader loader = new FileClassLoader(new File("./target/test-classes"));
-        Class<?> cl = loader.loadClass(TestLoader.class.getName());
-        cl.getMethod("test0").invoke(null);
+    public void testLoader() {
+        CompositeClassLoader ccl = new CompositeClassLoader();
+        ccl.add(new File("./src/test/resources/test1.jar"), FileClassLoader::new);
+        ccl.add(new File("./src/test/resources/test2.jar"), FileClassLoader::new);
+        System.out.println(ccl.get());
+        ccl.remove(new File("./src/test/resources/test2.jar"));
+        System.out.println(ccl.get());
     }
 
 
     @Test
     public void testLoader2() throws Exception {
         CompositeClassLoader ccl = new CompositeClassLoader();
-        ccl.add(new File("./src/test/resources/test.jar"));
-        ccl.add(new File("./target/test-classes"));
+        ccl.add(new File("./src/test/resources/test.jar"), FileClassLoader::new);
+        ccl.add(new File("./target/test-classes"), FileClassLoader::new);
         Class testAClass1 = ccl.loadClass("com.test.jar.TestA");
         testAClass1.getDeclaredMethod("test").invoke(testAClass1.getDeclaredConstructor().newInstance());
         ccl.remove(new File("./src/test/resources/test.jar"));
         Assertions.assertThrows(ClassNotFoundException.class, () -> ccl.loadClass("com.test.jar.TestA"));
-        ccl.add(new File("./src/test/resources/test2.jar"));
-        ccl.add(new File("./src/test/resources/test.jar"));
+        ccl.add(new File("./src/test/resources/test2.jar"), FileClassLoader::new);
+        ccl.add(new File("./src/test/resources/test.jar"), FileClassLoader::new);
         Class testAClass2 = ccl.loadClass("com.test.jar.TestA");
         Assertions.assertNotEquals(testAClass1, testAClass2);
         testAClass2.getDeclaredMethod("test").invoke(testAClass2.getDeclaredConstructor().newInstance());
@@ -49,13 +52,13 @@ public class TestLoader {
     @SneakyThrows
     public void testLoader3() {
         CompositeClassLoader ccl = new CompositeClassLoader();
-        ccl.insert(new File("./src/test/resources/test2.jar"));
+        ccl.insert(new File("./src/test/resources/test2.jar"), FileClassLoader::new);
         Class<?> aClass = Class.forName("com.test.jar.TestA", false, ccl);
         System.out.println(aClass.getClassLoader());
         ccl.remove(new File("./src/test/resources/test2.jar"));
         Class<?> bClass = Class.forName("com.test.jar.TestA", false, ccl);
         Assertions.assertThrows(ClassNotFoundException.class, () -> ccl.loadClass("com.test.jar.TestA"));
-        ccl.add(new File("./src/test/resources/test.jar"));
+        ccl.add(new File("./src/test/resources/test.jar"), FileClassLoader::new);
         System.out.println("@@@@@@@");
         Class<?> cClass = ccl.loadClass("com.test.jar.TestA");
         System.out.println(bClass.getClassLoader());
@@ -68,25 +71,22 @@ public class TestLoader {
     @SneakyThrows
     public void testLoader4() {
         CompositeClassLoader ccl = new CompositeClassLoader();
-        ccl.add(new File("./src/test/resources/test2.jar"));
-        Class<?> aClass = Class.forName("com.test.jar.TestA", false, ccl.wrapped());
+        ccl.add(new File("./src/test/resources/test2.jar"), FileClassLoader::new);
+        Class<?> aClass = Class.forName("com.test.jar.TestA", false, ccl.get());
         System.out.println(aClass.getClassLoader());
         ccl.remove(new File("./src/test/resources/test2.jar"));
-        ccl.add(new File("./src/test/resources/test.jar"));
-        Class<?> bClass = Class.forName("com.test.jar.TestA", false, ccl.wrapped());
+        ccl.add(new File("./src/test/resources/test.jar"), FileClassLoader::new);
+        Class<?> bClass = Class.forName("com.test.jar.TestA", false, ccl.get());
         Class<?> cClass = ccl.loadClass("com.test.jar.TestA");
         System.out.println(bClass.getClassLoader());
         System.out.println(cClass.getClassLoader());
         Assertions.assertNotEquals(aClass, bClass);
         Assertions.assertEquals(bClass, cClass);
-        Thread.currentThread().setContextClassLoader(ccl.wrapped());
+        Thread.currentThread().setContextClassLoader(ccl.get());
         ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
         Assertions.assertNotNull(engine);
         System.out.println(engine);
     }
 
-    public static void test0() {
-        System.out.println("hello,world");
-    }
 
 }

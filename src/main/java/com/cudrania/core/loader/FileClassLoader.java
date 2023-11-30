@@ -1,5 +1,6 @@
 package com.cudrania.core.loader;
 
+import lombok.Getter;
 import lombok.SneakyThrows;
 
 import java.io.File;
@@ -22,7 +23,8 @@ import java.util.Enumeration;
  */
 public class FileClassLoader extends URLClassLoader {
 
-    private File file;
+    @Getter
+    private final File file;
 
     private String[] excludes;
 

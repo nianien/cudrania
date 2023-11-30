@@ -2,13 +2,13 @@ package com.cudrania.core.loader;
 
 import lombok.SneakyThrows;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
+import java.util.function.Function;
 
 /**
  * 多个类加载器聚合的classloader，支持动态增删类加载器
@@ -21,16 +21,17 @@ public class CompositeClassLoader extends ClassLoader {
     /**
      * 当前classloader的包装对象
      */
-    private ClassLoaderWrapper classloader;
+    private ClassLoaderWrapper wrapper;
     /**
      * 根加载器的包装对象
      */
     private ClassLoaderWrapper root;
 
     /**
-     * 文件到classloader的映射
+     * classloader的集合
      */
-    private Map<File, ClassLoader> filesClassLoader = new HashMap<>();
+    private Map<Object, ClassLoader> classLoaders = new HashMap<>();
+
 
     /**
      * 默认使用当前上下文类加载器
@@ -46,39 +47,41 @@ public class CompositeClassLoader extends ClassLoader {
      */
     public CompositeClassLoader(ClassLoader classLoader) {
         if (classLoader instanceof ClassLoaderWrapper) {
-            this.classloader = (ClassLoaderWrapper) classLoader;
+            this.wrapper = (ClassLoaderWrapper) classLoader;
         } else {
-            this.classloader = new ClassLoaderWrapper(classLoader, classLoader.getParent());
+            this.wrapper = new ClassLoaderWrapper(classLoader, classLoader.getParent());
         }
-        this.root = this.classloader;
+        this.root = this.wrapper;
     }
 
     public Class<?> loadClass(String name)
             throws ClassNotFoundException {
-        return classloader.loadClass(name);
+        return wrapper.loadClass(name);
     }
 
 
     @Override
     public Enumeration<URL> getResources(String name) throws IOException {
-        return classloader.getResources(name);
+        return wrapper.getResources(name);
     }
 
     @Override
     public URL getResource(String name) {
-        return classloader.getResource(name);
+        return wrapper.getResource(name);
     }
 
 
     /**
-     * 添加类加载器加载指定文件,优先级最低
+     * 添加类加载器,优先级仅次于根加载器
      *
-     * @param file
+     * @param key
+     * @param builder
      * @return
      */
-    public CompositeClassLoader add(File file) {
-        filesClassLoader.computeIfAbsent(file, k -> {
-            FileClassLoader classLoader = new FileClassLoader(k);
+    public <T> CompositeClassLoader add(T key, Function<T, ClassLoader> builder) {
+        Map<T, ClassLoader> cls = (Map<T, ClassLoader>) classLoaders;
+        cls.computeIfAbsent(key, k -> {
+            ClassLoader classLoader = builder.apply(k);
             CompositeClassLoader.this.add(classLoader);
             return classLoader;
         });
@@ -92,20 +95,22 @@ public class CompositeClassLoader extends ClassLoader {
      * @return
      */
     public CompositeClassLoader add(ClassLoader loader) {
-        this.classloader = this.classloader.add(loader);
+        this.wrapper = this.wrapper.add(loader);
         return this;
     }
 
 
     /**
-     * 添加类加载器加载指定文件,优先级仅次于根加载器
+     * 添加类加载器,优先级仅次于根加载器
      *
-     * @param file
+     * @param key
+     * @param clsLoader
      * @return
      */
-    public CompositeClassLoader insert(File file) {
-        filesClassLoader.computeIfAbsent(file, k -> {
-            FileClassLoader classLoader = new FileClassLoader(k);
+    public <T> CompositeClassLoader insert(T key, Function<T, ClassLoader> clsLoader) {
+        Map<T, ClassLoader> cls = (Map<T, ClassLoader>) classLoaders;
+        cls.computeIfAbsent(key, k -> {
+            ClassLoader classLoader = clsLoader.apply(k);
             CompositeClassLoader.this.insert(classLoader);
             return classLoader;
         });
@@ -113,26 +118,26 @@ public class CompositeClassLoader extends ClassLoader {
     }
 
     /**
-     * 添加指定类加载器,优先级仅次于根加载器
+     * 添加类加载器,优先级仅次于根加载器
      *
      * @param loader
      * @return
      */
     public CompositeClassLoader insert(ClassLoader loader) {
-        this.classloader = this.classloader.insert(loader);
+        this.wrapper = this.wrapper.insert(loader);
         return this;
     }
 
 
     /**
-     * 移除指定文件的类加载器
+     * 移除指定类加载器
      *
-     * @param file
+     * @param key
      * @return
      */
     @SneakyThrows
-    public CompositeClassLoader remove(File file) {
-        filesClassLoader.computeIfPresent(file, (k,v) -> {
+    public <T> CompositeClassLoader remove(T key) {
+        classLoaders.computeIfPresent(key, (k, v) -> {
             CompositeClassLoader.this.remove(v);
             return null;
         });
@@ -141,32 +146,35 @@ public class CompositeClassLoader extends ClassLoader {
 
 
     /**
-     * 移除类加载器
+     * 移除指定类加载器
      *
      * @param loader
      * @return
      */
     @SneakyThrows
     public CompositeClassLoader remove(ClassLoader loader) {
-        this.classloader = this.classloader.remove(loader);
+        if (classLoaders.values().contains(loader)) {
+            this.wrapper = this.wrapper.remove(loader);
+            this.classLoaders.remove(loader);
+        }
         return this;
     }
 
 
     /**
-     * 获取当前类加载器的包装对象
+     * 获取当前类加载器
      *
      * @return
      */
-    public ClassLoaderWrapper wrapped() {
-        return this.classloader;
+    public ClassLoader get() {
+        return this.wrapper.unwrap();
     }
 
 
     /**
      * 类加载的包装类
      */
-    protected class ClassLoaderWrapper extends ClassLoader {
+    private class ClassLoaderWrapper extends ClassLoader {
 
         private ClassLoader classloader;
 
