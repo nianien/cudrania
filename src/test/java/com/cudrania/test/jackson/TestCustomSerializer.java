@@ -11,6 +11,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -102,12 +103,36 @@ public class TestCustomSerializer {
      * 序列化自动添加字段描述
      */
     @Test
+    public void testPbField() {
+        JsonParser parser = new JsonParser()
+                .modifyPropertyWriter(writer -> new ProtobufPropertyWriter(writer));
+
+        Account account = new Account();
+        account.setId(1001);
+        account.setFavorites(Arrays.asList("apple", "banana", "orange"));
+        account.setUserName("jack-wang");
+        account.setPassword("pwd12345");
+        account.setPhone("18901010001");
+        Map<String, String> map = new HashMap<>();
+        map.put("id_card", "110115200810010011");
+        map.put("balance", "1314.520");
+        map.put("email", "18901010001@qq.com");
+        account.setExtras(map);
+        System.out.println(parser.toJson(account));
+        System.out.println(parser.toJson(map));
+    }
+
+    /**
+     * 序列化自动添加字段描述
+     */
+    @Test
     public void testFieldDesc() {
         JsonParser parser = new JsonParser()
                 .modifyPropertyWriter(writer -> new DescriptionPropertyWriter(writer));
 
         Account account = new Account();
         account.setId(1001);
+        account.setFavorites(Arrays.asList("apple", "banana", "orange"));
         account.setUserName("jack-wang");
         account.setPassword("pwd12345");
         account.setPhone("18901010001");

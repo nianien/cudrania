@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,6 +20,8 @@ public class Account {
 
     @JsonPropertyDescription("用户名")
     private String userName;
+
+    private List<String> favorites;
 
     @JsonView({FullView.class})
     private String password;
