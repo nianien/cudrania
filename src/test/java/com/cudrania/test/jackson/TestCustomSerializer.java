@@ -103,23 +103,24 @@ public class TestCustomSerializer {
      * 序列化自动添加字段描述
      */
     @Test
-    public void testPbField() {
-        JsonParser parser = new JsonParser()
-                .modifyPropertyWriter(writer -> new ProtobufPropertyWriter(writer));
+    public void testPbFieldFromBean() {
+        JsonParser jp = new JsonParser()
+                .modifyPropertyWriter(writer -> new PbPropertyWriter(writer));
+        String json = "{\"id\":1001,\"userName\":\"jack-wang\",\"favorites\":[\"apple\",\"banana\",\"orange\"],\"password\":\"pwd12345\",\"phone\":\"18901010001\",\"extras\":{\"balance\":\"1314.520\",\"id_card\":\"110115200810010011\",\"email\":\"18901010001@qq.com\"}}";
+        System.out.println(jp.toJson(jp.toBean(json, Account.class)));
+    }
 
-        Account account = new Account();
-        account.setId(1001);
-        account.setFavorites(Arrays.asList("apple", "banana", "orange"));
-        account.setUserName("jack-wang");
-        account.setPassword("pwd12345");
-        account.setPhone("18901010001");
-        Map<String, String> map = new HashMap<>();
-        map.put("id_card", "110115200810010011");
-        map.put("balance", "1314.520");
-        map.put("email", "18901010001@qq.com");
-        account.setExtras(map);
-        System.out.println(parser.toJson(account));
-        System.out.println(parser.toJson(map));
+
+    /**
+     * 序列化自动添加字段描述
+     */
+    @Test
+    public void testParsePbFromJson() {
+        JsonParser jp = new JsonParser()
+                .withPropertyFilter(
+                        new PbPropertyFilter());
+        String json = "{\"id\":1001,\"userName\":\"jack-wang\",\"favorites\":[\"apple\",\"banana\",\"orange\"],\"password\":\"pwd12345\",\"phone\":\"18901010001\",\"extras\":{\"balance\":\"1314.520\",\"id_card\":\"110115200810010011\",\"email\":\"18901010001@qq.com\"}}";
+        System.out.println(jp.toJson(jp.toObject(json)));
     }
 
     /**

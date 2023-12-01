@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import java.util.List;
 
 /**
- * 支持JSON序列化时对PB字段兼容,序列化自动添加xxxList<p/>
+ * JSON序列化时，对POJO对象兼容PB格式，对集合字段自动添加xxxList<p/>
  * <pre>
  *    objectMapper.setSerializerFactory(
  *
@@ -30,7 +30,7 @@ import java.util.List;
  * );
  * </pre>
  */
-public class ProtobufPropertyWriter extends BeanPropertyWriter {
+public class PbPropertyWriter extends BeanPropertyWriter {
 
 
     private final BeanPropertyWriter writer;
@@ -40,7 +40,7 @@ public class ProtobufPropertyWriter extends BeanPropertyWriter {
      *
      * @param writer
      */
-    public ProtobufPropertyWriter(BeanPropertyWriter writer) {
+    public PbPropertyWriter(BeanPropertyWriter writer) {
         super(writer);
         this.writer = writer;
     }

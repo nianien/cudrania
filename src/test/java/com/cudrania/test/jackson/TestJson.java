@@ -1,6 +1,7 @@
 package com.cudrania.test.jackson;
 
 
+import com.cudrania.core.collection.wrapper.Wrappers;
 import com.cudrania.core.json.JsonParser;
 import com.cudrania.core.math.SmartDecimal;
 import com.cudrania.test.bean.Color;
@@ -64,14 +65,19 @@ public class TestJson {
 
 
     interface TypeRefer extends Consumer<Map<String, String[]>> {
-        void accept(Map<String, LinkedList<String>> map);
+        void accept(Map<String, List<User>> users);
     }
 
     @Test
     @SneakyThrows
     public void testParseType() {
         JsonParser jp = new JsonParser();
-        String json = "{name:['lining','wuhao']}";
+        Map<String, List<User>> map = new HashMap<>();
+        map.put("name",Wrappers.<User>list().$add(new User("18","jack")).$add(new User("19","tom")).get());
+        String json = jp.toJson(map);
+        Map bean = jp.toBean(json, Map.class);
+        List list=(List) bean.get("name");
+        System.out.println(list.get(0).getClass());
         Type type = TypeRefer.class.getDeclaredMethods()[0].getGenericParameterTypes()[0];
         Object result = jp.toBean(json, new TypeReference<>() {
             @Override
@@ -79,10 +85,10 @@ public class TestJson {
                 return type;
             }
         });
-        System.out.println(result);
-        result = jp.toBean(json, new TypeReference<Map<String, String[]>>() {
+        System.out.println(List.class.cast(((Map)result).get("name")).get(0).getClass());
+        result = jp.toBean(json, new TypeReference<Map<String, List<User>>>() {
         });
-        System.out.println(result);
+        System.out.println(List.class.cast(((Map)result).get("name")).get(0).getClass());
     }
 
     @Test
