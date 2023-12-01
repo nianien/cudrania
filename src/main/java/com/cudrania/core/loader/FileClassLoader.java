@@ -10,6 +10,7 @@ import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Objects;
 
 /**
  * 基于文件的类加载器<p/>
@@ -79,30 +80,29 @@ public class FileClassLoader extends URLClassLoader {
     }
 
 
-    protected Class<?> loadClass(String name, boolean resolve) {
+    protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
         synchronized (getClassLoadingLock(name)) {
             // First, check if the class has already been loaded
             Class<?> c = findLoadedClass(name);
-            try {
-                c = findClass(name);
-            } catch (ClassNotFoundException e) {
-                //ignore, continue to load from parent
-            }
-            if (c == null && Arrays.stream(excludes).noneMatch(name::matches)) {
+            if (c == null) {
                 try {
-                    if (getParent() != null) {
-                        c = getParent().loadClass(name);
-                    }
+                    c = findClass(name);
                 } catch (ClassNotFoundException e) {
-                    // ClassNotFoundException thrown if class not found
-                    // from the non-null parent class loader
+                    //ignore, continue to load from parent
                 }
+                if (c == null && getParent() != null && Arrays.stream(excludes).noneMatch(name::matches)) {
+                    c = getParent().loadClass(name);
+                }
+            }
+            if (c == null) {
+                throw new ClassNotFoundException(name);
             }
             if (resolve) {
                 resolveClass(c);
             }
             return c;
         }
+
     }
 
 
@@ -130,5 +130,17 @@ public class FileClassLoader extends URLClassLoader {
         return new URL(urlString);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FileClassLoader that = (FileClassLoader) o;
+        return Objects.equals(file, that.file);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(file);
+    }
 }
 

@@ -329,7 +329,7 @@ public class Reflections {
      */
     @SneakyThrows
     public static Object invoke(Method method, Object owner, Object... parameters) {
-        return invoke(method, owner, null, parameters);
+        return invoke(method, owner, parameters, null);
     }
 
     /**
@@ -342,11 +342,11 @@ public class Reflections {
      * @return 方法的执行结果
      */
     @SneakyThrows
-    public static Object invoke(Method method, Object owner, BiFunction<Object, Class, Object> typeConverter, Object... parameters) {
+    public static Object invoke(Method method, Object owner, Object[] parameters, BiFunction<Object, Type, Object> typeConverter) {
         method.setAccessible(true);
         Object[] castParams = parameters;
         if (typeConverter != null) {
-            castParams = convert(parameters, method.getParameterTypes(), typeConverter);
+            castParams = convert(parameters, method.getGenericParameterTypes(), typeConverter);
         }
         return method.invoke(owner, castParams);
     }
@@ -360,7 +360,7 @@ public class Reflections {
      * @param parameters 实际参数值
      * @return
      */
-    public static Object invoke(String methodName, Object owner, Object[] parameters) {
+    public static Object invoke(String methodName, Object owner, Object... parameters) {
         Class beanClass = owner.getClass();
         List<Method> methods = getMethods(beanClass, m -> m.getName().equals(methodName) && argsMatched(m.getParameterTypes(), parameters) >= 0);
         for (Method method : methods) {
@@ -376,8 +376,7 @@ public class Reflections {
                     "no suitable method [" + methodName + "] for class [" + beanClass + "] with parameters: "
                             + Arrays.toString(parameters));
         }
-        Method method = methods.get(0);
-        return invoke(method, owner, parameters);
+        return invoke(methods.get(0), owner, parameters);
     }
 
 
@@ -389,18 +388,13 @@ public class Reflections {
      * @param typeConverter  类型转化器
      * @return
      */
-    public static Object[] convert(Object[] parameters, Class[] parameterTypes, BiFunction<Object, Class, Object> typeConverter) {
+    public static Object[] convert(Object[] parameters, Type[] parameterTypes, BiFunction<Object, Type, Object> typeConverter) {
         Object[] castParams = new Object[parameters.length];
         for (int i = 0; i < parameterTypes.length; i++) {
-            if (parameterTypes[i].isInstance(parameters[i])) {
-                castParams[i] = parameters[i];
-            } else {
-                castParams[i] = convert(parameters[i], parameterTypes[i], typeConverter);
-            }
+            castParams[i] = doConvert(parameters[i], parameterTypes[i], typeConverter);
         }
         return castParams;
     }
-
 
     /**
      * 根据字符串尽可能地去获取指定类型的实例<p>
@@ -410,52 +404,55 @@ public class Reflections {
      * 4) 否则进行类型转换
      *
      * @param <T>
-     * @param clazz
+     * @param type
      * @param value
      * @return
      */
     @SneakyThrows
-    private static <T> T convert(Object value, Class<T> clazz, BiFunction<Object, Class, T> typeConverter) {
+    private static <T> T doConvert(Object value, Type type, BiFunction<Object, Type, T> typeConverter) {
         if (value == null) {
             return null;
         }
-        if (value instanceof String) {
-            String valueString = (String) value;
-            if (clazz.equals(String.class)) {
-                return (T) valueString;
+        if (type instanceof Class<?>) {
+            Class<T> clazz = (Class<T>) type;
+            if (clazz.isInstance(value)) {
+                return (T) value;
             }
-            if (clazz.equals(Boolean.TYPE) || clazz.equals(Boolean.class)) {
-                return (T) Boolean.valueOf(valueString);
-            }
-            if (clazz.equals(Byte.TYPE) || clazz.equals(Byte.class)) {
-                return (T) Byte.valueOf(valueString);
-            }
-            if (clazz.equals(Short.TYPE) || clazz.equals(Short.class)) {
-                return (T) Short.valueOf(valueString);
-            }
-            if (clazz.equals(Integer.TYPE) || clazz.equals(Integer.class)) {
-                return (T) Integer.valueOf(valueString);
-            }
-            if (clazz.equals(Long.TYPE) || clazz.equals(Long.class)) {
-                return (T) Long.valueOf(valueString);
-            }
-            if (clazz.equals(Float.TYPE) || clazz.equals(Float.class)) {
-                return (T) Float.valueOf(valueString);
-            }
-            if (clazz.equals(Double.TYPE) || clazz.equals(Double.class)) {
-                return (T) Double.valueOf(valueString);
-            }
-            if (clazz.equals(Character.TYPE) || clazz.equals(Character.class)) {
-                return (T) Character.valueOf(valueString.charAt(0));
-            }
-            if (clazz.isEnum()) {
-                return (T) Enum.valueOf((Class<Enum>) clazz, valueString);
+            if (value instanceof String) {
+                String valueString = (String) value;
+                if (clazz.equals(String.class)) {
+                    return (T) valueString;
+                }
+                if (clazz.equals(Boolean.TYPE) || clazz.equals(Boolean.class)) {
+                    return (T) Boolean.valueOf(valueString);
+                }
+                if (clazz.equals(Byte.TYPE) || clazz.equals(Byte.class)) {
+                    return (T) Byte.valueOf(valueString);
+                }
+                if (clazz.equals(Short.TYPE) || clazz.equals(Short.class)) {
+                    return (T) Short.valueOf(valueString);
+                }
+                if (clazz.equals(Integer.TYPE) || clazz.equals(Integer.class)) {
+                    return (T) Integer.valueOf(valueString);
+                }
+                if (clazz.equals(Long.TYPE) || clazz.equals(Long.class)) {
+                    return (T) Long.valueOf(valueString);
+                }
+                if (clazz.equals(Float.TYPE) || clazz.equals(Float.class)) {
+                    return (T) Float.valueOf(valueString);
+                }
+                if (clazz.equals(Double.TYPE) || clazz.equals(Double.class)) {
+                    return (T) Double.valueOf(valueString);
+                }
+                if (clazz.equals(Character.TYPE) || clazz.equals(Character.class)) {
+                    return (T) Character.valueOf(valueString.charAt(0));
+                }
+                if (clazz.isEnum()) {
+                    return (T) Enum.valueOf((Class<Enum>) clazz, valueString);
+                }
             }
         }
-        if (typeConverter == null) {
-            return clazz.getConstructor(value.getClass()).newInstance(value);
-        }
-        return typeConverter.apply(value, clazz);
+        return typeConverter.apply(value, type);
     }
 
     /**

@@ -10,12 +10,14 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.type.ClassStack;
 import com.fasterxml.jackson.databind.type.TypeBindings;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class TestJson {
@@ -23,13 +25,8 @@ public class TestJson {
     @Test
     public void testPrimitive() {
         JsonParser jp = new JsonParser();
-        SmartDecimal financeDecimal = new SmartDecimal(3.1415926);
-        System.out.println(jp.toJson(financeDecimal));
-    }
-
-    @Test
-    public void testBase() {
-        JsonParser jp = new JsonParser();
+        SmartDecimal smartDecimal = new SmartDecimal(3.1415926);
+        System.out.println(jp.toJson(smartDecimal));
         String json = "[1,2]";
         Object obj = jp.toObject(json);
         Assertions.assertEquals(obj.getClass(), ArrayList.class);
@@ -66,44 +63,36 @@ public class TestJson {
     }
 
 
+    interface TypeRefer extends Consumer<Map<String, String[]>> {
+        void accept(Map<String, LinkedList<String>> map);
+    }
+
     @Test
-    public void testMap() throws Exception {
+    @SneakyThrows
+    public void testParseType() {
         JsonParser jp = new JsonParser();
         String json = "{name:['lining','wuhao']}";
-        System.out.println("=============================>1:");
-        Map<String, String[]> map = jp.toBean(json, new TypeReference<Map<String, String[]>>() {
+        Type type = TypeRefer.class.getDeclaredMethods()[0].getGenericParameterTypes()[0];
+        Object result = jp.toBean(json, new TypeReference<>() {
+            @Override
+            public Type getType() {
+                return type;
+            }
         });
+        System.out.println(result);
+        result = jp.toBean(json, new TypeReference<Map<String, String[]>>() {
+        });
+        System.out.println(result);
+    }
 
-        for (Entry<String, String[]> en : map.entrySet()) {
-            System.out.print(en.getKey() + ":[");
-            String[] values = en.getValue();
-            for (String e : values) {
-                System.out.print(e + "\t");
-            }
-            System.out.println("]");
-        }
-        System.out.println("=============================>2:");
-
+    @Test
+    public void testParseMap() throws Exception {
+        JsonParser jp = new JsonParser();
+        String json = "{name:['lining','wuhao']}";
         Map<String, List> map2 = jp.toMap(json, String.class, List.class);
-        for (Entry<String, List> en : map2.entrySet()) {
-            System.out.print(en.getKey() + ":[");
-            List<String> values = en.getValue();
-            for (String e : values) {
-                System.out.print(e + "\t");
-            }
-            System.out.println("]");
-        }
-        System.out.println("=============================>3:");
+        System.out.println(map2);
         Map<String, String[]> map3 = jp.toMap(json, String.class, String[].class);
-        for (Entry<String, String[]> en : map3.entrySet()) {
-            System.out.print(en.getKey() + ":[");
-            String[] values = en.getValue();
-            for (String e : values) {
-                System.out.print(e + "\t");
-            }
-            System.out.println("]");
-        }
-
+        System.out.println(map3);
         TypeFactory typeFactory = jp.getObjectMapper().getTypeFactory();
         TypeBindings typeBindings = TypeBindings.createIfNeeded(
                 Map.class,
@@ -115,22 +104,13 @@ public class TestJson {
         method.setAccessible(true);
         JavaType result = (JavaType) method.invoke(typeFactory, null, Map.class,
                 typeBindings);
-
-        System.out.println("=============================>3:");
         HashMap<String, String[]> map4 = jp.getObjectMapper().readValue(json, result);
-        for (Entry<String, String[]> en : map4.entrySet()) {
-            System.out.print(en.getKey() + ":[");
-            String[] values = en.getValue();
-            for (String e : values) {
-                System.out.print(e + "\t");
-            }
-            System.out.println("]");
-        }
+        System.out.println(map4);
 
     }
 
     @Test
-    public void testList() {
+    public void testParseList() {
         JsonParser jp = new JsonParser();
         List<User> users = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
@@ -152,7 +132,7 @@ public class TestJson {
     }
 
     @Test
-    public void testArray() {
+    public void testParseArray() {
         JsonParser jp = new JsonParser();
         String[][] arr = new String[2][];
         arr[0] = new String[]{"zg", "\"中国"};
@@ -168,44 +148,28 @@ public class TestJson {
     @Test
     public void testOther() {
         JsonParser jp = new JsonParser();
-        String[][] arr = new String[2][];
-        arr[0] = new String[]{"zg", "\"中国"};
-        arr[1] = new String[]{"mg", "美国"};
-        System.out.println(jp.toJson(arr));
-        String json = jp.toJson(arr);
-        arr = jp.toBean(json, String[][].class);
+        String json = "[[\"zg\",\"\\\"中国\"],[\"mg\",\"美国\"]]";
+        System.out.println(json);
+        String[][] arr = jp.toBean(json, String[][].class);
         for (String[] s : arr) {
             System.out.println(Arrays.toString(s));
         }
-        System.out.println("=============");
         List<List<String>> list = jp.toBean(json, List.class);
         for (List<String> ss : list) {
-            for (String s : ss) {
-                System.out.print(s + "\t");
-            }
-            System.out.println();
+            System.out.println(ss);
         }
         json = "['lining','wuhao']";
-        Object obj = jp.toBean(json, String[].class);
-        System.out.println(obj.getClass());
-
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>");
+        String[] obj = jp.toBean(json, String[].class);
+        System.out.println(Arrays.toString(obj));
         json = "[{name:['lining']},{name:'wuhao'}]";
-        Map[] omap = jp.toBean(json, Map[].class);
-        for (Map m : omap) {
-            for (Object o : m.entrySet()) {
-                Entry en = (Entry) o;
-                System.out.println(en.getKey() + "->" + en.getValue().getClass());
-            }
+        Map[] maps = jp.toBean(json, Map[].class);
+        for (Map m : maps) {
+            System.out.println(m);
         }
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>");
-        Object objList = jp.toBean(json, Object.class);
-        for (Object l : (List) objList) {
+        List<Map> objList = (List<Map>) jp.toBean(json, Object.class);
+        for (Object l : objList) {
             Map m = (Map) l;
-            for (Object o : m.entrySet()) {
-                Entry en = (Entry) o;
-                System.out.println(en.getKey() + "->" + en.getValue().getClass());
-            }
+            System.out.println(m);
         }
     }
 
