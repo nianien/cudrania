@@ -451,6 +451,23 @@ public class Reflections {
                     return (T) Enum.valueOf((Class<Enum>) clazz, valueString);
                 }
             }
+        } else if (type instanceof ParameterizedType) {
+            //FIXME: 这里只处理了List类型
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            Class rawType = (Class) parameterizedType.getRawType();
+            if (List.class.isAssignableFrom(rawType) && value instanceof List) {
+                List<?> list = (List<?>) value;
+                if (list.isEmpty()) {
+                    return (T) value;
+                }
+                Type[] actualTypes = parameterizedType.getActualTypeArguments();
+                if (actualTypes.length == 1 && actualTypes[0] instanceof Class) {
+                    Class<?> actualClass = (Class<?>) actualTypes[0];
+                    if (actualClass.isInstance(list.get(0))) {
+                        return (T) value;
+                    }
+                }
+            }
         }
         return typeConverter.apply(value, type);
     }
