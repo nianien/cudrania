@@ -1,10 +1,17 @@
 package com.cudrania.core.reflection;
 
 import com.cudrania.core.collection.CollectionUtils;
+import com.cudrania.core.date.DateFormatter;
+import com.cudrania.core.date.DatePattern;
 import lombok.SneakyThrows;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
@@ -216,7 +223,7 @@ public class Reflections {
     private static List<Field> getFields0(Class<?> clazz) {
         return fieldCache.computeIfAbsent(clazz, key -> {
             List<Field> list = new ArrayList<>();
-            for (; key != Object.class; key = key.getSuperclass()) {
+            for (; key != null && key != Object.class; key = key.getSuperclass()) {
                 Arrays.stream(clazz.getDeclaredFields()).forEach(list::add);
             }
             return list;
@@ -413,59 +420,121 @@ public class Reflections {
         if (value == null) {
             return null;
         }
+        if (instanceOf(type, value)) {
+            return (T) value;
+        }
         if (type instanceof Class<?>) {
             Class<T> clazz = (Class<T>) type;
-            if (clazz.isInstance(value)) {
+            if (clazz.equals(String.class)) {
                 return (T) value;
             }
-            if (value instanceof String) {
-                String valueString = (String) value;
-                if (clazz.equals(String.class)) {
-                    return (T) valueString;
+            if (clazz.equals(Boolean.TYPE) || clazz.equals(Boolean.class)) {
+                if (value instanceof String) {
+                    return (T) Boolean.valueOf((String) value);
                 }
-                if (clazz.equals(Boolean.TYPE) || clazz.equals(Boolean.class)) {
-                    return (T) Boolean.valueOf(valueString);
-                }
-                if (clazz.equals(Byte.TYPE) || clazz.equals(Byte.class)) {
-                    return (T) Byte.valueOf(valueString);
-                }
-                if (clazz.equals(Short.TYPE) || clazz.equals(Short.class)) {
-                    return (T) Short.valueOf(valueString);
-                }
-                if (clazz.equals(Integer.TYPE) || clazz.equals(Integer.class)) {
-                    return (T) Integer.valueOf(valueString);
-                }
-                if (clazz.equals(Long.TYPE) || clazz.equals(Long.class)) {
-                    return (T) Long.valueOf(valueString);
-                }
-                if (clazz.equals(Float.TYPE) || clazz.equals(Float.class)) {
-                    return (T) Float.valueOf(valueString);
-                }
-                if (clazz.equals(Double.TYPE) || clazz.equals(Double.class)) {
-                    return (T) Double.valueOf(valueString);
-                }
-                if (clazz.equals(Character.TYPE) || clazz.equals(Character.class)) {
-                    return (T) Character.valueOf(valueString.charAt(0));
-                }
-                if (clazz.isEnum()) {
-                    return (T) Enum.valueOf((Class<Enum>) clazz, valueString);
+                if (value instanceof Number) {
+                    return (T) Boolean.valueOf(((Number) value).intValue() != 0);
                 }
             }
-        } else if (type instanceof ParameterizedType) {
-            //FIXME: 这里只处理了List类型
-            ParameterizedType parameterizedType = (ParameterizedType) type;
-            Class rawType = (Class) parameterizedType.getRawType();
-            if (List.class.isAssignableFrom(rawType) && value instanceof List) {
-                List<?> list = (List<?>) value;
-                if (list.isEmpty()) {
-                    return (T) value;
+            if (clazz.equals(Byte.TYPE) || clazz.equals(Byte.class)) {
+                if (value instanceof String) {
+                    return (T) Byte.valueOf((String) value);
                 }
-                Type[] actualTypes = parameterizedType.getActualTypeArguments();
-                if (actualTypes.length == 1 && actualTypes[0] instanceof Class) {
-                    Class<?> actualClass = (Class<?>) actualTypes[0];
-                    if (actualClass.isInstance(list.get(0))) {
-                        return (T) value;
+                if (value instanceof Number) {
+                    return (T) Byte.valueOf(((Number) value).byteValue());
+                }
+            }
+            if (clazz.equals(Short.TYPE) || clazz.equals(Short.class)) {
+                if (value instanceof String) {
+                    return (T) Short.valueOf((String) value);
+                }
+                if (value instanceof Number) {
+                    return (T) Short.valueOf(((Number) value).shortValue());
+                }
+            }
+            if (clazz.equals(Integer.TYPE) || clazz.equals(Integer.class)) {
+                if (value instanceof String) {
+                    return (T) Integer.valueOf((String) value);
+                }
+                if (value instanceof Number) {
+                    return (T) Integer.valueOf(((Number) value).intValue());
+                }
+            }
+            if (clazz.equals(Long.TYPE) || clazz.equals(Long.class)) {
+                if (value instanceof String) {
+                    return (T) Long.valueOf((String) value);
+                }
+                if (value instanceof Number) {
+                    return (T) Long.valueOf(((Number) value).longValue());
+                }
+            }
+            if (clazz.equals(Float.TYPE) || clazz.equals(Float.class)) {
+                if (value instanceof String) {
+                    return (T) Float.valueOf((String) value);
+                }
+                if (value instanceof Number) {
+                    return (T) Float.valueOf(((Number) value).floatValue());
+                }
+            }
+            if (clazz.equals(Double.TYPE) || clazz.equals(Double.class)) {
+                if (value instanceof String) {
+                    return (T) Double.valueOf((String) value);
+                }
+                if (value instanceof Number) {
+                    return (T) Double.valueOf(((Number) value).doubleValue());
+                }
+            }
+            if (clazz.equals(Character.TYPE) || clazz.equals(Character.class)) {
+                if (value instanceof String) {
+                    if (((String) value).length() > 0) {
+                        return (T) Character.valueOf(((String) value).charAt(0));
+                    } else {
+                        return (T) Character.valueOf('\u0000');
                     }
+                }
+                if (value instanceof Number) {
+                    return (T) Character.valueOf((char) ((Number) value).intValue());
+                }
+            }
+            if (clazz.isEnum()) {
+                if (value instanceof String) {
+                    return (T) Enum.valueOf((Class<Enum>) clazz, (String) value);
+                }
+                if (value instanceof Number) {
+                    return clazz.getEnumConstants()[((Number) value).intValue()];
+                }
+            }
+
+            if (clazz.equals(Date.class)) {
+                if (value instanceof String) {
+                    return (T) DateFormatter.parseDate((String) value, DatePattern.DateTime24, DatePattern.DateTime12);
+                }
+                if (value instanceof Number) {
+                    return (T) new Date(((Number) value).longValue());
+                }
+            }
+            if (clazz.equals(LocalDateTime.class)) {
+                if (value instanceof String) {
+                    return (T) LocalDateTime.parse((String) value, DateTimeFormatter.ofPattern(DatePattern.DateTime24));
+                }
+                if (value instanceof Number) {
+                    return (T) LocalDateTime.ofInstant(Instant.ofEpochMilli(((Number) value).longValue()), TimeZone.getDefault().toZoneId());
+                }
+            }
+            if (clazz.equals(LocalTime.class)) {
+                if (value instanceof String) {
+                    return (T) LocalDateTime.parse((String) value, DateTimeFormatter.ofPattern(DatePattern.Time24)).toLocalTime();
+                }
+                if (value instanceof Number) {
+                    return (T) LocalDateTime.ofInstant(Instant.ofEpochMilli(((Number) value).longValue()), TimeZone.getDefault().toZoneId()).toLocalTime();
+                }
+            }
+            if (clazz.equals(LocalDate.class)) {
+                if (value instanceof String) {
+                    return (T) LocalDateTime.parse((String) value, DateTimeFormatter.ofPattern(DatePattern.Date)).toLocalDate();
+                }
+                if (value instanceof Number) {
+                    return (T) LocalDateTime.ofInstant(Instant.ofEpochMilli(((Number) value).longValue()), TimeZone.getDefault().toZoneId()).toLocalDate();
                 }
             }
         }
@@ -540,7 +609,7 @@ public class Reflections {
      * @return
      */
     public static Class wrapClass(Class<?> clazz) {
-        Primitive primitive = Primitive.get(clazz);
+        Primitive primitive = Primitive.get(clazz.getName());
         if (primitive != null)
             return primitive.clazz;
         return clazz;
@@ -557,6 +626,51 @@ public class Reflections {
         return wrapClass(clazz).isInstance(obj);
     }
 
+    /**
+     * 判断指定对象obj是不为是clazz类的实例
+     *
+     * @param type
+     * @param obj
+     * @return
+     */
+    public static boolean instanceOf(Type type, Object obj) {
+        if (type instanceof Class<?>) {
+            return instanceOf((Class<?>) type, obj);
+        }
+        if (type instanceof WildcardType) {
+            return instanceOf(((WildcardType) type).getUpperBounds()[0], obj);
+        }
+        if (type instanceof ParameterizedType) {
+            ParameterizedType parameterizedType = (ParameterizedType) type;
+            Class rawType = (Class) parameterizedType.getRawType();
+            if (!instanceOf(rawType, obj)) {
+                return false;
+            }
+            if (Iterable.class.isAssignableFrom(rawType)) {
+                Iterator it = ((Iterable) obj).iterator();
+                if (!it.hasNext()) {
+                    return true;
+                }
+                if (parameterizedType.getActualTypeArguments().length == 1) {
+                    Object next = it.next();
+                    return instanceOf(parameterizedType.getActualTypeArguments()[0], next);
+                }
+            }
+            if (Map.class.isAssignableFrom(rawType)) {
+                Map map = (Map) obj;
+                if (map.isEmpty()) {
+                    return true;
+                }
+                if (parameterizedType.getActualTypeArguments().length == 2) {
+                    Map.Entry entry = (Map.Entry) map.entrySet().iterator().next();
+                    return instanceOf(parameterizedType.getActualTypeArguments()[0], entry.getKey())
+                            && instanceOf(parameterizedType.getActualTypeArguments()[1], entry.getValue());
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 
     /**
      * 判断参数类型是否匹配期望类型列表<p>

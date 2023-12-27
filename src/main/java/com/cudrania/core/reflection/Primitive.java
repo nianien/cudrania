@@ -1,8 +1,6 @@
 package com.cudrania.core.reflection;
 
-import com.cudrania.core.utils.Enums;
-
-import static com.cudrania.core.exception.ExceptionChecker.throwException;
+import lombok.SneakyThrows;
 
 /**
  * 基本类型
@@ -16,26 +14,45 @@ public enum Primitive {
     Float("float", java.lang.Float.class),
     Double("double", java.lang.Double.class),
     Character("char", java.lang.Character.class);
-    String name;
-    Class type;
-    Class clazz;
+    public final String name;
+    public final Class type;
+    public final Class clazz;
 
+    @SneakyThrows
     Primitive(String name, Class clazz) {
-        try {
-            this.name = name;
-            this.clazz = clazz;
-            this.type = (Class) clazz.getField("TYPE").get(null);
-        } catch (Exception e) {
-            throwException(e);
-        }
+        this.name = name;
+        this.clazz = clazz;
+        this.type = (Class) clazz.getField("TYPE").get(null);
     }
 
+    /**
+     * 根据名称获取基本类型
+     *
+     * @param name
+     * @return
+     */
     public static Primitive get(String name) {
-        return Enums.with(Primitive.class, "name", name);
+        for (Primitive primitive : Primitive.values()) {
+            if (primitive.name.equals(name)) {
+                return primitive;
+            }
+        }
+        return null;
     }
 
+    /**
+     * 根据类型获取基本类型
+     *
+     * @param clazz
+     * @return
+     */
     public static Primitive get(Class clazz) {
-        return Enums.with(Primitive.class, "clazz", clazz);
+        for (Primitive primitive : Primitive.values()) {
+            if (primitive.clazz == clazz || primitive.type == clazz) {
+                return primitive;
+            }
+        }
+        return null;
     }
 
 }
