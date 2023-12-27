@@ -1236,13 +1236,13 @@ public class StringUtils {
         for (char ch : src.toCharArray()) {
             if (separators.indexOf(ch) != -1) {
                 needToUpper = true;
-            } else if (Character.isLetter(ch)) {
-                if (needToUpper) {
+            } else {
+                if (needToUpper && Character.isLetter(ch)) {
                     sb.append(Character.toUpperCase(ch));
-                    needToUpper = false;
                 } else {
                     sb.append(ch);
                 }
+                needToUpper = false;
             }
         }
         return sb.toString();
