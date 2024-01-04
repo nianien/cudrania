@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.databind.ser.std.MapProperty;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * JSON序列化时，对POJO和& Map对象兼容PB格式，对集合字段自动添加xxxList<p/>
@@ -38,24 +39,23 @@ public class PbPropertyFilter extends SimpleBeanPropertyFilter {
             return;
         }
         String name = writer.getName();
-        if (writer instanceof MapProperty) {
-            MapProperty mw = (MapProperty) writer;
-            Object value = mw.getValue();
-            super.serializeAsField(pojo, jgen, provider, writer);
-            if (value instanceof List<?> || value.getClass().isArray()) {
-                jgen.writeObjectField(name + "List", value);
-            }
-            return;
-        } else if (writer instanceof BeanPropertyWriter) {
+        if (writer instanceof BeanPropertyWriter) {
             BeanPropertyWriter bw = (BeanPropertyWriter) writer;
             Object value = bw.get(pojo);
-            jgen.writeObjectField(name, value);
             if (value instanceof List<?> || value.getClass().isArray()) {
                 jgen.writeObjectField(name + "List", value);
+            } else if (value instanceof Map<?, ?>) {
+                jgen.writeObjectField(name + "Map", value);
             }
-            return;
+        } else if (writer instanceof MapProperty) {
+            MapProperty mw = (MapProperty) writer;
+            Object value = mw.getValue();
+            if (value instanceof List<?> || value.getClass().isArray()) {
+                jgen.writeObjectField(name + "List", value);
+            } else if (value instanceof Map<?, ?>) {
+                jgen.writeObjectField(name + "Map", value);
+            }
         }
         super.serializeAsField(pojo, jgen, provider, writer);
-
     }
 }

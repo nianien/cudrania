@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * JSON序列化时，对POJO对象兼容PB格式，对集合字段自动添加xxxList<p/>
@@ -55,11 +56,12 @@ public class PbPropertyWriter extends BeanPropertyWriter {
         if (value == null) {
             return;
         }
-        super.serializeAsField(bean, gen, prov);
         if (value instanceof List<?> || value.getClass().isArray()) {
             gen.writeObjectField(name + "List", value);
+        } else if (value instanceof Map<?, ?>) {
+            gen.writeObjectField(name + "Map", value);
         }
-
+        super.serializeAsField(bean, gen, prov);
     }
 
 }

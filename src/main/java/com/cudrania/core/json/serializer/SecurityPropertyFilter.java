@@ -50,22 +50,20 @@ public class SecurityPropertyFilter extends SimpleBeanPropertyFilter {
             return;
         }
         String name = writer.getName();
-        if (writer instanceof MapProperty) {
+        if (writer instanceof BeanPropertyWriter) {
+            BeanPropertyWriter bw = (BeanPropertyWriter) writer;
+            Object value = bw.get(pojo);
+            if (encryptor.shouldEncrypt(name)) {
+                //这里由于pojo对象未发生改变, 所以只能手动直接序列化
+                value = encryptor.encrypt(name, value);
+                jgen.writeObjectField(name, value);
+                return;
+            }
+        } else if (writer instanceof MapProperty) {
             MapProperty mw = (MapProperty) writer;
             Object value = mw.getValue();
             if (encryptor.shouldEncrypt(name)) {
                 mw.setValue(encryptor.encrypt(name, value));
-            }
-            super.serializeAsField(pojo, jgen, provider, writer);
-            return;
-        } else if (writer instanceof BeanPropertyWriter) {
-            BeanPropertyWriter bw = (BeanPropertyWriter) writer;
-            Object value = bw.get(pojo);
-            if (encryptor.shouldEncrypt(name)) {
-                //注意: 这里没有直接调用父类方法,是为了不修改pojo对象
-                value = encryptor.encrypt(name, value);
-                jgen.writeObjectField(name, value);
-                return;
             }
         }
         super.serializeAsField(pojo, jgen, provider, writer);
