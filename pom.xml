@@ -264,7 +264,7 @@
                                     <pomFile>${project.basedir}/.flattened-pom.xml</pomFile>
                                     <groupId>${project.groupId}</groupId>
                                     <artifactId>${project.artifactId}</artifactId>
-                                    <version>${project.version}-${git.commit.time}-${git.commit.id.abbrev}</version>
+                                    <version>${project.version}.${git.commit.time}-${git.commit.id.abbrev}</version>
                                     <packaging>jar</packaging>
                                 </configuration>
                             </execution>
