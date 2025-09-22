@@ -13,11 +13,11 @@ import java.util.Enumeration;
 import java.util.Objects;
 
 /**
- * 基于文件的类加载器<p/>
+ * 基于文件的类加载器<br/>
  * <ul>
  *     <li>{@link #loadClass(String)}加载类，优先从当前类加载器中进行加载，如果找不到，则尝试从父类加载器中加载，可以指定不被允许从父类加载器加载的特定类</li>
  *     <li>{@link #getResource(String)}/{@link #getResources(String)}加载资源列表，优先从当前类加载器加载资源，如果找不到，则尝试从父类加载器中加载</li>
- * ul/>
+ * </ul>
  * Created on 2022/10/21
  *
  * @author liyifei

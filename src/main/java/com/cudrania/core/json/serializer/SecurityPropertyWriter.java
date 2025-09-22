@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 
 /**
- * 支持JSON序列化时对POJO对象加密<p/>
+ * 支持JSON序列化时对POJO对象加密<br/>
  * <pre>
  *  {@link SimpleSerEncryptor} encryptor = new {@link SimpleSerEncryptor}("(?i).*(password|balance|phone|id_?card).*");
  *  objectMapper.setSerializerFactory(
@@ -15,8 +15,8 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
  *       .withSerializerModifier(new {@link  BeanSerializerModifier}() {
  *
  *          <code>@Override</code>
- *          public List<BeanPropertyWriter> changeProperties(SerializationConfig config,
- *                 BeanDescription beanDesc,List<BeanPropertyWriter> beanProperties) {
+ *          public List&lt;BeanPropertyWriter&gt; changeProperties(SerializationConfig config,
+ *                 BeanDescription beanDesc,List&lt;BeanPropertyWriter&gt; beanProperties) {
  *
  *            //修改原有的BeanPropertyWriter列表
  *            return beanProperties

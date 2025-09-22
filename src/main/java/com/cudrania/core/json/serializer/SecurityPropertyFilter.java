@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import com.fasterxml.jackson.databind.ser.std.MapProperty;
 
 /**
- * 支持JSON序列化时对POJO和& Map对象加密<p/>
+ * 支持JSON序列化时对POJO和&amp; Map对象加密<br/>
  * <pre>
  *  {@link SimpleSerEncryptor} encryptor = new {@link SimpleSerEncryptor}("(?i).*(password|balance|phone|id_?card).*");
  *

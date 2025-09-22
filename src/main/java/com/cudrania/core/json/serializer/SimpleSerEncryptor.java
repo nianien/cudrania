@@ -25,7 +25,7 @@ public class SimpleSerEncryptor implements SerEncryptor {
      * 自定义字段判断和处理
      *
      * @param validator 判断字段是否需要处理
-     * @param converter BiFunction<字段名, 字段值, 转换后内容> 字段转换
+     * @param converter BiFunction&lt;字段名, 字段值, 转换后内容&gt; 字段转换
      */
     public SimpleSerEncryptor(Predicate<String> validator, BiFunction<String, Object, Object> converter) {
         this.validator = validator;
@@ -37,7 +37,7 @@ public class SimpleSerEncryptor implements SerEncryptor {
      * 基于正则式实现字段判断和处理
      *
      * @param regex     需要处理字段的正则式
-     * @param converter BiFunction<字段名, 字段值, 转换后内容> 字段转换
+     * @param converter BiFunction&lt;字段名, 字段值, 转换后内容&gt; 字段转换
      */
     public SimpleSerEncryptor(String regex, BiFunction<String, Object, Object> converter) {
         this(s -> s.matches(regex), converter);

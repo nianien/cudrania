@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * JSON序列化时，对POJO和& Map对象兼容PB格式，对集合字段自动添加xxxList<p/>
+ * JSON序列化时，对POJO和&amp; Map对象兼容PB格式，对集合字段自动添加xxxList<br/>
  * <pre>
  *  objectMapper.setFilterProvider(
  *

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * JSON序列化时，对POJO对象兼容PB格式，对集合字段自动添加xxxList<p/>
+ * JSON序列化时，对POJO对象兼容PB格式，对集合字段自动添加xxxList<br/>
  * <pre>
  *    objectMapper.setSerializerFactory(
  *
@@ -17,8 +17,8 @@ import java.util.Map;
  *      .withSerializerModifier(new BeanSerializerModifier() {
  *
  *          <code>@Override</code>
- *          public List<BeanPropertyWriter> changeProperties(SerializationConfig config,
- *              BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties) {
+ *          public List&lt;BeanPropertyWriter&gt; changeProperties(SerializationConfig config,
+ *              BeanDescription beanDesc, List&lt;BeanPropertyWriter&gt; beanProperties) {
  *
  *                  //修改原有的BeanPropertyWriter列表
  *                  return beanProperties

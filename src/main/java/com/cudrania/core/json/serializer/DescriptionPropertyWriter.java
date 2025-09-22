@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 
 /**
- * 支持JSON序列化时对POJO提供字段描述<p/>
+ * 支持JSON序列化时对POJO提供字段描述<br/>
  * <pre>
  *    objectMapper.setSerializerFactory(
  *
@@ -15,8 +15,8 @@ import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
  *      .withSerializerModifier(new BeanSerializerModifier() {
  *
  *          <code>@Override</code>
- *          public List<BeanPropertyWriter> changeProperties(SerializationConfig config,
- *              BeanDescription beanDesc, List<BeanPropertyWriter> beanProperties) {
+ *          public List&lt;BeanPropertyWriter&gt; changeProperties(SerializationConfig config,
+ *              BeanDescription beanDesc, List&lt;BeanPropertyWriter&gt; beanProperties) {
  *
  *                  //修改原有的BeanPropertyWriter列表
  *                  return beanProperties

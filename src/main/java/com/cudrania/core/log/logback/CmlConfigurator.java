@@ -7,14 +7,14 @@ import ch.qos.logback.core.Context;
 import ch.qos.logback.core.status.Status;
 
 /**
- * Logback默认配置，代替logback.xml中的配置<p/>
+ * Logback默认配置，代替logback.xml中的配置<br/>
  * <pre>
  * &lt;conversionRule conversionWord="CML" converterClass="com.cudrania.core.log.logback.FQCNConverter"/&gt;
  * </pre>
  *
  * SPI配置: META-INF/services/ch.qos.logback.classic.spi.Configurator
  * @author : skyfalling
- * @created : 2023/11/3, 星期五
+ * @since 2023/11/3
  * Copyright (c) 2004-2029 All Rights Reserved.
  **/
 public class CmlConfigurator implements Configurator {
