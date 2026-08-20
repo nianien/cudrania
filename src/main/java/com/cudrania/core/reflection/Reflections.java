@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -26,8 +27,8 @@ import static com.cudrania.core.utils.StringUtils.decapitalize;
  */
 public class Reflections {
 
-    private final static Map<Class, List<Method>> methodCache = new WeakHashMap<>();
-    private final static Map<Class, List<Field>> fieldCache = new WeakHashMap<>();
+    private final static Map<Class, List<Method>> methodCache = new ConcurrentHashMap<>();
+    private final static Map<Class, List<Field>> fieldCache = new ConcurrentHashMap<>();
     public final static Predicate<Method> IS_SETTER = Reflections::isSetter;
     public final static Predicate<Method> IS_GETTER = Reflections::isGetter;
 
@@ -71,7 +72,10 @@ public class Reflections {
             if (matched == 0) {
                 return method;
             }
-            candidates.add(method);
+            //只收集兼容匹配(matched>=0), 不兼容(-1)的重载不应污染候选集
+            if (matched > 0) {
+                candidates.add(method);
+            }
         }
         if (candidates.size() > 1) {
             throw new IllegalArgumentException("ambiguous methods:" + candidates);
@@ -224,7 +228,7 @@ public class Reflections {
         return fieldCache.computeIfAbsent(clazz, key -> {
             List<Field> list = new ArrayList<>();
             for (; key != null && key != Object.class; key = key.getSuperclass()) {
-                Arrays.stream(clazz.getDeclaredFields()).forEach(list::add);
+                Arrays.stream(key.getDeclaredFields()).forEach(list::add);
             }
             return list;
         });
@@ -310,7 +314,13 @@ public class Reflections {
                         if (value instanceof BeanProperty) {
                             BeanProperty property = (BeanProperty) value;
                             Method getter = ((BeanProperty) value).getGetter();
-                            if (getter != null && setter.getSetter().getParameterTypes()[0].isAssignableFrom(getter.getReturnType())) {
+                            //目标可写类型: 优先setter入参, 否则字段类型(仅有字段无setter的属性也可写)
+                            Class<?> targetType = setter.getSetter() != null
+                                    ? setter.getSetter().getParameterTypes()[0]
+                                    : (setter.getField() != null ? setter.getField().getType() : null);
+                            //用wrapClass比较, 使int↔Integer等装箱兼容类型也能赋值
+                            if (getter != null && targetType != null
+                                    && wrapClass(targetType).isAssignableFrom(wrapClass(getter.getReturnType()))) {
                                 value = property.getValue(from);
                             } else {
                                 value = null;
@@ -320,7 +330,7 @@ public class Reflections {
                             setter.setValue(to, value);
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        throw new RuntimeException("failed to populate property '" + n + "' on " + to.getClass().getName(), e);
                     }
                 }
         );
@@ -681,7 +691,7 @@ public class Reflections {
      * @return
      */
     private static int typeMatched(Class<?>[] expectedTypes, Class<?>[] argTypes) {
-        if (argTypes.length != argTypes.length) {
+        if (expectedTypes.length != argTypes.length) {
             return -1;
         }
         int res = 0;
@@ -705,15 +715,25 @@ public class Reflections {
      * @return
      */
     private static int argsMatched(Class<?>[] expectedTypes, Object[] args) {
-        if (args.length != args.length) {
+        if (expectedTypes.length != args.length) {
             return -1;
         }
         int res = 0;
         for (int i = 0; i < args.length; i++) {
-            if (!expectedTypes[i].isInstance(args[i])) {
+            Class<?> expected = expectedTypes[i];
+            if (args[i] == null) {
+                //null无法匹配基本类型形参; 匹配引用类型时按兼容匹配计
+                if (expected.isPrimitive()) {
+                    return -1;
+                }
+                res++;
+                continue;
+            }
+            //用包装类型比较, 使基本类型形参(如int)能匹配装箱实参(如Integer)
+            if (!wrapClass(expected).isInstance(args[i])) {
                 return -1;
             }
-            if (wrapClass(expectedTypes[i]) != wrapClass(args[i].getClass())) {
+            if (wrapClass(expected) != wrapClass(args[i].getClass())) {
                 res++;
             }
         }

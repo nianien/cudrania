@@ -116,15 +116,15 @@ public class FileClassLoader extends URLClassLoader {
     @SneakyThrows
     public static URL classPathToURL(String path) {
         File file = new File(path);
-        // 获取系统上的规范路径
-        String urlString = "file://" + file.getCanonicalPath();
+        // 用toURI().toURL()生成URL, 正确转义空格/中文/特殊字符, 避免手工拼接出错
+        String urlString = file.toURI().toURL().toString();
         if (file.isFile()) {
             if (path.toLowerCase().endsWith("zip")) {
                 urlString = "zip:" + urlString + "!/";
             } else if (path.toLowerCase().endsWith("jar")) {
                 urlString = "jar:" + urlString + "!/";
             }
-        } else {
+        } else if (!urlString.endsWith("/")) {
             urlString = urlString + "/";
         }
         return new URL(urlString);

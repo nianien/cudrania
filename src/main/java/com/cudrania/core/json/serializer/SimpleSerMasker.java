@@ -4,11 +4,11 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 /**
- * 字段判断和加密处理的默认实现
+ * 字段判断和脱敏处理的默认实现
  *
  * @author liyifei
  */
-public class SimpleSerEncryptor implements SerEncryptor {
+public class SimpleSerMasker implements SerMasker {
 
     /**
      * 处理字段判断
@@ -27,7 +27,7 @@ public class SimpleSerEncryptor implements SerEncryptor {
      * @param validator 判断字段是否需要处理
      * @param converter BiFunction&lt;字段名, 字段值, 转换后内容&gt; 字段转换
      */
-    public SimpleSerEncryptor(Predicate<String> validator, BiFunction<String, Object, Object> converter) {
+    public SimpleSerMasker(Predicate<String> validator, BiFunction<String, Object, Object> converter) {
         this.validator = validator;
         this.converter = converter;
     }
@@ -39,7 +39,7 @@ public class SimpleSerEncryptor implements SerEncryptor {
      * @param regex     需要处理字段的正则式
      * @param converter BiFunction&lt;字段名, 字段值, 转换后内容&gt; 字段转换
      */
-    public SimpleSerEncryptor(String regex, BiFunction<String, Object, Object> converter) {
+    public SimpleSerMasker(String regex, BiFunction<String, Object, Object> converter) {
         this(s -> s.matches(regex), converter);
     }
 
@@ -50,15 +50,15 @@ public class SimpleSerEncryptor implements SerEncryptor {
      * @param regex       需要处理字段的正则式
      * @param replacement 字段内容替换
      */
-    public SimpleSerEncryptor(String regex, String replacement) {
+    public SimpleSerMasker(String regex, String replacement) {
         this(regex, (k, v) -> replacement);
     }
 
-    public boolean shouldEncrypt(String name) {
+    public boolean shouldMask(String name) {
         return validator.test(name);
     }
 
-    public Object encrypt(String name, Object value) {
+    public Object mask(String name, Object value) {
         return converter.apply(name, value);
     }
 }

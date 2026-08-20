@@ -103,7 +103,7 @@ public class ResultSetAdapter {
                     try {
                         map.put(meta.getColumnLabel(i), resultSet.getObject(i));
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        throw new RuntimeException("failed to read column [" + i + "] '" + meta.getColumnLabel(i) + "'", e);
                     }
                 }
             }
@@ -303,9 +303,8 @@ public class ResultSetAdapter {
             if (resultSet.getType() == ResultSet.TYPE_FORWARD_ONLY) {
                 if (rowNo > 1) {
                     int index = 0;
-                    while (resultSet.next()) {
+                    while (index < rowNo - 1 && resultSet.next()) {
                         index++;
-                        if (index < rowNo - 1) continue;
                     }
                 }
             } else {
@@ -436,12 +435,18 @@ public class ResultSetAdapter {
             } else if (type.isAssignableFrom(URL.class)) {
                 value = resultSet.getURL(fieldName);
             } else {
-                // 用字符串构造的对象实例
+                // 用字符串构造的对象实例; 包装类型(Integer/Long/枚举等)走此分支,
+                // SQL NULL时getString返回null, 必须提前返回null, 否则newInstance(type,null)会NPE
                 String args = resultSet.getString(fieldName);
-                value = Reflections.newInstance(type, args);
+                value = args == null ? null : Reflections.newInstance(type, args);
+            }
+            //基本类型在SQL NULL时getXxx会返回0/false, 需借助wasNull还原为null, 避免丢失NULL语义
+            if (type.isPrimitive() && resultSet.wasNull()) {
+                value = null;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            //不再静默吞异常: 携带列名抛出, 便于定位映射失败
+            throw new RuntimeException("failed to read column '" + fieldName + "' as " + type.getName(), e);
         }
         return value;
     }

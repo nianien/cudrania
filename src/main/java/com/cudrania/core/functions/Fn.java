@@ -6,8 +6,8 @@ import java.io.Serializable;
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
 import java.util.Map;
-import java.util.WeakHashMap;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 多个参数的函数定义
@@ -350,9 +350,12 @@ public class Fn {
     }
 
     /**
-     * 缓存
+     * 缓存.
+     * <p>
+     * 以方法引用的实现类(而非lambda实例)为键: 同一方法引用在源码中对应唯一的合成类,
+     * 解析出的{@link SerializedLambda}也相同, 故按类缓存既线程安全又不会因持有lambda实例导致内存泄漏.
      */
-    private static Map<Serializable, SerializedLambda> cache = new WeakHashMap();
+    private static final Map<Class<?>, SerializedLambda> cache = new ConcurrentHashMap<>();
 
     /**
      * 获取SerializedLambda对象, 入参必须是方法引用
@@ -360,9 +363,8 @@ public class Fn {
      * @param lambda
      * @return
      */
-    @SneakyThrows
     public static SerializedLambda lambda(Serializable lambda) {
-        return cache.computeIfAbsent(lambda, k -> lambda0(k));
+        return cache.computeIfAbsent(lambda.getClass(), k -> lambda0(lambda));
     }
 
     /**

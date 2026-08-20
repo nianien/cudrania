@@ -39,7 +39,7 @@ public class Closer {
                     Reflections.invoke("close", object, new Object[0]);
                 }
             } catch (Throwable e) {
-                e.printStackTrace();
+                //ignore: 与close(AutoCloseable)保持一致, 关闭动作不对外抛异常/打印
             }
         }
     }

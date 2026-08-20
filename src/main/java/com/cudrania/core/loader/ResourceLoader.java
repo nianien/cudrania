@@ -64,9 +64,13 @@ public class ResourceLoader {
      * @return File
      */
     public static File getFile(String resourceName, String packageName) {
+        URL url = findResource(resourceName, packageName);
+        //jar/zip 内的资源没有对应磁盘文件, 返回null而非让 new File(url.toURI()) 抛异常
+        if (url == null || !"file".equals(url.getProtocol())) {
+            return null;
+        }
         try {
-            URL url = findResource(resourceName, packageName);
-            return url != null ? new File(url.toURI()) : null;
+            return new File(url.toURI());
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
         }

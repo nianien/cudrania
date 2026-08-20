@@ -1,13 +1,12 @@
 package com.cudrania.jdbc.table;
 
-import com.cudrania.core.log.LoggerFactory;
+import com.cudrania.core.collection.map.CaseInsensitiveMap;
 import com.cudrania.core.reflection.BeanProperty;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Logger;
 
 import static com.cudrania.core.exception.ExceptionChecker.throwIf;
@@ -20,7 +19,7 @@ import static com.cudrania.core.reflection.Reflections.beanProperties;
  * @param <T>
  */
 class DataTableImpl<T> implements DataTable<T> {
-    private static Logger logger = LoggerFactory.getLogger(DataTableImpl.class);
+    private static Logger logger = Logger.getLogger(DataTableImpl.class.getName());
     /**
      * 表名
      */
@@ -34,7 +33,8 @@ class DataTableImpl<T> implements DataTable<T> {
     /**
      * 字段属性列表
      */
-    private Map<String, FieldProperty> fieldProperties = new TreeMap<>();
+    //大小写不敏感: 各数据库返回的列名大小写不一(如H2默认大写), 需与实体列名不区分大小写匹配
+    private Map<String, FieldProperty> fieldProperties = new CaseInsensitiveMap<>();
 
     /**
      * 主键字段
@@ -99,8 +99,14 @@ class DataTableImpl<T> implements DataTable<T> {
         Column column = TableHelper.getColumnName(property);
         String columnName = column.value();
         throwIf(fieldProperties.containsKey(columnName), "duplicate field declared in table[" + type + "]: " + columnName);
-        fieldProperties.put(columnName, new FieldProperty(column, property.getGetter().getReturnType(), property.getGetter(), property.getSetter()));
-        if (property.getGetter().isAnnotationPresent(Id.class) || property.getField().isAnnotationPresent(Id.class)) {
+        //属性类型: 优先取getter返回类型, 无getter时用字段类型(避免field-only属性NPE)
+        Class<?> propType = property.getGetter() != null
+                ? property.getGetter().getReturnType() : property.getField().getType();
+        fieldProperties.put(columnName, new FieldProperty(column, propType, property.getGetter(), property.getSetter()));
+        //@Id可能标注在getter或field上, 二者都可能为null, 需分别判空
+        boolean isId = (property.getGetter() != null && property.getGetter().isAnnotationPresent(Id.class))
+                || (property.getField() != null && property.getField().isAnnotationPresent(Id.class));
+        if (isId) {
             this.keyFields.add(columnName);
         }
     }

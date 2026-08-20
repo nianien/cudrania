@@ -19,11 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Pipelines<IN1, IN2, IN3, OUT> implements Pipeline<IN1, OUT>, Pipeline2<IN1, IN2, OUT>, Pipeline3<IN1, IN2, IN3, OUT> {
     private AbstractStep step;
-    private PipelineContext context;
 
     public Pipelines(AbstractStep step) {
         this.step = step;
-        this.context = new PipelineContext();
     }
 
     /**
@@ -152,17 +150,19 @@ public class Pipelines<IN1, IN2, IN3, OUT> implements Pipeline<IN1, OUT>, Pipeli
      * @return
      */
     private <R> R eval0(Object... inputs) {
+        //上下文为每次调用独立创建, 保证Pipelines实例可复用/可重入/线程安全
+        PipelineContext context = new PipelineContext();
         context.setFirst(inputs);
         AbstractStep initStep = this.step.getInitStep();
         String[] inputNames = initStep.getOutputNames();
-        log.info("==>init step [{}] with input: {}", 0, inputNames);
+        log.debug("==>init step [{}] with input: {}", 0, inputNames);
         //初始步骤的出参作为第一个步骤的参数
         for (int i = 0; i < inputs.length && i < inputNames.length; i++) {
             context.put(inputNames[i], inputs[i]);
         }
         AbstractStep step = initStep.getNextStep();
         while (step != null) {
-            doEval(step);
+            doEval(step, context);
             step = step.getNextStep();
         }
         return (R) context.getLast()[0];
@@ -176,8 +176,8 @@ public class Pipelines<IN1, IN2, IN3, OUT> implements Pipeline<IN1, OUT>, Pipeli
      * @param <R>
      * @return
      */
-    private <R> R doEval(AbstractStep step) {
-        log.info("==>begin step [{}] with input: {}", step.getDepth(), step.getInputNames());
+    private <R> R doEval(AbstractStep step, PipelineContext context) {
+        log.debug("==>begin step [{}] with input: {}", step.getDepth(), step.getInputNames());
         String[] inputNames = step.getInputNames();
         Object[] inputValues = new Object[inputNames.length];
         if (inputNames.length == 0) {
@@ -229,7 +229,7 @@ public class Pipelines<IN1, IN2, IN3, OUT> implements Pipeline<IN1, OUT>, Pipeli
             context.put(outputName, output);
         }
         context.setLast(new Object[]{output});
-        log.info("==>finish step [{}] with output{}: {} ", step.getDepth(), step.getOutputNames(), output);
+        log.debug("==>finish step [{}] with output{}: {} ", step.getDepth(), step.getOutputNames(), output);
         return (R) output;
     }
 

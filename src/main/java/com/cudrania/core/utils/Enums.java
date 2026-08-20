@@ -1,9 +1,12 @@
 package com.cudrania.core.utils;
 
+import com.cudrania.core.exception.ExceptionChecker;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 枚举工具类
@@ -101,24 +104,26 @@ public class Enums {
      * @return
      */
     public static <T extends Enum<T>> T with(Class<T> enumClass, String fieldName, Object fieldValue) {
-        T[] types = enumClass.getEnumConstants();
         Field field;
         try {
             field = enumClass.getDeclaredField(fieldName);
             field.setAccessible(true);
         } catch (NoSuchFieldException e) {
-            System.err.println("field not found in enum[" + enumClass.getName() + "]: " + fieldName);
+            //按契约: 无此字段返回null(不再打印噪音)
             return null;
         }
-        for (T t : types) {
+        for (T t : enumClass.getEnumConstants()) {
             try {
-                if (field.get(t).equals(fieldValue))
+                //Objects.equals 兼容字段值为null的枚举常量, 避免NPE
+                if (Objects.equals(field.get(t), fieldValue)) {
                     return t;
-            } catch (Exception e) {
-                e.printStackTrace();
+                }
+            } catch (IllegalAccessException e) {
+                //已setAccessible, 正常不会到这; 若真发生是反射错误, 抛出而非静默吞掉
+                throw ExceptionChecker.throwException(e);
             }
         }
-        System.err.println("enum not found: " + enumClass.getName() + "[" + fieldName + "=" + fieldValue + "]");
+        //按契约: 无匹配返回null(不再打印噪音)
         return null;
     }
 

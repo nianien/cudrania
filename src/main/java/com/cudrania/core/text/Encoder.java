@@ -4,11 +4,14 @@ import com.cudrania.core.utils.RadixUtils;
 import com.cudrania.core.utils.StringUtils;
 
 /**
- * 针对文本提供编码解码操作的工具类
+ * 针对文本提供<b>可逆编码/解码</b>操作的工具类.
+ * <p>
+ * 注意: 这是基于公开字符集的进制换算编码, <b>不是加密</b> —— 无密钥、任何人可还原,
+ * 请勿用于口令、令牌等敏感数据的机密性保护.
  *
  * @author skyfalling
  */
-public class Encryptor {
+public class Encoder {
 
     /**
      * 默认字符集合[0-9A-Za-z]
@@ -22,8 +25,8 @@ public class Encryptor {
      * @param source
      * @return 编码后的字符串
      */
-    public static String encrypt(String source) {
-        return encrypt(source, defaultCharset);
+    public static String encode(String source) {
+        return encode(source, defaultCharset);
     }
 
     /**
@@ -33,7 +36,7 @@ public class Encryptor {
      * @param charset 编码所使用的字符集
      * @return 编码后的字符串
      */
-    public static String encrypt(String source, char[] charset) {
+    public static String encode(String source, char[] charset) {
         StringBuilder sb = new StringBuilder();
         for (char c : source.toCharArray()) {
             String str = RadixUtils.toRadix(c, charset);
@@ -51,7 +54,7 @@ public class Encryptor {
      * @param source
      * @return 返回解码后的字符串
      */
-    public static String decrypt(String source) {
+    public static String decode(String source) {
         String[] arr = groupByLength(source, 3);
         StringBuilder sb = new StringBuilder();
         for (String s : arr) {
@@ -67,7 +70,7 @@ public class Encryptor {
      * @param charset 解码所使用的字符集
      * @return 返回解码后的字符串
      */
-    public static String decrypt(String source, char[] charset) {
+    public static String decode(String source, char[] charset) {
         String[] arr = groupByLength(source, getDigit(charset.length));
         StringBuilder sb = new StringBuilder();
         for (String s : arr) {
@@ -82,7 +85,7 @@ public class Encryptor {
      * @param source
      * @return 数字字符串
      */
-    public static String encryptToNumber(String source) {
+    public static String encodeToNumber(String source) {
         StringBuilder sb = new StringBuilder();
         // 纯数字表示,需要5位
         int width = 5;
@@ -101,7 +104,7 @@ public class Encryptor {
      * @param source
      * @return 解码后字符串
      */
-    public static String decryptFromNumber(String source) {
+    public static String decodeFromNumber(String source) {
         // 纯数字表示,需要5位
         int width = 5;
         String[] arr = groupByLength(source, width);

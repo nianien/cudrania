@@ -24,8 +24,7 @@ public class Methods {
    * @return 返回方法所在类的名称
    */
   public static String getCallerClassName(int depth) {
-    StackTraceElement trace = getStackTraceElement(depth);
-    return trace.getClassName();
+    return frameAt(depth).getClassName();
   }
 
 
@@ -37,8 +36,7 @@ public class Methods {
    * @return 返回方法名称
    */
   public static String getCallerMethodName(int depth) {
-    StackTraceElement trace = getStackTraceElement(depth);
-    return trace.getMethodName();
+    return frameAt(depth).getMethodName();
   }
 
   /**
@@ -60,13 +58,18 @@ public class Methods {
   }
 
   /**
-   * 获取指定深度的堆栈信息<p>
+   * 获取指定调用深度的栈帧(JDK9+ StackWalker,替代脆弱的 getStackTrace 魔数偏移)。
+   * <p>
+   * StackWalker 的帧流从"调用 walk 的方法"(即本方法 frameAt)起算:
+   * [0]=frameAt、[1]=getCallerXxx、[2]=depth 0(getCallerXxx 的调用者)……故取 skip(n+2)。
    *
-   * @return 返回StackTraceElement实例
+   * @param n 调用深度,0 表示调用 getCallerXxx 的方法
+   * @return 对应的栈帧
    */
-  private static StackTraceElement getStackTraceElement(int n) {
-    // return new Exception().getStackTrace()[n + 2];
-    return Thread.currentThread().getStackTrace()[n + 3];
+  private static StackWalker.StackFrame frameAt(int n) {
+    return StackWalker.getInstance()
+            .walk(stream -> stream.skip(n + 2).findFirst())
+            .orElseThrow(() -> new IllegalArgumentException("no caller stack frame at depth: " + n));
   }
 
   /**

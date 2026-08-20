@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ser.std.MapProperty;
 /**
  * 支持JSON序列化时对POJO和&amp; Map对象加密<br/>
  * <pre>
- *  {@link SimpleSerEncryptor} encryptor = new {@link SimpleSerEncryptor}("(?i).*(password|balance|phone|id_?card).*");
+ *  {@link SimpleSerMasker} encryptor = new {@link SimpleSerMasker}("(?i).*(password|balance|phone|id_?card).*");
  *
  *  objectMapper.setFilterProvider(
  *
@@ -32,15 +32,15 @@ import com.fasterxml.jackson.databind.ser.std.MapProperty;
 public class SecurityPropertyFilter extends SimpleBeanPropertyFilter {
 
     /**
-     * 加密器
+     * 脱敏器
      */
-    private SerEncryptor encryptor;
+    private SerMasker masker;
 
     /**
-     * @param encryptor
+     * @param masker 字段脱敏器
      */
-    public SecurityPropertyFilter(SerEncryptor encryptor) {
-        this.encryptor = encryptor;
+    public SecurityPropertyFilter(SerMasker masker) {
+        this.masker = masker;
     }
 
 
@@ -53,17 +53,17 @@ public class SecurityPropertyFilter extends SimpleBeanPropertyFilter {
         if (writer instanceof BeanPropertyWriter) {
             BeanPropertyWriter bw = (BeanPropertyWriter) writer;
             Object value = bw.get(pojo);
-            if (encryptor.shouldEncrypt(name)) {
+            if (masker.shouldMask(name)) {
                 //这里由于pojo对象未发生改变, 所以只能手动直接序列化
-                value = encryptor.encrypt(name, value);
+                value = masker.mask(name, value);
                 jgen.writeObjectField(name, value);
                 return;
             }
         } else if (writer instanceof MapProperty) {
             MapProperty mw = (MapProperty) writer;
             Object value = mw.getValue();
-            if (encryptor.shouldEncrypt(name)) {
-                mw.setValue(encryptor.encrypt(name, value));
+            if (masker.shouldMask(name)) {
+                mw.setValue(masker.mask(name, value));
             }
         }
         super.serializeAsField(pojo, jgen, provider, writer);
@@ -73,8 +73,8 @@ public class SecurityPropertyFilter extends SimpleBeanPropertyFilter {
     @Override
     public void serializeAsElement(Object elementValue, JsonGenerator jgen, SerializerProvider provider, PropertyWriter writer) throws Exception {
         if (writer instanceof MapProperty) {
-            if (encryptor.shouldEncrypt(writer.getName())) {
-                ((MapProperty) writer).setValue(encryptor.encrypt(writer.getName(), elementValue));
+            if (masker.shouldMask(writer.getName())) {
+                ((MapProperty) writer).setValue(masker.mask(writer.getName(), elementValue));
             }
         }
         super.serializeAsElement(elementValue, jgen, provider, writer);

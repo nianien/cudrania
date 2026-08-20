@@ -35,7 +35,7 @@ public class SqlTypeConverter implements TypeConverter<Object, String> {
         register(Number.class, number -> {
             if (scale > 0)
                 if (number instanceof Float || number instanceof Double) {
-                    return new BigDecimal(number.doubleValue()).setScale(scale, RoundingMode.HALF_UP).toString();
+                    return BigDecimal.valueOf(number.doubleValue()).setScale(scale, RoundingMode.HALF_UP).toString();
                 }
             return number.toString();
         });

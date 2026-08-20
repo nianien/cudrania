@@ -136,7 +136,6 @@ public class PropertiesLoader {
      * @return Properties对象
      */
     public static Properties loadXML(InputStream inputStream) {
-        InputStream is = null;
         try {
             Properties p = new Properties();
             p.loadFromXML(inputStream);
@@ -144,7 +143,7 @@ public class PropertiesLoader {
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
         } finally {
-            Closer.close(is);
+            Closer.close(inputStream);
         }
     }
 

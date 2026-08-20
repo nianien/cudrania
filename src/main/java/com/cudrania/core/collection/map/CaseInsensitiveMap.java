@@ -106,6 +106,30 @@ public class CaseInsensitiveMap<K, V> extends HashMap<K, V> {
         return super.remove(findRealKey(key));
     }
 
+    /**
+     * 批量写入<br>
+     * HashMap#putAll内部走putVal而非本类put, 故需重写以维护大小写映射
+     *
+     * @see java.util.HashMap#putAll(Map)
+     */
+    @Override
+    public void putAll(Map<? extends K, ? extends V> m) {
+        for (Entry<? extends K, ? extends V> entry : m.entrySet()) {
+            put(entry.getKey(), entry.getValue());
+        }
+    }
+
+    /**
+     * 获取Key值所映射的Value值,不存在时返回默认值<br>
+     * 当Key为String类型时不分大小写
+     *
+     * @see java.util.HashMap#getOrDefault(Object, Object)
+     */
+    @Override
+    public V getOrDefault(Object key, V defaultValue) {
+        return super.getOrDefault(findRealKey(key), defaultValue);
+    }
+
     @Override
     public void clear() {
         super.clear();

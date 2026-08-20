@@ -2,6 +2,7 @@ package com.cudrania.jdbc.sql;
 
 import com.cudrania.core.arrays.ArrayUtils;
 import com.cudrania.jdbc.table.DataTable;
+import com.cudrania.jdbc.table.FieldProperty;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -99,7 +100,7 @@ public class SqlGenerator {
      * @return
      */
     public static SqlStatement insertSql(String tableName, Collection<DataField> fields) {
-        assert !fields.isEmpty() : "required at least one field to insert";
+        throwIf(fields.isEmpty(), "required at least one field to insert");
         SqlStatement sqlStatement = new SqlStatement("insert into").append(tableName);
         StringBuilder nameString = new StringBuilder("(");
         StringBuilder valueString = new StringBuilder("values(");
@@ -236,8 +237,11 @@ public class SqlGenerator {
     private static List<DataField> getFields(Object entity, String[] fields, boolean includeNull) {
         DataTable table = get(entity.getClass());
         return Arrays.stream(fields)
-                .map(table::getField)
-                .map(f -> new DataField(f.getName(), f.getValue(entity), f.getSqlType()))
+                .map(name -> {
+                    FieldProperty f = table.getField(name);
+                    throwIf(f == null, "unknown field '" + name + "' for " + entity.getClass().getName());
+                    return new DataField(f.getName(), f.getValue(entity), f.getSqlType());
+                })
                 .filter(f -> includeNull || f.value != null)
                 .collect(Collectors.toList());
     }

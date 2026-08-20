@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.net.URL;
+import java.util.Enumeration;
 
 /**
  * @author skyfalling
@@ -62,6 +64,24 @@ public class TestLoader {
         System.out.println(cClass.getClassLoader());
         Assertions.assertEquals(aClass, bClass);
         Assertions.assertNotEquals(bClass, cClass);
+    }
+
+    /**
+     * 资源查找(Spring配置场景): 加入附加loader后, getResources<b>不得重复枚举</b>同一资源.
+     * <p>
+     * 附加loader(FileClassLoader)自身child-first且父加载器为system loader, 已能摸到应用classpath资源;
+     * 若CompositeClassLoader再沿wrapper链聚合, rootLoader的同一份资源会被重复枚举, 导致Spring
+     * 按classpath*:扫描出现重复配置. 这里断言各资源URL唯一, 守护该行为.
+     */
+    @Test
+    @SneakyThrows
+    public void testResourceLookupNoDuplicate() {
+        CompositeClassLoader ccl = new CompositeClassLoader();
+        ccl.add(new File("./src/test/resources/test2.jar"));
+        Enumeration<URL> urls = ccl.getResources("db.properties");
+        java.util.List<URL> list = java.util.Collections.list(urls);
+        java.util.Set<URL> unique = new java.util.HashSet<>(list);
+        Assertions.assertEquals(unique.size(), list.size(), "getResources不应重复枚举同一资源: " + list);
     }
 
     @Test

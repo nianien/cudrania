@@ -135,7 +135,7 @@ public class MultiBitSet {
         int sum = 0;
         // 步长为N,一个索引占用n个bit
         for (int i = 0; i < this.bitset.length(); i += bitNum) {
-            for (int j = i; j < i + bitNum - 1; j++) {
+            for (int j = i; j < i + bitNum; j++) {
                 // 任意一个bit不为零即为非零索引
                 if (this.bitset.get(j)) {
                     sum++;
@@ -154,7 +154,8 @@ public class MultiBitSet {
      * @see java.util.BitSet#nextSetBit(int)
      */
     public int nextSetBit(int fromIndex) {
-        return this.bitset.nextSetBit(fromIndex * bitNum) / bitNum;
+        int bit = this.bitset.nextSetBit(fromIndex * bitNum);
+        return bit < 0 ? -1 : bit / bitNum;
     }
 
     /**

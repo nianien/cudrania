@@ -67,7 +67,7 @@ public class RadixUtils {
      */
     public static long toNumber(String source, int radix) {
         ExceptionChecker.throwIf(radix > 62, "the radix of hex must be no more than 62.");
-        if (source == "0")
+        if ("0".equals(source))
             return 0;
         int len = source.length();
         long sum = 0;
@@ -91,7 +91,7 @@ public class RadixUtils {
      */
     public static long toNumber(String source, char[] charset) {
         ExceptionChecker.throwIf(charset.length < 2, "the number of different characters must be more than 2.");
-        if (source == "0")
+        if ("0".equals(source))
             return 0;
         int len = source.length();
         int r = charset.length;

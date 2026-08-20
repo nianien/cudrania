@@ -114,7 +114,8 @@ public class ArrayUtils {
      * @return 如果array包含true, 否则返回false
      */
     public static boolean contains(byte[] array, byte target) {
-        return binarySearch(array, target) >= 0;
+        for (byte v : array) if (v == target) return true;
+        return false;
     }
 
     /**
@@ -125,7 +126,8 @@ public class ArrayUtils {
      * @return 如果array包含true, 否则返回false
      */
     public static boolean contains(char[] array, char target) {
-        return binarySearch(array, target) >= 0;
+        for (char v : array) if (v == target) return true;
+        return false;
     }
 
     /**
@@ -136,7 +138,8 @@ public class ArrayUtils {
      * @return 如果array包含true, 否则返回false
      */
     public static boolean contains(short[] array, int target) {
-        return binarySearch(array, (short) target) >= 0;
+        for (short v : array) if (v == target) return true;
+        return false;
     }
 
     /**
@@ -147,7 +150,8 @@ public class ArrayUtils {
      * @return 如果array包含true, 否则返回false
      */
     public static boolean contains(int[] array, int target) {
-        return binarySearch(array, target) >= 0;
+        for (int v : array) if (v == target) return true;
+        return false;
     }
 
     /**
@@ -158,7 +162,8 @@ public class ArrayUtils {
      * @return 如果array包含true, 否则返回false
      */
     public static boolean contains(long[] array, long target) {
-        return binarySearch(array, target) >= 0;
+        for (long v : array) if (v == target) return true;
+        return false;
     }
 
     /**
@@ -169,7 +174,8 @@ public class ArrayUtils {
      * @return 如果array包含true, 否则返回false
      */
     public static boolean contains(float[] array, float target) {
-        return binarySearch(array, target) >= 0;
+        for (float v : array) if (Float.compare(v, target) == 0) return true;
+        return false;
     }
 
     /**
@@ -180,7 +186,8 @@ public class ArrayUtils {
      * @return 如果array包含true, 否则返回false
      */
     public static boolean contains(double[] array, double target) {
-        return binarySearch(array, target) >= 0;
+        for (double v : array) if (Double.compare(v, target) == 0) return true;
+        return false;
     }
 
     /**
@@ -192,7 +199,8 @@ public class ArrayUtils {
      * @return 如果array包含true, 否则返回false
      */
     public static <T> boolean contains(T[] array, T target) {
-        return binarySearch(array, target) >= 0;
+        for (T v : array) if (java.util.Objects.equals(v, target)) return true;
+        return false;
     }
 
     /**
@@ -388,7 +396,7 @@ public class ArrayUtils {
      * @return 差集
      */
     public static boolean[] subtract(boolean[] arr1, boolean[] arr2) {
-        if (arr1.length == 0 || arr2.length == 0)
+        if (arr1.length == 0)
             return new boolean[0];
         boolean[] arr = new boolean[arr1.length];
         int i = 0;
@@ -408,7 +416,7 @@ public class ArrayUtils {
      * @return 差集
      */
     public static byte[] subtract(byte[] arr1, byte[] arr2) {
-        if (arr1.length == 0 || arr2.length == 0)
+        if (arr1.length == 0)
             return new byte[0];
         byte[] arr = new byte[arr1.length];
         int i = 0;
@@ -428,7 +436,7 @@ public class ArrayUtils {
      * @return 差集
      */
     public static char[] subtract(char[] arr1, char[] arr2) {
-        if (arr1.length == 0 || arr2.length == 0)
+        if (arr1.length == 0)
             return new char[0];
         char[] arr = new char[arr1.length];
         int i = 0;
@@ -448,7 +456,7 @@ public class ArrayUtils {
      * @return 差集
      */
     public static short[] subtract(short[] arr1, short[] arr2) {
-        if (arr1.length == 0 || arr2.length == 0)
+        if (arr1.length == 0)
             return new short[0];
         short[] arr = new short[arr1.length];
         int i = 0;
@@ -468,7 +476,7 @@ public class ArrayUtils {
      * @return 差集
      */
     public static int[] subtract(int[] arr1, int[] arr2) {
-        if (arr1.length == 0 || arr2.length == 0)
+        if (arr1.length == 0)
             return new int[0];
         int[] arr = new int[arr1.length];
         int i = 0;
@@ -488,7 +496,7 @@ public class ArrayUtils {
      * @return 差集
      */
     public static long[] subtract(long[] arr1, long[] arr2) {
-        if (arr1.length == 0 || arr2.length == 0)
+        if (arr1.length == 0)
             return new long[0];
         long[] arr = new long[arr1.length];
         int i = 0;
@@ -508,7 +516,7 @@ public class ArrayUtils {
      * @return 差集
      */
     public static float[] subtract(float[] arr1, float[] arr2) {
-        if (arr1.length == 0 || arr2.length == 0)
+        if (arr1.length == 0)
             return new float[0];
         float[] arr = new float[arr1.length];
         int i = 0;
@@ -528,7 +536,7 @@ public class ArrayUtils {
      * @return 差集
      */
     public static double[] subtract(double[] arr1, double[] arr2) {
-        if (arr1.length == 0 || arr2.length == 0)
+        if (arr1.length == 0)
             return new double[0];
         double[] arr = new double[arr1.length];
         int i = 0;
@@ -551,7 +559,7 @@ public class ArrayUtils {
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] subtract(T[] arr1, T[] arr2, Class<T> clazz) {
-        if (arr1.length == 0 || arr2.length == 0)
+        if (arr1.length == 0)
             return (T[]) Array.newInstance(clazz, 0);
         T[] arr = (T[]) Array.newInstance(clazz, arr1.length);
         int i = 0;

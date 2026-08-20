@@ -119,7 +119,9 @@ public enum SqlOperator {
      * @return
      */
     public String toSQL(String name) {
-        return this.value.replaceFirst("\\?", name);
+        //按普通字符串替换首个'?', 避免replaceFirst把name当作正则替换模板(name含$/\时会出错)
+        int idx = this.value.indexOf('?');
+        return idx < 0 ? this.value : this.value.substring(0, idx) + name + this.value.substring(idx + 1);
     }
 
 }

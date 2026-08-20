@@ -1,6 +1,5 @@
 package com.cudrania.core.text;
 
-import com.cudrania.core.bits.ByteUtils;
 import com.cudrania.core.exception.ExceptionChecker;
 import com.cudrania.core.io.Closer;
 
@@ -8,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.HexFormat;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -41,7 +41,7 @@ public class MessageDigests {
     public static String md5(String content) {
         MessageDigest md = md5.get();
         md.reset();
-        return ByteUtils.byte2Hex(digest(md, content));
+        return HexFormat.of().formatHex(digest(md, content));
     }
 
     /**
@@ -54,7 +54,7 @@ public class MessageDigests {
     public static String md5(String content, String charset) {
         MessageDigest md = md5.get();
         md.reset();
-        return ByteUtils.byte2Hex(digest(md, content, charset));
+        return HexFormat.of().formatHex(digest(md, content, charset));
     }
 
     /**
@@ -66,7 +66,7 @@ public class MessageDigests {
     public static String md5(File file) {
         MessageDigest md = md5.get();
         md.reset();
-        return ByteUtils.byte2Hex(digest(md, file));
+        return HexFormat.of().formatHex(digest(md, file));
     }
 
 
@@ -92,7 +92,7 @@ public class MessageDigests {
     public static String sha(String content) {
         MessageDigest md = sha.get();
         md.reset();
-        return ByteUtils.byte2Hex(digest(md, content));
+        return HexFormat.of().formatHex(digest(md, content));
     }
 
     /**
@@ -105,7 +105,7 @@ public class MessageDigests {
     public static String sha(String content, String charset) {
         MessageDigest md = sha.get();
         md.reset();
-        return ByteUtils.byte2Hex(digest(md, content, charset));
+        return HexFormat.of().formatHex(digest(md, content, charset));
     }
 
 
@@ -118,7 +118,7 @@ public class MessageDigests {
     public static String sha(File file) {
         MessageDigest md = sha.get();
         md.reset();
-        return ByteUtils.byte2Hex(digest(md, file));
+        return HexFormat.of().formatHex(digest(md, file));
     }
 
     /**
@@ -141,7 +141,7 @@ public class MessageDigests {
      * @return
      */
     public static byte[] digest(MessageDigest md, String content) {
-        return md.digest(content.getBytes());
+        return md.digest(content.getBytes(java.nio.charset.StandardCharsets.UTF_8));
     }
 
     /**

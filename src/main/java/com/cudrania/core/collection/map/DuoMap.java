@@ -59,8 +59,10 @@ public class DuoMap<K, V1, V2> extends HashMap<K, DuoValue<V1, V2>> {
      * @return
      */
     public V1 updateValue1(K key, V1 value1) {
-        DuoValue<V1, V2> duoValue = this.computeIfAbsent(key, (k) -> new DuoValue<>(value1, null));
+        DuoValue<V1, V2> duoValue = this.get(key);
         if (duoValue == null) {
+            //key不存在: 新建并返回null(更新前无旧值)
+            this.put(key, new DuoValue<>(value1, null));
             return null;
         }
         V1 old = duoValue.getValue1();
@@ -77,8 +79,10 @@ public class DuoMap<K, V1, V2> extends HashMap<K, DuoValue<V1, V2>> {
      * @return
      */
     public V2 updateValue2(K key, V2 value2) {
-        DuoValue<V1, V2> duoValue = this.computeIfAbsent(key, (k) -> new DuoValue<>(null, value2));
+        DuoValue<V1, V2> duoValue = this.get(key);
         if (duoValue == null) {
+            //key不存在: 新建并返回null(更新前无旧值)
+            this.put(key, new DuoValue<>(null, value2));
             return null;
         }
         V2 old = duoValue.getValue2();

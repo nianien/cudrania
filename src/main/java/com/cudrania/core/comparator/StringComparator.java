@@ -20,7 +20,7 @@ public enum StringComparator implements Comparator<String> {
          */
         @Override
         public int compare(String str1, String str2) {
-            return compareD(str1, str2);
+            return nullLast(str1, str2, String::compareToIgnoreCase);
         }
     },
     /**
@@ -32,7 +32,7 @@ public enum StringComparator implements Comparator<String> {
          */
         @Override
         public int compare(String str1, String str2) {
-            return compareD(str2, str1);
+            return nullLast(str1, str2, (a, b) -> b.compareToIgnoreCase(a));
         }
     },
     /**
@@ -44,7 +44,7 @@ public enum StringComparator implements Comparator<String> {
          */
         @Override
         public int compare(String str1, String str2) {
-            return compareL(str1, str2);
+            return nullLast(str1, str2, (a, b) -> Integer.compare(a.length(), b.length()));
         }
     },
     /**
@@ -56,33 +56,25 @@ public enum StringComparator implements Comparator<String> {
          */
         @Override
         public int compare(String str1, String str2) {
-            return compareL(str2, str1);
+            return nullLast(str1, str2, (a, b) -> Integer.compare(b.length(), a.length()));
         }
     };
 
 
     /**
-     * 按字典顺序排序
+     * null始终排在最后(与升序/降序无关): str1为null返回1(排后), str2为null返回-1(排前);
+     * 两者均非null时按core比较. 这样保证四种排序下null都在最后, 且不违反Comparator契约.
      *
-     * @param str1
-     * @param str2
+     * @param str1 参数1
+     * @param str2 参数2
+     * @param core 非null情形的比较逻辑(升序/降序由各枚举传入)
      * @return
      */
-    private static int compareD(String str1, String str2) {
-        return str1 == null ? 1 : str2 == null ? 1 : str1
-                .compareToIgnoreCase(str2);
-    }
-
-    /**
-     * 按长度升序排序
-     *
-     * @param str1
-     * @param str2
-     * @return
-     */
-    private static int compareL(String str1, String str2) {
-        return str1 == null ? 1 : str2 == null ? 1 : str1.length()
-                - str2.length();
+    private static int nullLast(String str1, String str2, Comparator<String> core) {
+        if (str1 == null && str2 == null) return 0;
+        if (str1 == null) return 1;
+        if (str2 == null) return -1;
+        return core.compare(str1, str2);
     }
 
 }

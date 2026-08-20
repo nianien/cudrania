@@ -224,7 +224,7 @@ public class CollectionUtils {
     public static <K, V, T> Map<K, V> map(Iterable<T> iterable, Function<T, K> keyGen, Function<T, V> valueGen) {
         Map<K, V> map;
         if (iterable instanceof Collection) {
-            map = new HashMap<>(((Collection) iterable).size());
+            map = new HashMap<>((int) (((Collection) iterable).size() / 0.75f) + 1);
         } else {
             map = new HashMap<>();
         }
@@ -258,7 +258,7 @@ public class CollectionUtils {
     public static <K, V, T> Map<K, List<V>> groupBy(Iterable<T> iterable, Function<T, K> keyGen, Function<T, V> valueGen) {
         Map<K, List<V>> map;
         if (iterable instanceof Collection) {
-            map = new HashMap<>(((Collection) iterable).size());
+            map = new HashMap<>((int) (((Collection) iterable).size() / 0.75f) + 1);
         } else {
             map = new HashMap<>();
         }

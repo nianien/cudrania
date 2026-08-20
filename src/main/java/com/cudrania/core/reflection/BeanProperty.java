@@ -88,8 +88,7 @@ public class BeanProperty {
     public void setValue(Object owner, Object value) {
         if (setter != null) {
             Reflections.invoke(setter, owner, value);
-        }
-        if (field != null) {
+        } else if (field != null) {
             Reflections.setFieldValue(field, owner, value);
         }
     }

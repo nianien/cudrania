@@ -1,6 +1,6 @@
 package com.cudrania.test.database;
 
-import com.cudrania.core.collection.wrapper.Wrappers;
+import java.util.Map;
 import com.cudrania.jdbc.sql.SqlStatement;
 import com.cudrania.test.bean.User;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,10 @@ public class TestSqlGenerator {
 
         sqlStatement = new SqlStatement("select * from users where").append(getFields(user, "user_id", "user_name"));
         assertEquals("select * from users where user_id = 'skyfalling' and user_name = 'who'", sqlStatement.renderSql());
-        sqlStatement = new SqlStatement("select * from users where").append(Wrappers.map("user_id", "skyfalling").$put("user_name", "who"));
+        java.util.LinkedHashMap<String, Object> ordered = new java.util.LinkedHashMap<>();
+        ordered.put("user_id", "skyfalling");
+        ordered.put("user_name", "who");
+        sqlStatement = new SqlStatement("select * from users where").append(ordered);
         assertEquals("select * from users where user_id = 'skyfalling' and user_name = 'who'", sqlStatement.renderSql());
 
 

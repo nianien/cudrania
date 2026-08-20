@@ -62,8 +62,8 @@ public class MultiBit {
         if (value < 0 || value > maxValue) {
             throw new IllegalArgumentException("value must be between 0 and " + maxValue);
         }
-        this.trueCode = this.trueCode & ~(maxValue << index * bitNum) | (value << index * bitNum);
-        this.maskCode = this.maskCode | (maxValue << index * bitNum);
+        this.trueCode = this.trueCode & ~((long) maxValue << index * bitNum) | ((long) value << index * bitNum);
+        this.maskCode = this.maskCode | ((long) maxValue << index * bitNum);
         return this;
     }
 
@@ -77,8 +77,8 @@ public class MultiBit {
         if (index < 0 || index > maxIndex) {
             throw new IllegalArgumentException("index must be between 0 and " + maxIndex);
         }
-        this.trueCode = this.trueCode & ~(maxValue << index * bitNum);
-        this.maskCode = this.maskCode & ~(maxValue << index * bitNum);
+        this.trueCode = this.trueCode & ~((long) maxValue << index * bitNum);
+        this.maskCode = this.maskCode & ~((long) maxValue << index * bitNum);
         return this;
     }
 

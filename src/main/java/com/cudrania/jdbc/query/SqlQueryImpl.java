@@ -246,7 +246,9 @@ class SqlQueryImpl implements SqlQuery {
         PreparedStatement stmt = connection.prepareStatement(sqlStatement.preparedSql());
         int i = 1;
         for (DataField field : sqlStatement.preparedParameters()) {
-            if (field.type == null || field.type == DataField.GENERIC_TYPE) {
+            //OTHER与JAVA_OBJECT一样交由驱动推断类型(plain setObject): 仅给@Column指定列名(sqlType默认OTHER)
+            //时不应改变绑定路径, 否则部分驱动(PostgreSQL/某些MySQL)会拒绝 setObject(v, Types.OTHER)
+            if (field.type == null || field.type == DataField.GENERIC_TYPE || field.type == java.sql.JDBCType.OTHER) {
                 stmt.setObject(i++, field.value);
             } else {
                 stmt.setObject(i++, field.value, field.type.getVendorTypeNumber());

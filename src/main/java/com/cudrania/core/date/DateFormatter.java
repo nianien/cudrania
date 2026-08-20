@@ -41,11 +41,9 @@ import java.util.Locale;
  */
 public class DateFormatter {
 
-    private static ThreadLocal<DateFormat> local = ThreadLocal.withInitial(() -> new SimpleDateFormat());
-
-    static {
-        setLocale(Locale.getDefault());
-    }
+    //全局Locale, 保证setLocale对后续新线程也生效(ThreadLocal.initialValue据此构建)
+    private static volatile Locale locale = Locale.getDefault();
+    private static ThreadLocal<DateFormat> local = ThreadLocal.withInitial(() -> new SimpleDateFormat(new SimpleDateFormat().toPattern(), locale));
 
     /**
      * 格式当前日期的默认格式：yyyy-MM-dd HH:mm:ss
@@ -169,6 +167,8 @@ public class DateFormatter {
      * @param locale
      */
     public static void setLocale(Locale locale) {
+        //更新全局Locale(影响后续新线程), 并刷新当前线程已有的格式器
+        DateFormatter.locale = locale;
         SimpleDateFormat dateFormat = (SimpleDateFormat) local.get();
         local.set(new SimpleDateFormat(dateFormat.toPattern(), locale));
     }

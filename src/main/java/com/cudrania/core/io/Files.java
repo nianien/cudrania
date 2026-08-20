@@ -145,30 +145,7 @@ public class Files {
      */
     public static byte[] getBytes(InputStream inputStream) {
         try {
-           /*
-            lack of performance:
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            int read;
-            byte[] buffer = new byte[bufferSize];
-            while ((read = inputStream.read(buffer)) != -1) {
-                byteArrayOutputStream.write(buffer, 0, read);
-            }
-            return byteArrayOutputStream.toByteArray();*/
-            List<byte[]> buffers = new LinkedList<>();
-            int size = 0;
-            int read;
-            byte[] buffer = new byte[BUFFER_SIZE];
-            while ((read = inputStream.read(buffer)) != -1) {
-                size += read;
-                buffers.add(Arrays.copyOf(buffer, read));
-            }
-            byte[] result = new byte[size];
-            int position = 0;
-            for (byte[] byteArray : buffers) {
-                System.arraycopy(byteArray, 0, result, position, byteArray.length);
-                position += byteArray.length;
-            }
-            return result;
+            return inputStream.readAllBytes();
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
         } finally {
@@ -418,12 +395,15 @@ public class Files {
      */
     public static void write(File file, String content, String charset,
                              boolean isAppend) {
+        OutputStream outputStream = null;
         try {
             createParent(file);
-            OutputStream outputStream = new FileOutputStream(file, isAppend);
+            outputStream = new FileOutputStream(file, isAppend);
             Writer writer = new OutputStreamWriter(outputStream, charset);
             write(writer, content);
         } catch (Exception e) {
+            //若OutputStreamWriter(charset非法)构造抛异常, 底层流尚未被write关闭, 这里兜底关闭避免句柄泄漏
+            Closer.close(outputStream);
             ExceptionChecker.throwException(e);
         }
     }
@@ -496,6 +476,8 @@ public class Files {
             }
         } catch (Exception e) {
             ExceptionChecker.throwException(e);
+        } finally {
+            Closer.close(writer, reader);
         }
     }
 

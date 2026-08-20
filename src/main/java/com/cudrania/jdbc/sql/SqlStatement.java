@@ -141,7 +141,10 @@ public class SqlStatement {
     }
 
     /**
-     * 代入参数后的SQL语句
+     * 代入参数后的SQL语句.
+     * <p>
+     * <b>仅用于日志展示/调试, 切勿直接用于执行!</b> 该方法将参数值内联拼接到SQL中,
+     * 虽已对字符串值中的单引号做转义, 但不保证防注入; 执行请使用{@link #preparedSql()}配合预编译参数.
      *
      * @param sqlTypeConverter SQL参数类型转换器
      * @return
@@ -150,8 +153,13 @@ public class SqlStatement {
         String[] parameters = new String[preparedParameters.size()];
         for (int i = 0; i < parameters.length; i++) {
             Object obj = preparedParameters.get(i).value;
-            String quote = obj instanceof Number ? "" : "'";
-            parameters[i] = quote + sqlTypeConverter.convert(obj) + quote;
+            if (obj instanceof Number) {
+                parameters[i] = String.valueOf(sqlTypeConverter.convert(obj));
+            } else {
+                String converted = String.valueOf(sqlTypeConverter.convert(obj));
+                //转义单引号, 避免值内含'导致SQL片段错乱
+                parameters[i] = "'" + converted.replace("'", "''") + "'";
+            }
         }
         return StringUtils.fill(preparedSql(), '?', parameters).trim();
     }
@@ -375,8 +383,13 @@ public class SqlStatement {
         } else if (paramValue instanceof Collection) {
             substituteNamedParameter(sqlBuilder, name, new DataField(dataField.name, ((Collection) paramValue).toArray(new Object[0]), dataField.type), preparedParameters);
         } else if (paramValue.getClass().isArray()) {
-            sqlBuilder.append("(");
             int length = Array.getLength(paramValue);
+            if (length == 0) {
+                //空集合/空数组: 生成合法且恒不匹配的 (null), 避免非法的 in ()
+                sqlBuilder.append("(null)");
+                return;
+            }
+            sqlBuilder.append("(");
             for (int i = 0; i < length; i++) {
                 if (i > 0) {
                     sqlBuilder.append(",");

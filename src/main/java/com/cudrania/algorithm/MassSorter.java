@@ -12,6 +12,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -48,7 +49,7 @@ public class MassSorter {
      * @param maxBufferSize 一次可以加载的最大数据量
      */
     public MassSorter(int maxBufferSize) {
-        this(maxBufferSize, (str1, str2) -> str1.compareTo(str1));
+        this(maxBufferSize, (str1, str2) -> str1.compareTo(str2));
     }
 
     /**
@@ -156,8 +157,9 @@ public class MassSorter {
             BufferedReader bufferReader1 = new BufferedReader(firstReader);
             BufferedReader bufferReader2 = new BufferedReader(secondReader);
             BufferedWriter bufferWriter = new BufferedWriter(writer);
-            List<String> first = new ArrayList<String>();
-            List<String> second = new ArrayList<String>();
+            // 归并阶段从队首取/删元素, 用LinkedList保证get(0)/remove(0)为O(1)
+            List<String> first = new LinkedList<String>();
+            List<String> second = new LinkedList<String>();
             do {
                 read(first, bufferReader1, maxBufferSize);
                 read(second, bufferReader2, maxBufferSize);
@@ -218,10 +220,12 @@ public class MassSorter {
     private void write(List<String> list, BufferedWriter writer, boolean close)
             throws Exception {
         try {
-            while (!list.isEmpty()) {
-                writer.write(list.remove(0));
+            //顺序遍历后统一清空, 避免对ArrayList反复remove(0)导致的O(n^2)
+            for (String line : list) {
+                writer.write(line);
                 writer.newLine();
             }
+            list.clear();
             writer.flush();
         } finally {
             if (close) {

@@ -36,18 +36,25 @@ public class ProxyFactory {
             return target;
         }
         return proxy(target, (proxy, target1, method, args) -> {
-            Object result;
+            Object result = null;
             // 代理前的处理
             interceptor.before(target1, method, args);
             try {
-                // 执行被代理的方法
-                result = method.invoke(target1, args);
-            } catch (Exception ex) {
-                result = interceptor.exception(ex, target1, method, args);
+                try {
+                    // 执行被代理的方法
+                    result = method.invoke(target1, args);
+                } catch (Exception ex) {
+                    //method.invoke会把业务方法抛出的异常包装成InvocationTargetException, 解包出真实异常再交给拦截器
+                    Throwable cause = ex instanceof java.lang.reflect.InvocationTargetException
+                            ? ((java.lang.reflect.InvocationTargetException) ex).getTargetException() : ex;
+                    Exception real = cause instanceof Exception ? (Exception) cause : ex;
+                    result = interceptor.exception(real, target1, method, args);
+                }
+                return result;
+            } finally {
+                // 代理之后的处理: 放在finally, 保证异常路径(exception()重抛)也会执行after
+                interceptor.after(target1, method, args);
             }
-            // 代理之后的处理
-            interceptor.after(target1, method, args);
-            return result;
         });
     }
 

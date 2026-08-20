@@ -84,7 +84,7 @@ public class BitValue {
      * @param value
      */
     public void set(int index, boolean value) {
-        ExceptionChecker.throwIf(index > 64 || index == 64 && value, "index cannot be larger than 64:" + index);
+        ExceptionChecker.throwIf(index < 0 || index > 63, "index must be between 0 and 63:" + index);
         if (value) {
             this.value |= (1L << index);
         } else {

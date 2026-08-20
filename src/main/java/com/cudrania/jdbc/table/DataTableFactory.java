@@ -27,14 +27,7 @@ public class DataTableFactory {
      * @return
      */
     private static DataTable register(Class entityClass) {
-        if (!CONTAINER.containsKey(entityClass)) {
-            synchronized (entityClass) {
-                if (!CONTAINER.containsKey(entityClass)) {
-                    CONTAINER.put(entityClass, new DataTableImpl(entityClass));
-                }
-            }
-        }
-        return CONTAINER.get(entityClass);
+        return CONTAINER.computeIfAbsent(entityClass, DataTableImpl::new);
     }
 
     /**

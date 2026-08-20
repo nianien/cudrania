@@ -25,14 +25,14 @@ public class TestCustomSerializer {
 
     //通过正则表达式判断是否为敏感字段
 
-    static SerEncryptor encryptor = new SimpleSerEncryptor("(?i).*(password|balance|phone|id_?card).*", "****");
+    static SerMasker masker = new SimpleSerMasker("(?i).*(password|balance|phone|id_?card).*", "****");
 
     /**
-     * 序列化字段加密
+     * 序列化字段脱敏
      */
     @Test
-    public void testBySerEncryptor() {
-        JsonParser parser = new JsonParser().withSerEncryptor(encryptor);
+    public void testBySerMasker() {
+        JsonParser parser = new JsonParser().withSerMasker(masker);
         Account account = new Account();
         account.setId(1001);
         account.setUserName("jack-wang");
@@ -55,7 +55,7 @@ public class TestCustomSerializer {
     @Test
     public void testByModifier() {
         JsonParser parser = new JsonParser()
-                .modifyPropertyWriter(w -> new SecurityPropertyWriter(w, encryptor));
+                .modifyPropertyWriter(w -> new SecurityPropertyWriter(w, masker));
         Account account = new Account();
         account.setId(1001);
         account.setUserName("jack-wang");
@@ -79,7 +79,7 @@ public class TestCustomSerializer {
     public void testByFilter() {
         JsonParser jsonParser = new JsonParser()
                 .withPropertyFilter(
-                        new SecurityPropertyFilter(encryptor));
+                        new SecurityPropertyFilter(masker));
         Account account = new Account();
         account.setId(1001);
         account.setUserName("jack-wang");

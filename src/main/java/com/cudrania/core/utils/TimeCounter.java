@@ -8,11 +8,11 @@ package com.cudrania.core.utils;
 public class TimeCounter {
 
     /**
-     * 开始时间
+     * 开始时间(纳秒, 单调时钟)
      */
     private long begin;
     /**
-     * 结束时间
+     * 结束时间(纳秒, 单调时钟)
      */
     private long end;
     /**
@@ -24,25 +24,25 @@ public class TimeCounter {
      * 默认构造方法,计时器起止时间均设置为当前时间
      */
     public TimeCounter() {
-        this.begin = this.end = current();
+        this.begin = this.end = System.nanoTime();
     }
 
     /**
-     * 开始计时
+     * 开始计时, 返回开始时刻的墙钟毫秒时间戳
      */
     public long start() {
         this.isStopped = false;
-        this.begin = current();
-        return this.begin;
+        this.begin = System.nanoTime();
+        return current();
     }
 
     /**
-     * 停止计时
+     * 停止计时, 返回结束时刻的墙钟毫秒时间戳
      */
     public long stop() {
         this.isStopped = true;
-        this.end = current();
-        return this.end;
+        this.end = System.nanoTime();
+        return current();
     }
 
     /**
@@ -55,7 +55,9 @@ public class TimeCounter {
      * @return 经历的毫秒数
      */
     public long timePassed() {
-        return this.isStopped ? this.end - this.begin : current() - this.begin;
+        //用单调的nanoTime测时长, 换算成毫秒; 避免currentTimeMillis受系统改时间/NTP影响
+        long endNanos = this.isStopped ? this.end : System.nanoTime();
+        return (endNanos - this.begin) / 1_000_000L;
     }
 
     /**

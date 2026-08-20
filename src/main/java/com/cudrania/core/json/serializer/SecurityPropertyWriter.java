@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 /**
  * 支持JSON序列化时对POJO对象加密<br/>
  * <pre>
- *  {@link SimpleSerEncryptor} encryptor = new {@link SimpleSerEncryptor}("(?i).*(password|balance|phone|id_?card).*");
+ *  {@link SimpleSerMasker} encryptor = new {@link SimpleSerMasker}("(?i).*(password|balance|phone|id_?card).*");
  *  objectMapper.setSerializerFactory(
  *
  *       objectMapper.getSerializerFactory()
@@ -33,20 +33,20 @@ import com.fasterxml.jackson.databind.ser.BeanSerializerModifier;
 public class SecurityPropertyWriter extends BeanPropertyWriter {
 
     /**
-     * 加密器
+     * 脱敏器
      */
-    private final SerEncryptor encryptor;
+    private final SerMasker masker;
 
     private final BeanPropertyWriter writer;
 
     /**
-     * @param writer    被代理的字段写入器
-     * @param encryptor 字段加密器
+     * @param writer 被代理的字段写入器
+     * @param masker 字段脱敏器
      */
-    public SecurityPropertyWriter(BeanPropertyWriter writer, SerEncryptor encryptor) {
+    public SecurityPropertyWriter(BeanPropertyWriter writer, SerMasker masker) {
         super(writer);
         this.writer = writer;
-        this.encryptor = encryptor;
+        this.masker = masker;
     }
 
 
@@ -58,8 +58,8 @@ public class SecurityPropertyWriter extends BeanPropertyWriter {
         if (value == null) {
             return;
         }
-        if (encryptor.shouldEncrypt(name)) {
-            value = encryptor.encrypt(name, value);
+        if (masker.shouldMask(name)) {
+            value = masker.mask(name, value);
         }
         gen.writeObjectField(name, value);
     }

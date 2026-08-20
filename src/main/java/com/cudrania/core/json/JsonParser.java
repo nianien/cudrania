@@ -3,7 +3,7 @@ package com.cudrania.core.json;
 import com.cudrania.core.date.DateFormatter;
 import com.cudrania.core.functions.Fn.Function;
 import com.cudrania.core.json.serializer.SecurityPropertyFilter;
-import com.cudrania.core.json.serializer.SerEncryptor;
+import com.cudrania.core.json.serializer.SerMasker;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -199,13 +199,13 @@ public class JsonParser {
 
 
     /**
-     * 设置字段序列化加密器
+     * 设置字段序列化脱敏器
      *
-     * @param encryptor 字段加密器
+     * @param masker 字段脱敏器
      * @return
      */
-    public JsonParser withSerEncryptor(SerEncryptor encryptor) {
-        return withPropertyFilter(new SecurityPropertyFilter(encryptor));
+    public JsonParser withSerMasker(SerMasker masker) {
+        return withPropertyFilter(new SecurityPropertyFilter(masker));
     }
 
     /**

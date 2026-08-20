@@ -243,6 +243,17 @@ public class SmartDecimal extends BigDecimal {
     }
 
     /**
+     * 与{@link #equals}保持一致: equals按compareTo(忽略scale)判等,
+     * 故hashCode基于去除末尾零后的规范形式, 保证 1.0 与 1.00 hashCode相同。
+     */
+    @Override
+    public int hashCode() {
+        //用普通BigDecimal规范化后取hash: 直接调this.stripTrailingZeros()会命中本类重写(返回SmartDecimal)
+        //从而无限递归, 故这里用原始unscaledValue/scale重建普通BigDecimal
+        return new BigDecimal(unscaledValue(), scale()).stripTrailingZeros().hashCode();
+    }
+
+    /**
      * 自动转换精度
      *
      * @param bigDecimal

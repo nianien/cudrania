@@ -1,7 +1,7 @@
 package com.cudrania.test.jackson;
 
 
-import com.cudrania.core.collection.wrapper.Wrappers;
+import java.util.Arrays;
 import com.cudrania.core.json.JsonParser;
 import com.cudrania.core.math.SmartDecimal;
 import com.cudrania.test.bean.Color;
@@ -73,7 +73,7 @@ public class TestJson {
     public void testParseType() {
         JsonParser jp = new JsonParser();
         Map<String, List<User>> map = new HashMap<>();
-        map.put("name",Wrappers.<User>list().$add(new User("18","jack")).$add(new User("19","tom")).get());
+        map.put("name", Arrays.asList(new User("18","jack"), new User("19","tom")));
         String json = jp.toJson(map);
         Map bean = jp.toBean(json, Map.class);
         List list=(List) bean.get("name");

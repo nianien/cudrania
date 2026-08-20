@@ -79,7 +79,7 @@ public class StringUtils {
             sb.append(param);
         }
         return sb.toString().replaceAll(
-                "(" + Pattern.quote(connector) + "){2,}", connector);
+                "(" + Pattern.quote(connector) + "){2,}", java.util.regex.Matcher.quoteReplacement(connector));
     }
 
     /**
@@ -652,7 +652,7 @@ public class StringUtils {
         // 最大索引
         int high = -1;
         for (String str : parameters) {
-            int index = source.indexOf(str);
+            int index = source.lastIndexOf(str);
             if (index > high) {
                 high = index;
             }

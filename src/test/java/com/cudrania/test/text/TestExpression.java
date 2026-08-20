@@ -1,6 +1,6 @@
 package com.cudrania.test.text;
 
-import com.cudrania.core.collection.wrapper.Wrappers;
+import java.util.Collections;
 import com.cudrania.core.text.Expression;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -60,7 +60,7 @@ public class TestExpression {
     public void testSql() {
         TestExpression tx = new TestExpression();
         tx.ff("select * from user where user={0} and age={1}", "lining", 19);
-        tx.ff("select * from user where user={user} and age={age}", Wrappers.map("user", "lining"));
+        tx.ff("select * from user where user={user} and age={age}", Collections.singletonMap("user", "lining"));
     }
 
     @Test

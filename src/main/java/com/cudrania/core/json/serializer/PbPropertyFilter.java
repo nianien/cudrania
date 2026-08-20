@@ -42,7 +42,7 @@ public class PbPropertyFilter extends SimpleBeanPropertyFilter {
         if (writer instanceof BeanPropertyWriter) {
             BeanPropertyWriter bw = (BeanPropertyWriter) writer;
             Object value = bw.get(pojo);
-            if (value instanceof List<?> || value.getClass().isArray()) {
+            if (value != null && (value instanceof List<?> || value.getClass().isArray())) {
                 jgen.writeObjectField(name + "List", value);
             } else if (value instanceof Map<?, ?>) {
                 jgen.writeObjectField(name + "Map", value);
@@ -50,7 +50,7 @@ public class PbPropertyFilter extends SimpleBeanPropertyFilter {
         } else if (writer instanceof MapProperty) {
             MapProperty mw = (MapProperty) writer;
             Object value = mw.getValue();
-            if (value instanceof List<?> || value.getClass().isArray()) {
+            if (value != null && (value instanceof List<?> || value.getClass().isArray())) {
                 jgen.writeObjectField(name + "List", value);
             } else if (value instanceof Map<?, ?>) {
                 jgen.writeObjectField(name + "Map", value);

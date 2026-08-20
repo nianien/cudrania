@@ -3,6 +3,7 @@ package com.cudrania.algorithm;
 import com.cudrania.core.exception.ExceptionChecker;
 import com.cudrania.core.text.MessageDigests;
 
+import java.nio.charset.StandardCharsets;
 import java.util.TreeMap;
 
 /**
@@ -57,6 +58,9 @@ public class ConsistentHash<T> {
      * @return
      */
     public T getTarget(Object data) {
+        if (keysMap.isEmpty()) {
+            return null;
+        }
         Long key = hashCode(data.toString());
         if (!keysMap.containsKey(key)) {
             key = keysMap.ceilingKey(key);
@@ -75,12 +79,13 @@ public class ConsistentHash<T> {
      */
     private long hashCode(String key) {
         try {
-            // 十六位字节数组
-            byte[] bytes = MessageDigests.md5(key.getBytes());
-            // 每隔四位取一个字节
-            long code = ((long) (bytes[12] & 0xFF) << 24)
-                    | ((long) (bytes[8] & 0xFF) << 16)
-                    | ((long) (bytes[4] & 0xFF) << 8) | (bytes[0] & 0xFF);
+            // 十六字节MD5摘要, 固定UTF-8编码以保证跨平台可复现
+            byte[] bytes = MessageDigests.md5(key.getBytes(StandardCharsets.UTF_8));
+            // 取前8字节组成64位哈希, 充分利用摘要分布, 降低虚拟节点碰撞
+            long code = 0;
+            for (int i = 0; i < 8; i++) {
+                code = (code << 8) | (bytes[i] & 0xFF);
+            }
             return code;
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);

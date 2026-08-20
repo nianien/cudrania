@@ -227,7 +227,10 @@ public class TrieTree {
             node.firstChild(child.firstChild());
             optimize(node);
         } else {
-            optimize(node.firstChild());
+            //逐个优化所有子节点(firstChild及其兄弟), 而非只优化第一个孩子
+            for (TreeNode c = node.firstChild(); c != null; c = c.nextBrother()) {
+                optimize(c);
+            }
         }
     }
 

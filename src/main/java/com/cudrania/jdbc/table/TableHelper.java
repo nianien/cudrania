@@ -39,25 +39,30 @@ public class TableHelper {
      * @return Column
      */
     public static Column getColumnName(BeanProperty beanProperty) {
-        return Arrays.stream(beanProperty.getAnnotations(Column.class))
-                .filter(c -> !c.value().isEmpty())
-                .findFirst().orElse(new Column() {
+        //取首个@Column(不再因value为空而整体丢弃, 否则只设sqlType的@Column会丢失sqlType)
+        Column column = Arrays.stream(beanProperty.getAnnotations(Column.class)).findFirst().orElse(null);
+        //列名: @Column.value非空则用之, 否则按字段名下划线化
+        String name = column != null && !column.value().isEmpty()
+                ? column.value() : underscoreCase(beanProperty.getAlias());
+        //类型: 有@Column则沿用其sqlType(默认OTHER), 无注解时退回JAVA_OBJECT
+        JDBCType type = column != null ? column.sqlType() : JDBCType.JAVA_OBJECT;
+        return new Column() {
 
-                    @Override
-                    public Class<? extends Annotation> annotationType() {
-                        return Column.class;
-                    }
+            @Override
+            public Class<? extends Annotation> annotationType() {
+                return Column.class;
+            }
 
-                    @Override
-                    public String value() {
-                        return underscoreCase(beanProperty.getAlias());
-                    }
+            @Override
+            public String value() {
+                return name;
+            }
 
-                    @Override
-                    public JDBCType sqlType() {
-                        return JDBCType.JAVA_OBJECT;
-                    }
-                });
+            @Override
+            public JDBCType sqlType() {
+                return type;
+            }
+        };
     }
 
 

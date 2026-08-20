@@ -281,7 +281,9 @@ public class EmailSender {
                 return new PasswordAuthentication(user, password);
             }
         } : null;
-        return Session.getDefaultInstance(props, authenticator);
+        //用getInstance而非getDefaultInstance: 后者返回JVM级单例, 会固定为首个调用者的props/authenticator,
+        //导致后续不同host/凭证的EmailSender被忽略配置
+        return Session.getInstance(props, authenticator);
     }
 
 

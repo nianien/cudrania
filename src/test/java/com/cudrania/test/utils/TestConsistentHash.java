@@ -1,7 +1,6 @@
 package com.cudrania.test.utils;
 
 import com.cudrania.algorithm.ConsistentHash;
-import com.cudrania.core.collection.map.CounterMap;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -48,12 +47,12 @@ public class TestConsistentHash {
 
 
     private static void test(Collection<String> list, List<String> keys, Map<String, List<String>> multiMap) {
-        CounterMap<String> counterMap = new CounterMap<String>();
+        Map<String, Integer> counterMap = new HashMap<>();
         ConsistentHash<String> hash = new ConsistentHash<>(keys);
         for (String data : list) {
             //判断data在哪个节点上, target is one of keys
             String target = hash.getTarget(data);
-            counterMap.increase(target);
+            counterMap.merge(target, 1, Integer::sum);
             if (multiMap != null) {
                 multiMap.computeIfAbsent(data, k -> new ArrayList<>()).add(target);
             }
