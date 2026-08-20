@@ -8,7 +8,7 @@
 
 ## 📌 本轮变更总览(相对原始代码)
 
-> 下方各包的逐类分析是**判断依据**;本节汇总落地结果——**当前代码库 103 个 main 类**。
+> 下方各包的逐类分析是**判断依据**;本节汇总落地结果——**当前代码库 105 个 main 类**。
 
 ### ⚠️ 更正:`collection/wrapper/*`(7 类)已恢复
 之前误删。逐字重读后确认它是**独特设计**:基于动态代理生成的对象**本身 implements List/Set/Map**(是活集合),又叠加 `$add/$put/...` 返回 this 的链式方法(`@Delegate` 转发)+ `IterSupplier/MapSupplier` 的 `map/groupBy/grouped/invert/doBatch` mixin。JDK/Guava 均无此组合(`List.of` 不可变、Guava Builder 产物不可变)。按"看实现是否独特"的标准应**留**。已连同 `TestWrapper`(6 测试)一起恢复至新包。
@@ -16,10 +16,19 @@
 ### ⚠️ 更正:`collection/map/CounterMap` 已恢复
 之前误删且未经授权。重读后确认它是**带计数语义的具名 `Map<T,Integer>`**:`increase/decrease/add(key,n)`、计数 ≤0 自动删 key、`get` 未命中返回 0。`map.merge` 无"自动删除 / 缺省返回 0"语义,且不是可传递的具名类型。应**留**,已恢复至新包。
 
-### 已删除(17 类)
-- **有 JDK17 标准替代 / 库内自我重复(9)**:`text/Encryptor`、`json/serializer/SerEncryptor`、`json/serializer/SimpleSerEncryptor`、`bits/ByteUtils`(→`HexFormat`)、`collection/map/Pair`(→`Map.entry`)、`comparator/EntryComparator`(→`Map.Entry.comparingBy*`)、`collection/set/CaseInsensitiveSet`(→`TreeSet(CASE_INSENSITIVE_ORDER)`)、`io/Console`(→`Scanner`)、`io/FileSearcher`(→`Files.walk`)
-- **有替代/本身有问题(6)**:`algorithm/Calculator`(运算符未实现)、`xml/XMLBuilder`(不转义)、`xml/XMLNode`、`xml/XMLDocument`、`io/ObjectSerializer`、`log/LoggerFactory`
-- **零依赖但按需删(2)**:`io/ClassScanner`、`utils/Zipper`(其唯一用户,连带移除 ant 依赖)
+### ⚠️ 二次复核:逐字重读全部已删类后的更正
+- **恢复 `algorithm/Calculator`**:自包含数学表达式求值器,JDK 无等价(Nashorn 已移除)。之前判"运算符未实现"不准确——算术子集(+-*/%** & | ^ << >> 一元负/取反、括号)完整可用;仅比较/逻辑运算符声明未在求值实现(局限,非损坏)。属独特实现,**留**。
+- **恢复 `io/ClassScanner`**:classpath 包扫描(file+jar),JDK 无等价(仅 Spring/Guava 有)。恢复时修复递归子包漏点 bug(`+""`→`+"."`)、移除 `System.out.println` 噪音。**留**。
+- 仍**删**但需说明:
+  - `xml/XMLDocument`:依赖 **dom4j(已按你要求移除)**,原样无法恢复,须改写到 JAXP。
+  - `xml/XMLNode`:XMLDocument 的产物类型,单独无用(w3c DOM 可替)。
+  - `xml/XMLBuilder`:bean→XML(自包含),但**不转义**(正确性隐患)且依赖的 `BeanProperty.getAlias()` 已改私有,需适配+修转义才能恢复。可按需处理。
+  - `utils/Zipper`:依赖 **ant(已移除)**,须改写到 `java.util.zip`。
+
+### 已删除(15 类)
+- **有 JDK17 标准直替(8)**:`text/Encryptor`(→已重命名 Encoder,功能保留)、`json/serializer/SerEncryptor`(→SerMasker)、`json/serializer/SimpleSerEncryptor`(→SimpleSerMasker)、`bits/ByteUtils`(→`HexFormat`+`ByteBuffer`+`Byte.toUnsignedInt`)、`collection/map/Pair`(→`AbstractMap.SimpleEntry`,且原 setValue 有 bug)、`comparator/EntryComparator`(→`Map.Entry.comparingByKey/Value`+`reversed/thenComparing`)、`collection/set/CaseInsensitiveSet`(→`TreeSet(CASE_INSENSITIVE_ORDER)`,且原 contains 有 bug)、`io/Console`(→`Scanner`)
+- **低价值/有替代(2)**:`io/FileSearcher`(→`Files.walk/find`)、`io/ObjectSerializer`(≈Commons `SerializationUtils`,JDK 无一行版)、`log/LoggerFactory`(≈JUL 平凡包装)
+- **依赖已移除、须改写才能留(4)**:`xml/XMLDocument`(dom4j)、`xml/XMLNode`、`xml/XMLBuilder`(+转义/适配)、`utils/Zipper`(ant,曾是 ant 依赖的唯一用户)
 
 ### 重命名(旧名已删,新名保留)
 - `text/Encryptor` → **`text/Encoder`**(名副其实:可逆编码非加密)
