@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-`cudrania` (`io.github.nianien:cudrania`) is a single-module Java 11 utility library published to Maven Central. It is a *library*, not an application — there is no `main`. Code is a collection of loosely-coupled helpers under `com.cudrania`; most consumers pull in one or two utilities, so keep dependencies between subpackages minimal and mark heavyweight/optional integrations (`javax.mail`, `janino`, `logback`, `javassist`, `junit`) as `<optional>` in `pom.xml`.
+`cudrania` (`io.github.nianien:cudrania`) is a single-module Java 11 utility library published to Maven Central. It is a *library*, not an application — there is no `main`. Code is a collection of loosely-coupled helpers under `com.nianien.cudrania`; most consumers pull in one or two utilities, so keep dependencies between subpackages minimal and mark heavyweight/optional integrations (`javax.mail`, `janino`, `logback`, `javassist`, `junit`) as `<optional>` in `pom.xml`.
 
 Comments and Javadoc are written in **Chinese** — match that convention when editing existing files.
 
@@ -28,7 +28,7 @@ The `install-jar` profile auto-activates whenever `src/main/java` exists and ins
 
 ## Architecture / key packages
 
-Three top-level areas under `src/main/java/com/cudrania/`: `core` (the bulk, ~92 files), `jdbc`, and `algorithm`.
+Three top-level areas under `src/main/java/com/nianien/cudrania/`: `core` (the bulk, ~92 files), `jdbc`, and `algorithm`.
 
 - **`core/functions`** — the functional foundation the rest builds on.
   - `Fn` defines multi-arity functional interfaces (`Function`/`Consumer`/`BiConsumer` … up to 10 args: bi/tri/qua/qui/hex/hep/oct/non/dec) plus `Lambda`/`SneakyThrows`-style variants. Its interfaces extend `Serializable` so lambdas can be reflected back to their target `Method` via `SerializedLambda` (cached in a `WeakHashMap`). Several APIs (pipeline named params, bean property references) depend on this method-resolution trick.
@@ -46,4 +46,4 @@ Three top-level areas under `src/main/java/com/cudrania/`: `core` (the bulk, ~92
 
 ## Tests
 
-JUnit 5 tests live under `src/test/java/com/cudrania/test/<topic>/`, mirroring the main package topics. Database tests use in-memory **H2** + **HikariCP** (test-scope) with fixtures in `src/test/resources` (`datasource.xml`, `db.properties`, plus large `*.txt` datasets for the sort/algorithm tests). No network or external services are needed to run the suite.
+JUnit 5 tests live under `src/test/java/com/nianien/cudrania/test/<topic>/`, mirroring the main package topics. Database tests use in-memory **H2** + **HikariCP** (test-scope) with fixtures in `src/test/resources` (`datasource.xml`, `db.properties`, plus large `*.txt` datasets for the sort/algorithm tests). No network or external services are needed to run the suite.

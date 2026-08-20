@@ -1,0 +1,75 @@
+package com.nianien.cudrania.core.log.logback;
+
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.PatternLayout;
+import ch.qos.logback.classic.spi.Configurator;
+import ch.qos.logback.core.Context;
+import ch.qos.logback.core.status.Status;
+
+/**
+ * Logback默认配置，代替logback.xml中的配置<br/>
+ * <pre>
+ * &lt;conversionRule conversionWord="CML" converterClass="com.nianien.cudrania.core.log.logback.FQCNConverter"/&gt;
+ * </pre>
+ *
+ * SPI配置: META-INF/services/ch.qos.logback.classic.spi.Configurator
+ * @author : skyfalling
+ * @since 2023/11/3
+ * Copyright (c) 2004-2029 All Rights Reserved.
+ **/
+public class CmlConfigurator implements Configurator {
+
+    {
+        PatternLayout.DEFAULT_CONVERTER_MAP.put("CML", FQCNConverter.class.getName());
+    }
+
+    @Override
+    public ExecutionStatus configure(LoggerContext loggerContext) {
+        return ExecutionStatus.NEUTRAL;
+    }
+
+    @Override
+    public void setContext(Context context) {
+
+    }
+
+    @Override
+    public Context getContext() {
+        return null;
+    }
+
+    @Override
+    public void addStatus(Status status) {
+
+    }
+
+    @Override
+    public void addInfo(String s) {
+
+    }
+
+    @Override
+    public void addInfo(String s, Throwable throwable) {
+
+    }
+
+    @Override
+    public void addWarn(String s) {
+
+    }
+
+    @Override
+    public void addWarn(String s, Throwable throwable) {
+
+    }
+
+    @Override
+    public void addError(String s) {
+
+    }
+
+    @Override
+    public void addError(String s, Throwable throwable) {
+
+    }
+}

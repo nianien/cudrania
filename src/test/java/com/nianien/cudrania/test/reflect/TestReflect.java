@@ -1,0 +1,62 @@
+package com.nianien.cudrania.test.reflect;
+
+import com.nianien.cudrania.core.reflection.Reflections;
+import com.nianien.cudrania.test.bean.Home;
+import com.nianien.cudrania.test.bean.User;
+import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
+public class TestReflect {
+
+    class A<T> {
+
+        public void dot(T t) {
+
+        }
+    }
+
+    class B extends A<User> {
+
+        public void dot(User t) {
+        }
+    }
+
+    public static List<Method> getAllMethods(Class<?> clazz) {
+        List<Method> list = new ArrayList<Method>();
+        for (; clazz != null; clazz = clazz.getSuperclass()) {
+            for (Method method : clazz.getDeclaredMethods()) {
+                list.add(method);
+            }
+        }
+        return list;
+    }
+
+    @Test
+    public void test() throws Exception {
+
+        List<Method> allMethods = getAllMethods(B.class);
+        for (Method allMethod : allMethods) {
+            System.out.println(allMethod);
+        }
+
+    }
+
+    @Test
+    public void testInstance() throws Exception {
+        Home h = new Home();
+        h.setAddress("aaa");
+        h.setUsers(null);
+        Home b = new Home();
+        Reflections.populate(b, h);
+        System.out.println(b.getAddress());
+
+        Class clazz = Integer.class;
+        int r = (Integer) clazz.getConstructor(String.class).newInstance("1");
+        assert r == 1;
+
+    }
+
+}
