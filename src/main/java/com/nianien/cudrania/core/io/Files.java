@@ -84,11 +84,8 @@ public class Files {
                 copy(file, new File(dest, file.getName()));
             }
         } else {
-            FileChannel inChannel = null;
-            FileChannel outChannel = null;
-            try {
-                inChannel = new FileInputStream(src).getChannel();
-                outChannel = new FileOutputStream(dest).getChannel();
+            try (FileChannel inChannel = new FileInputStream(src).getChannel();
+                 FileChannel outChannel = new FileOutputStream(dest).getChannel()) {
                 // 8M缓冲区
                 ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
                 while (inChannel.read(buffer) != -1) {
@@ -98,8 +95,6 @@ public class Files {
                 }
             } catch (Exception e) {
                 ExceptionChecker.throwException(e);
-            } finally {
-                Closer.close(inChannel, outChannel);
             }
         }
     }
@@ -144,12 +139,10 @@ public class Files {
      * @return
      */
     public static byte[] getBytes(InputStream inputStream) {
-        try {
+        try (inputStream) {
             return inputStream.readAllBytes();
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
-        } finally {
-            Closer.close(inputStream);
         }
     }
 
@@ -355,7 +348,7 @@ public class Files {
      * @param consumer
      */
     public static void readLines(Reader reader, Consumer<String> consumer) {
-        try {
+        try (reader) {
             BufferedReader buffer = new BufferedReader(reader);
             String line;
             while ((line = buffer.readLine()) != null) {
@@ -363,8 +356,6 @@ public class Files {
             }
         } catch (Exception e) {
             ExceptionChecker.throwException(e);
-        } finally {
-            Closer.close(reader);
         }
     }
 
@@ -403,7 +394,13 @@ public class Files {
             write(writer, content);
         } catch (Exception e) {
             //若OutputStreamWriter(charset非法)构造抛异常, 底层流尚未被write关闭, 这里兜底关闭避免句柄泄漏
-            Closer.close(outputStream);
+            if (outputStream != null) {
+                try {
+                    outputStream.close();
+                } catch (Exception ignored) {
+                    //静默关闭
+                }
+            }
             ExceptionChecker.throwException(e);
         }
     }
@@ -415,7 +412,7 @@ public class Files {
      * @param inputStream
      */
     public static void write(OutputStream outputStream, InputStream inputStream) {
-        try {
+        try (outputStream; inputStream) {
             int read;
             byte[] buffer = new byte[BUFFER_SIZE];
             while ((read = inputStream.read(buffer)) != -1) {
@@ -424,9 +421,6 @@ public class Files {
             }
         } catch (Exception e) {
             ExceptionChecker.throwException(e);
-        } finally {
-            Closer.close(outputStream);
-            Closer.close(inputStream);
         }
     }
 
@@ -467,7 +461,7 @@ public class Files {
      * @param reader
      */
     public static void write(Writer writer, Reader reader) {
-        try {
+        try (writer; reader) {
             char[] buffer = new char[BUFFER_SIZE];
             int read;
             while ((read = reader.read(buffer)) != -1) {
@@ -476,8 +470,6 @@ public class Files {
             }
         } catch (Exception e) {
             ExceptionChecker.throwException(e);
-        } finally {
-            Closer.close(writer, reader);
         }
     }
 
@@ -488,14 +480,11 @@ public class Files {
      * @param content
      */
     public static void write(Writer writer, String content) {
-        writer = new BufferedWriter(writer);
-        try {
-            writer.write(content);
-            writer.flush();
+        try (Writer buffered = new BufferedWriter(writer)) {
+            buffered.write(content);
+            buffered.flush();
         } catch (Exception e) {
             ExceptionChecker.throwException(e);
-        } finally {
-            Closer.close(writer);
         }
     }
 

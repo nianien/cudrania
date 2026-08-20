@@ -1,7 +1,6 @@
 package com.nianien.cudrania.core.loader;
 
 import com.nianien.cudrania.core.exception.ExceptionChecker;
-import com.nianien.cudrania.core.io.Closer;
 
 import java.io.*;
 import java.util.Properties;
@@ -75,14 +74,12 @@ public class PropertiesLoader {
      * @return Properties对象
      */
     public static Properties load(InputStream inputStream) {
-        try {
+        try (inputStream) {
             Properties p = new Properties();
             p.load(inputStream);
             return p;
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
-        } finally {
-            Closer.close(inputStream);
         }
     }
 
@@ -93,14 +90,12 @@ public class PropertiesLoader {
      * @return Properties对象
      */
     public static Properties load(Reader reader) {
-        try {
+        try (reader) {
             Properties p = new Properties();
             p.load(reader);
             return p;
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
-        } finally {
-            Closer.close(reader);
         }
     }
 
@@ -136,14 +131,12 @@ public class PropertiesLoader {
      * @return Properties对象
      */
     public static Properties loadXML(InputStream inputStream) {
-        try {
+        try (inputStream) {
             Properties p = new Properties();
             p.loadFromXML(inputStream);
             return p;
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
-        } finally {
-            Closer.close(inputStream);
         }
     }
 

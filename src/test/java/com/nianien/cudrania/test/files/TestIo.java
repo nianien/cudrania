@@ -11,7 +11,6 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.nianien.cudrania.core.exception.ExceptionChecker;
-import com.nianien.cudrania.core.io.Closer;
 import com.nianien.cudrania.core.io.Files;
 import com.nianien.cudrania.core.loader.ResourceLoader;
 import com.nianien.cudrania.core.utils.TimeCounter;
@@ -75,7 +74,7 @@ public class TestIo {
      * @return 文件字节内容
      */
     public static byte[] getBytes(InputStream inputStream) {
-        try {
+        try (inputStream) {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             int read;
             byte[] buffer = new byte[bufferSize];
@@ -85,13 +84,11 @@ public class TestIo {
             return byteArrayOutputStream.toByteArray();
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
-        } finally {
-            Closer.close(inputStream);
         }
     }
 
     public static byte[] getBytes2(InputStream inputStream) {
-        try {
+        try (inputStream) {
             List<byte[]> buffers = new ArrayList<byte[]>();
             int size = 0;
             int read;
@@ -112,8 +109,6 @@ public class TestIo {
             return bytes;
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
-        } finally {
-            Closer.close(inputStream);
         }
     }
 }

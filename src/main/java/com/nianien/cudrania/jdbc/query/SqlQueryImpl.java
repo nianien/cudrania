@@ -1,7 +1,6 @@
 package com.nianien.cudrania.jdbc.query;
 
 import com.nianien.cudrania.core.exception.ExceptionChecker;
-import com.nianien.cudrania.core.io.Closer;
 import com.nianien.cudrania.jdbc.sql.DataField;
 import com.nianien.cudrania.jdbc.sql.SqlStatement;
 
@@ -136,33 +135,31 @@ class SqlQueryImpl implements SqlQuery {
 
     @Override
     public <T> T executeQuery(ResultSetHandler<T> rsh) {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
         Connection connection = null;
         try {
             connection = connection();
-            stmt = prepare(connection);
-            return rsh.handle((rs = stmt.executeQuery()));
+            try (PreparedStatement stmt = prepare(connection);
+                 ResultSet rs = stmt.executeQuery()) {
+                return rsh.handle(rs);
+            }
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
         } finally {
-            Closer.close(rs, stmt);
             releaseConnection(connection);
         }
     }
 
     @Override
     public int executeUpdate() {
-        PreparedStatement stmt = null;
         Connection connection = null;
         try {
             connection = connection();
-            stmt = prepare(connection);
-            return stmt.executeUpdate();
+            try (PreparedStatement stmt = prepare(connection)) {
+                return stmt.executeUpdate();
+            }
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
         } finally {
-            Closer.close(stmt);
             releaseConnection(connection);
         }
     }
@@ -171,18 +168,17 @@ class SqlQueryImpl implements SqlQuery {
     @Override
     public int[] executeBatch(String... sqlList) {
         Connection connection = null;
-        Statement stmt = null;
         try {
             connection = connection();
-            stmt = connection.createStatement();
-            for (String sql : sqlList) {
-                stmt.addBatch(sql);
+            try (Statement stmt = connection.createStatement()) {
+                for (String sql : sqlList) {
+                    stmt.addBatch(sql);
+                }
+                return stmt.executeBatch();
             }
-            return stmt.executeBatch();
         } catch (SQLException e) {
             throw ExceptionChecker.throwException(e);
         } finally {
-            Closer.close(stmt);
             releaseConnection(connection);
         }
     }
@@ -191,22 +187,21 @@ class SqlQueryImpl implements SqlQuery {
     @Override
     public int[] executeBatch(String sql, Object[][] parametersList) {
         Connection connection = null;
-        PreparedStatement stmt = null;
         try {
             connection = connection();
-            stmt = connection.prepareStatement(sql);
-            for (Object[] parameters : parametersList) {
-                int i = 1;
-                for (Object p : parameters) {
-                    stmt.setObject(i++, p);
+            try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+                for (Object[] parameters : parametersList) {
+                    int i = 1;
+                    for (Object p : parameters) {
+                        stmt.setObject(i++, p);
+                    }
+                    stmt.addBatch();
                 }
-                stmt.addBatch();
+                return stmt.executeBatch();
             }
-            return stmt.executeBatch();
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
         } finally {
-            Closer.close(stmt);
             releaseConnection(connection);
         }
 
@@ -231,7 +226,13 @@ class SqlQueryImpl implements SqlQuery {
      * @param connection
      */
     public void releaseConnection(Connection connection) {
-        Closer.close(connection);
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException ignored) {
+                //释放动作静默,与原 Closer 行为保持一致
+            }
+        }
     }
 
     /**

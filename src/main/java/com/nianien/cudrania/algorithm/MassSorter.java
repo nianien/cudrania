@@ -1,7 +1,5 @@
 package com.nianien.cudrania.algorithm;
 
-import com.nianien.cudrania.core.io.Closer;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -104,7 +102,7 @@ public class MassSorter {
      */
     private List<File> split(Reader reader) throws Exception {
         List<File> files = new ArrayList<File>();
-        try {
+        try (reader) {
             BufferedReader bufferReader = new BufferedReader(reader);
             do {
                 List<String> data = new ArrayList<String>(maxBufferSize);
@@ -121,8 +119,6 @@ public class MassSorter {
                 file.delete();
             }
             throw e;
-        } finally {
-            Closer.close(reader);
         }
         return files;
     }
@@ -153,7 +149,7 @@ public class MassSorter {
      */
     public void sort(Reader firstReader, Reader secondReader, Writer writer)
             throws Exception {
-        try {
+        try (firstReader; secondReader; writer) {
             BufferedReader bufferReader1 = new BufferedReader(firstReader);
             BufferedReader bufferReader2 = new BufferedReader(secondReader);
             BufferedWriter bufferWriter = new BufferedWriter(writer);
@@ -183,10 +179,6 @@ public class MassSorter {
                 }
                 bufferWriter.flush();
             } while (true);
-        } finally {
-            Closer.close(firstReader);
-            Closer.close(secondReader);
-            Closer.close(writer);
         }
 
     }
@@ -229,7 +221,11 @@ public class MassSorter {
             writer.flush();
         } finally {
             if (close) {
-                Closer.close(writer);
+                try {
+                    writer.close();
+                } catch (Exception ignored) {
+                    //关闭动作静默,与原 Closer 行为保持一致
+                }
             }
 
         }

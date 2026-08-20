@@ -1,7 +1,6 @@
 package com.nianien.cudrania.core.text;
 
 import com.nianien.cudrania.core.exception.ExceptionChecker;
-import com.nianien.cudrania.core.io.Closer;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -168,9 +167,7 @@ public class MessageDigests {
      * @return
      */
     public static byte[] digest(MessageDigest md, File file) {
-        InputStream fis = null;
-        try {
-            fis = new FileInputStream(file);
+        try (InputStream fis = new FileInputStream(file)) {
             byte[] buffer = new byte[1024];
             int numRead;
             while ((numRead = fis.read(buffer)) > 0) {
@@ -179,8 +176,6 @@ public class MessageDigests {
             return md.digest();
         } catch (Exception e) {
             throw ExceptionChecker.throwException(e);
-        } finally {
-            Closer.close(fis);
         }
     }
 

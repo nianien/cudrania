@@ -8,7 +8,7 @@
 
 ## 📌 本轮变更总览(相对原始代码)
 
-> 下方各包的逐类分析是**判断依据**;本节汇总落地结果——**当前代码库 104 个 main 类**。
+> 下方各包的逐类分析是**判断依据**;本节汇总落地结果——**当前代码库 103 个 main 类**。
 
 ### ⚠️ 更正:`collection/wrapper/*`(7 类)已恢复
 之前误删。逐字重读后确认它是**独特设计**:基于动态代理生成的对象**本身 implements List/Set/Map**(是活集合),又叠加 `$add/$put/...` 返回 this 的链式方法(`@Delegate` 转发)+ `IterSupplier/MapSupplier` 的 `map/groupBy/grouped/invert/doBatch` mixin。JDK/Guava 均无此组合(`List.of` 不可变、Guava Builder 产物不可变)。按"看实现是否独特"的标准应**留**。已连同 `TestWrapper`(6 测试)一起恢复至新包。
@@ -356,10 +356,9 @@
 - **价值**:read/write/copy/delete 核心重复 `java.nio.file.Files`/Guava/Commons-IO;文件名助手重复 Commons-IO `FilenameUtils`;`NEW_LINE`=`System.lineSeparator()`。独特点很少(`urlToPath` 剥 jar 后缀)。
 - **判断**:🟡 **视情况**(大部分可瘦身;但被 Classes/Zipper 等内部用)。
 
-### Closer
+### ~~Closer~~(已删除)
 - **功能**:空安全静默关闭 `AutoCloseable`;`Object` 重载对非 AutoCloseable **反射调 `close()`**(鸭子类型);varargs 批量关。
-- **价值**:AutoCloseable 部分 = try-with-resources / Guava `Closeables` / Commons-IO;**反射鸭子关闭**独特。
-- **判断**:🟡 **视情况**(留反射重载才有意义)。
+- **判断**:**删**。全部调用点(Files/MessageDigests/PropertiesLoader/MassSorter/SqlQueryImpl/TestIo)均只关 `AutoCloseable`——反射鸭子重载**从无真实使用**;已改写为 **try-with-resources**(个别条件/构造兜底关闭处内联静默 close 保持原语义)。
 
 ### ClassScanner
 - **功能**:扫描包(file:/jar: URL)加载全部 `.class`,应用 `Predicate<Class>` 过滤,返回匹配 `Class` 列表。(已修:子包分隔符)
