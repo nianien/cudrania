@@ -8,11 +8,14 @@
 
 ## 📌 本轮变更总览(相对原始代码)
 
-> 下方各包的逐类分析是**判断依据**;本节汇总落地结果——**当前代码库 95 个 main 类**。
+> 下方各包的逐类分析是**判断依据**;本节汇总落地结果——**当前代码库 102 个 main 类**。
 
-### 已删除(25 类)
+### ⚠️ 更正:`collection/wrapper/*`(7 类)已恢复
+之前误删。逐字重读后确认它是**独特设计**:基于动态代理生成的对象**本身 implements List/Set/Map**(是活集合),又叠加 `$add/$put/...` 返回 this 的链式方法(`@Delegate` 转发)+ `IterSupplier/MapSupplier` 的 `map/groupBy/grouped/invert/doBatch` mixin。JDK/Guava 均无此组合(`List.of` 不可变、Guava Builder 产物不可变)。按"看实现是否独特"的标准应**留**。已连同 `TestWrapper`(6 测试)一起恢复至新包。
+
+### 已删除(18 类)
 - **有 JDK17 标准替代 / 库内自我重复(9)**:`text/Encryptor`、`json/serializer/SerEncryptor`、`json/serializer/SimpleSerEncryptor`、`bits/ByteUtils`(→`HexFormat`)、`collection/map/Pair`(→`Map.entry`)、`comparator/EntryComparator`(→`Map.Entry.comparingBy*`)、`collection/set/CaseInsensitiveSet`(→`TreeSet(CASE_INSENSITIVE_ORDER)`)、`io/Console`(→`Scanner`)、`io/FileSearcher`(→`Files.walk`)
-- **有替代/本身有问题/机制脆弱(14)**:`collection/wrapper/*`(7:Delegate/IterSupplier/ListWrapper/MapSupplier/MapWrapper/SetWrapper/Wrappers,反射代理脆弱)、`algorithm/Calculator`(运算符未实现)、`xml/XMLBuilder`(不转义)、`xml/XMLNode`、`xml/XMLDocument`、`io/ObjectSerializer`、`log/LoggerFactory`、`collection/map/CounterMap`(→`map.merge`)
+- **有替代/本身有问题(7)**:`algorithm/Calculator`(运算符未实现)、`xml/XMLBuilder`(不转义)、`xml/XMLNode`、`xml/XMLDocument`、`io/ObjectSerializer`、`log/LoggerFactory`、`collection/map/CounterMap`(→`map.merge`)
 - **零依赖但按需删(2)**:`io/ClassScanner`、`utils/Zipper`(其唯一用户,连带移除 ant 依赖)
 
 ### 重命名(旧名已删,新名保留)
