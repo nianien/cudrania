@@ -2,48 +2,48 @@ package com.cudrania.core.date;
 
 import com.cudrania.core.exception.ExceptionChecker;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalQueries;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 定义了以下模式字母（所有其他字符 'A' 到 'Z' 和 'a' 到 'z' 都被保留）：
+ * 对日期进行字符串格式化的工具类.
  * <p>
- * //	字母  日期或时间元素  表示  示例
- * //	G  Era 标志符  Text  AD
- * //	y  年  Year  1996; 96
- * //	M  年中的月份  Month  July; Jul; 07
- * //	w  年中的周数  Number  27
- * //	W  月份中的周数  Number  2
- * //	D  年中的天数  Number  189
- * //	d  月份中的天数  Number  10
- * //	F  月份中的星期  Number  2
- * //	E  星期中的天数  Text  Tuesday; Tue
- * //	a  Am/pm 标记  Text  PM
- * //	H  一天中的小时数（0-23）  Number  0
- * //	k  一天中的小时数（1-24）  Number  24
- * //	K  am/pm 中的小时数（0-11）  Number  0
- * //	high  am/pm 中的小时数（1-12）  Number  12
- * //	m  小时中的分钟数  Number  30
- * //	s  分钟中的秒数  Number  55
- * //	S  毫秒数  Number  978
- * //	z  时区  General time zone  Pacific Standard Time; PST; GMT-08:00
- * //	Z  时区  RFC 822 time zone  -0800
- **/
-
-/**
- * 对日期进行字符串格式化的工具类
+ * 公开 API 仍以 {@link java.util.Date} + 模式串为契约, 但内部改用不可变、线程安全的
+ * {@link DateTimeFormatter}(按 模式+Locale 缓存), 不再依赖 {@code SimpleDateFormat}+{@code ThreadLocal}.
+ * <p>
+ * 模式字母遵循 {@link java.time.format.DateTimeFormatter} 约定(与 SimpleDateFormat 基本一致:
+ * y 年, M 月, d 日, H/h 时(24/12), m 分, s 秒, S 毫秒, a 上/下午, E 星期, z/Z 时区)。
  *
  * @author skyfalling
  */
 public class DateFormatter {
 
-    //全局Locale, 保证setLocale对后续新线程也生效(ThreadLocal.initialValue据此构建)
+    /**
+     * 全局 Locale, {@link #setLocale} 更新后对后续调用生效(作为格式器缓存键的一部分)
+     */
     private static volatile Locale locale = Locale.getDefault();
-    private static ThreadLocal<DateFormat> local = ThreadLocal.withInitial(() -> new SimpleDateFormat(new SimpleDateFormat().toPattern(), locale));
+    /**
+     * 时区: 用于 Date(时间戳) 与本地日期时间之间的换算
+     */
+    private static volatile ZoneId zone = ZoneId.systemDefault();
+    /**
+     * 按 "模式@Locale" 缓存不可变、线程安全的格式器, 免去每次重建/applyPattern
+     */
+    private static final ConcurrentHashMap<String, DateTimeFormatter> CACHE = new ConcurrentHashMap<>();
+
+    private static DateTimeFormatter formatter(String pattern) {
+        return CACHE.computeIfAbsent(pattern + "@" + locale.toLanguageTag(),
+                k -> DateTimeFormatter.ofPattern(pattern, locale));
+    }
 
     /**
      * 格式当前日期的默认格式：yyyy-MM-dd HH:mm:ss
@@ -71,9 +71,8 @@ public class DateFormatter {
      * @return 格式化后的字符串
      */
     public static String format(Date date) {
-        return format(date, "yyyy-MM-dd HH:mm:ss");
+        return format(date, DatePattern.Default);
     }
-
 
     /**
      * 将给定的日期字符串进行格式化,指定日期的字符串必须包含格式化所必须的信息
@@ -94,9 +93,7 @@ public class DateFormatter {
      * @return 格式化后的字符串
      */
     public static String format(Date date, String pattern) {
-        SimpleDateFormat dateFormat = (SimpleDateFormat) local.get();
-        dateFormat.applyPattern(pattern);
-        return dateFormat.format(date);
+        return formatter(pattern).format(date.toInstant().atZone(zone));
     }
 
     /**
@@ -121,7 +118,7 @@ public class DateFormatter {
     }
 
     /**
-     * 根据日期字符串获取日期,采用指定日期格式
+     * 根据日期字符串获取日期,依次尝试多个日期格式,返回首个成功解析的结果
      *
      * @param source
      * @param patterns
@@ -129,8 +126,6 @@ public class DateFormatter {
      */
     public static Date parseDate(String source, String... patterns) {
         for (String pattern : patterns) {
-            SimpleDateFormat dateFormat = (SimpleDateFormat) local.get();
-            dateFormat.applyPattern(pattern);
             Date date = parse(source, pattern, true);
             if (date != null) {
                 return date;
@@ -139,21 +134,28 @@ public class DateFormatter {
         throw new IllegalArgumentException("date [" + source + "] must comply with the following format:" + Arrays.toString(patterns));
     }
 
-
     /**
-     * 解析日期
+     * 解析日期: 用DateTimeFormatter解析后提取日期/时间部分, 缺失的补默认值(纯日期→午夜, 纯时间→今天),
+     * 复现SimpleDateFormat对不完整模式的宽松行为
      *
      * @param source
      * @param pattern
-     * @param silently
+     * @param silently 为true时解析失败返回null, 否则抛出异常
      * @return
      */
     private static Date parse(String source, String pattern, boolean silently) {
         try {
-            SimpleDateFormat dateFormat = (SimpleDateFormat) local.get();
-            dateFormat.applyPattern(pattern);
-            return dateFormat.parse(source);
-        } catch (ParseException e) {
+            TemporalAccessor ta = formatter(pattern).parse(source);
+            LocalDate date = ta.query(TemporalQueries.localDate());
+            LocalTime time = ta.query(TemporalQueries.localTime());
+            if (date == null) {
+                date = LocalDate.now(zone);
+            }
+            if (time == null) {
+                time = LocalTime.MIDNIGHT;
+            }
+            return Date.from(LocalDateTime.of(date, time).atZone(zone).toInstant());
+        } catch (Exception e) {
             if (silently) {
                 return null;
             }
@@ -162,14 +164,20 @@ public class DateFormatter {
     }
 
     /**
-     * 设置Locale属性
+     * 设置Locale属性(影响后续格式化/解析)
      *
      * @param locale
      */
     public static void setLocale(Locale locale) {
-        //更新全局Locale(影响后续新线程), 并刷新当前线程已有的格式器
         DateFormatter.locale = locale;
-        SimpleDateFormat dateFormat = (SimpleDateFormat) local.get();
-        local.set(new SimpleDateFormat(dateFormat.toPattern(), locale));
+    }
+
+    /**
+     * 设置时区(影响Date与本地日期时间的换算)
+     *
+     * @param zone
+     */
+    public static void setZone(ZoneId zone) {
+        DateFormatter.zone = zone;
     }
 }

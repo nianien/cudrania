@@ -2,171 +2,227 @@ package com.cudrania.core.pipeline;
 
 import com.cudrania.core.functions.Fn;
 
+/**
+ * 接收三个初始参数并返回一个结果的流水线
+ * <p>
+ * 创建后首先处于三参步骤状态，因此第一个 {@code and} 接收三个初始参数
+ * 第一个步骤执行完成后进入单参状态，后续步骤可继续处理结果或重新选择命名参数
+ * <pre>{@code
+ * Pipeline3<Integer, Integer, Integer, Integer> pipeline = Pipelines
+ *         .of(Integer.class, Integer.class, Integer.class)
+ *         .and((left, middle, right) -> left + middle + right)
+ *         .end();
+ *
+ * Integer result = pipeline.eval(10, 20, 12);
+ * }</pre>
+ *
+ * @param <IN1> 初始参数1类型
+ * @param <IN2> 初始参数2类型
+ * @param <IN3> 初始参数3类型
+ * @param <OUT> 最终结果类型
+ * @see Pipelines#of(Class, Class, Class)
+ * @see Pipelines#of(Named, Named, Named)
+ */
 public interface Pipeline3<IN1, IN2, IN3, OUT> {
 
     /**
-     * 计算pipeline
+     * 使用三个给定初始参数执行完整流水线
      *
-     * @return
+     * @param input1 初始参数1
+     * @param input2 初始参数2
+     * @param input3 初始参数3
+     * @return 最后一个步骤的输出
      */
     OUT eval(IN1 input1, IN2 input2, IN3 input3);
 
 
     /**
-     * 进入单参处理步骤
+     * 等待添加单参处理函数的 DSL 状态
+     *
+     * @param <S1> 流水线初始参数1类型
+     * @param <S2> 流水线初始参数2类型
+     * @param <S3> 流水线初始参数3类型
+     * @param <IN> 当前待处理参数类型
      */
     interface StepIn<S1, S2, S3, IN> extends StepOut<S1, S2, S3, IN> {
 
         /**
-         * 添加执行步骤
+         * 追加单参执行步骤
          *
-         * @param ability 单参函数, 参数为上一个执行结果或者通过方法{@link #with(Named)}和{@link #with(String)}指定
-         * @return
+         * @param ability 接收当前参数并产生新结果的函数
+         * @param <R>     新步骤的结果类型
+         * @return 以新结果作为默认输入的 DSL 状态
          */
         <R> StepIn<S1, S2, S3, R> and(Fn.Function<? super IN, ? extends R> ability);
-
-
     }
 
     /**
-     * 进入双参处理步骤
+     * 等待添加双参处理函数的 DSL 状态
+     * <p>
+     * 两个参数由 {@code with} 从已命名的初始参数或步骤结果中选择
+     *
+     * @param <S1>  流水线初始参数1类型
+     * @param <S2>  流水线初始参数2类型
+     * @param <S3>  流水线初始参数3类型
+     * @param <IN1> 当前待处理参数1类型
+     * @param <IN2> 当前待处理参数2类型
      */
     interface StepIn2<S1, S2, S3, IN1, IN2> extends StepInit<S1, S2, S3> {
 
         /**
-         * 添加执行步骤
+         * 追加双参执行步骤
          *
-         * @param ability 双参函数, 参数可通过方法{@link #with(Named, Named)}或者{@link #with(String, String)}指定
-         * @return
+         * @param ability 接收两个已选参数并产生新结果的函数
+         * @param <R>     新步骤的结果类型
+         * @return 以新结果作为默认输入的单参 DSL 状态
          */
         <R> StepIn<S1, S2, S3, R> and(Fn.BiFunction<? super IN1, ? super IN2, ? extends R> ability);
-
     }
 
     /**
-     * 进入三参处理步骤
+     * 等待添加三参处理函数的 DSL 状态
+     * <p>
+     * 初次构建时三个参数就是流水线的三个初始参数
+     * 构建过程中也可由 {@code with} 重新选择三个已命名值
+     *
+     * @param <S1>  流水线初始参数1类型
+     * @param <S2>  流水线初始参数2类型
+     * @param <S3>  流水线初始参数3类型
+     * @param <IN1> 当前待处理参数1类型
+     * @param <IN2> 当前待处理参数2类型
+     * @param <IN3> 当前待处理参数3类型
      */
     interface StepIn3<S1, S2, S3, IN1, IN2, IN3> extends StepInit<S1, S2, S3> {
 
         /**
-         * 添加执行步骤
+         * 追加三参执行步骤
          *
-         * @param ability 三参函数, 参数可通过方法{@link #with(Named, Named, Named)}或者{@link #with(String, String, String)}指定
-         * @return
+         * @param ability 接收三个当前参数并产生新结果的函数
+         * @param <R>     新步骤的结果类型
+         * @return 以新结果作为默认输入的单参 DSL 状态
          */
         <R> StepIn<S1, S2, S3, R> and(Fn.TriFunction<? super IN1, ? super IN2, ? super IN3, ? extends R> ability);
-
     }
 
     /**
-     * 退出当前步骤
+     * 已产生当前步骤结果的 DSL 状态
+     *
+     * @param <S1> 流水线初始参数1类型
+     * @param <S2> 流水线初始参数2类型
+     * @param <S3> 流水线初始参数3类型
+     * @param <IN> 当前步骤结果类型
      */
     interface StepOut<S1, S2, S3, IN> extends StepInit<S1, S2, S3> {
 
-
         /**
-         * 构建结束,生成pipeline
+         * 结束 DSL 构建并生成三入参流水线
          *
-         * @return
+         * @return 以当前步骤结果作为最终输出的流水线
          */
         Pipeline3<S1, S2, S3, IN> end();
 
         /**
-         * 保存计算结果
+         * 将当前步骤结果保存到执行上下文
          *
-         * @param name 标记结果名称
-         * @return
+         * @param name 结果名称及类型声明
+         * @param <T>  声明名称的宿主类型
+         * @return 保持当前结果类型的 DSL 状态
          */
         <T> StepIn<S1, S2, S3, IN> as(Named<T, IN> name);
 
         /**
-         * 异常处理
+         * 为当前步骤设置异常降级函数
+         * <p>
+         * 降级函数结果替代失败步骤的结果，之后流水线继续执行
          *
-         * @param handler
-         * @return
+         * @param handler 接收步骤异常并返回替代结果的函数
+         * @return 保持当前结果类型的 DSL 状态
          */
         StepIn<S1, S2, S3, IN> failOver(Fn.Function<? super Exception, IN> handler);
-
     }
 
     /**
-     * 准备下一步骤
+     * 可为下一执行步骤选择输入参数的 DSL 状态
+     * <p>
+     * 名称可以来自创建流水线时声明的初始参数，也可以来自之前的 {@code as}
+     * 未找到指定名称时会在执行到该步骤时抛出 {@link IllegalStateException}
+     *
+     * @param <S1> 流水线初始参数1类型
+     * @param <S2> 流水线初始参数2类型
+     * @param <S3> 流水线初始参数3类型
      */
     interface StepInit<S1, S2, S3> {
 
-
         /**
-         * 指定下一步的参数名称和类型
+         * 通过命名方法引用选择下一步骤的一个参数
          *
-         * @param name 参数名称
-         * @param <T>  声明参数的对象
+         * @param name 参数名称及类型声明
+         * @param <T>  声明名称的宿主类型
          * @param <IN> 参数类型
-         * @return
+         * @return 等待添加单参函数的 DSL 状态
          */
         <T, IN> StepIn<S1, S2, S3, IN> with(Named<T, IN> name);
 
         /**
-         * 设置下一步骤的入参名称
+         * 通过上下文键选择下一步骤的一个参数
          *
-         * @param name 入参名称
-         * @param <IN> 入参类型
-         * @return
+         * @param name 上下文键
+         * @param <IN> 由调用方声明的参数类型
+         * @return 等待添加单参函数的 DSL 状态
          */
         <IN> StepIn<S1, S2, S3, IN> with(String name);
 
         /**
-         * 指定下一步的参数名称和类型
+         * 通过命名方法引用选择下一步骤的两个参数
          *
-         * @param name1 参数1名称
-         * @param name2 参数2名称
-         * @param <T1>  声明参数1的对象
-         * @param <T2>  声明参数2的对象
+         * @param name1 参数1名称及类型声明
+         * @param name2 参数2名称及类型声明
+         * @param <T1>  声明参数1名称的宿主类型
+         * @param <T2>  声明参数2名称的宿主类型
          * @param <IN1> 参数1类型
          * @param <IN2> 参数2类型
-         * @return
+         * @return 等待添加双参函数的 DSL 状态
          */
         <T1, T2, IN1, IN2> StepIn2<S1, S2, S3, IN1, IN2> with(Named<T1, IN1> name1, Named<T2, IN2> name2);
 
         /**
-         * 指定下一步的参数名称和类型
+         * 通过上下文键选择下一步骤的两个参数
          *
-         * @param name1 参数1名称
-         * @param name2 参数1名称
-         * @param <IN1> 参数1类型
-         * @param <IN2> 参数2类型
-         * @return
+         * @param name1 参数1上下文键
+         * @param name2 参数2上下文键
+         * @param <IN1> 由调用方声明的参数1类型
+         * @param <IN2> 由调用方声明的参数2类型
+         * @return 等待添加双参函数的 DSL 状态
          */
         <IN1, IN2> StepIn2<S1, S2, S3, IN1, IN2> with(String name1, String name2);
 
-
         /**
-         * 指定下一步的参数名称和类型
+         * 通过命名方法引用选择下一步骤的三个参数
          *
-         * @param name1 参数1名称
-         * @param name2 参数2名称
-         * @param name3 参数3名称
-         * @param <T1>  声明参数1的对象
-         * @param <T2>  声明参数2的对象
-         * @param <T3>  声明参数3的对象
+         * @param name1 参数1名称及类型声明
+         * @param name2 参数2名称及类型声明
+         * @param name3 参数3名称及类型声明
+         * @param <T1>  声明参数1名称的宿主类型
+         * @param <T2>  声明参数2名称的宿主类型
+         * @param <T3>  声明参数3名称的宿主类型
          * @param <IN1> 参数1类型
          * @param <IN2> 参数2类型
          * @param <IN3> 参数3类型
-         * @return
+         * @return 等待添加三参函数的 DSL 状态
          */
         <T1, T2, T3, IN1, IN2, IN3> StepIn3<S1, S2, S3, IN1, IN2, IN3> with(Named<T1, IN1> name1, Named<T2, IN2> name2, Named<T3, IN3> name3);
 
         /**
-         * 指定下一步的参数名称和类型
+         * 通过上下文键选择下一步骤的三个参数
          *
-         * @param name1 参数1名称
-         * @param name2 参数2名称
-         * @param name3 参数3名称
-         * @param <IN1> 参数1类型
-         * @param <IN2> 参数2类型
-         * @param <IN3> 参数3类型
-         * @return
+         * @param name1 参数1上下文键
+         * @param name2 参数2上下文键
+         * @param name3 参数3上下文键
+         * @param <IN1> 由调用方声明的参数1类型
+         * @param <IN2> 由调用方声明的参数2类型
+         * @param <IN3> 由调用方声明的参数3类型
+         * @return 等待添加三参函数的 DSL 状态
          */
         <IN1, IN2, IN3> StepIn3<S1, S2, S3, IN1, IN2, IN3> with(String name1, String name2, String name3);
-
     }
 }

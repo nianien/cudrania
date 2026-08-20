@@ -1,6 +1,9 @@
 package com.cudrania.test.pipeline;
 
 
+import com.cudrania.core.pipeline.Named;
+import com.cudrania.core.pipeline.Pipeline;
+import com.cudrania.core.pipeline.Pipeline2;
 import com.cudrania.core.pipeline.Pipeline3;
 import com.cudrania.core.pipeline.Pipelines;
 import com.cudrania.test.bean.Account;
@@ -37,6 +40,36 @@ public class PipeLineTest {
         Assertions.assertEquals(home.getAddress(), "address:china.beijing");
         Assertions.assertEquals(home.getUsers().size(), 2);
 
+    }
+
+    @Test
+    public void testSingleInputPipeline() {
+        Pipeline<Integer, String> pipeline = Pipelines.of(Integer.class)
+                .and(value -> "value:" + value)
+                .end();
+
+        Assertions.assertEquals("value:10", pipeline.eval(10));
+    }
+
+    @Test
+    public void testTwoInputPipeline() {
+        Pipeline2<Integer, Integer, Integer> pipeline = Pipelines.of(Integer.class, Integer.class)
+                .and(Integer::sum)
+                .end();
+
+        Assertions.assertEquals(30, pipeline.eval(10, 20));
+    }
+
+    @Test
+    public void testStringInputAndFailOver() {
+        Named<Inputs, String> input = Inputs::input2;
+        Pipeline<String, Integer> pipeline = Pipelines.of(input)
+                .<String>with(input.name())
+                .and(Integer::parseInt)
+                .failOver(error -> -1)
+                .end();
+
+        Assertions.assertEquals(-1, pipeline.eval("invalid"));
     }
 
 

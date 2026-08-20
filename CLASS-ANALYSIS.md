@@ -20,7 +20,7 @@
 - `json/serializer/SerEncryptor` → **`SerMasker`**;`SimpleSerEncryptor` → **`SimpleSerMasker`**(脱敏而非加密)
 
 ### 现代化/修复(保留但改进)
-- `date/DateFormatter` 判 🔧 待迁 `java.time`(未做,被 core 依赖)
+- `date/DateFormatter` **已迁 `java.time.DateTimeFormatter`**(保持 Date 公开 API,+TestDateFormat 断言)
 - `reflection/Methods` caller 部分已迁 `StackWalker`(去魔数偏移)
 - `utils/Enums` 去 `System.err`/`printStackTrace` 噪音
 - `utils/TimeCounter` 改用 `System.nanoTime`(单调)
@@ -206,9 +206,9 @@
 ---
 
 ### DateFormatter(date)
-- **功能**:`ThreadLocal<SimpleDateFormat>` 做线程安全,`format/parseDate` 通过 `applyPattern` 复用;`parseDate(source, patterns...)` 多格式回退;`setLocale`(已修:静态 volatile locale 让新线程也生效)。
-- **价值**:用的是**过时的 `SimpleDateFormat` 栈**。`java.time.DateTimeFormatter`(不可变、线程安全、无需 ThreadLocal)是现代替代;整套 ThreadLocal+applyPattern 只是在给 SimpleDateFormat 的非线程安全打补丁。多格式回退是小便利。
-- **判断**:🔧 **改造(非删)** —— 迁 `java.time.DateTimeFormatter`;但被 JsonParser/Reflections/jdbc 依赖,需回归测试。
+- **功能**:**已迁 `java.time.DateTimeFormatter`**(按"模式@Locale"缓存于 `ConcurrentHashMap`,不可变线程安全,去掉 `SimpleDateFormat`+`ThreadLocal`+每次 `applyPattern`);公开 API 仍为 `Date`+模式串(不破坏 JsonParser/Reflections/jdbc);解析用 `TemporalQueries` 提取日期/时间、缺失补默认(纯日期→午夜)复现宽松语义;`parseDate(source, patterns...)` 多格式回退;`setLocale`/新增 `setZone`。
+- **价值**:现已是现代 java.time 栈;新增 `TestDateFormat` 4 条断言(round-trip / 纯日期补午夜 / 多模式 / 12 小时制)验证行为。
+- **判断**:✅ **留(已现代化)**。
 
 ---
 
