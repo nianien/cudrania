@@ -43,8 +43,8 @@ public class RuleNodeSerializer extends BeanSerializerBase {
          * - have "any getter"
          * - have per-property filters
          */
+        // jackson 2.22 起移除了 _anyGetterWriter 字段,any-getter 守卫不再需要
         if ((_objectIdWriter == null)
-                && (_anyGetterWriter == null)
                 && (_propertyFilterId == null)
         ) {
             return new BeanAsArraySerializer(this);

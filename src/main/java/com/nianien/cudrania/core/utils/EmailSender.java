@@ -2,11 +2,11 @@ package com.nianien.cudrania.core.utils;
 
 import com.nianien.cudrania.core.exception.ExceptionChecker;
 
-import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
-import javax.mail.*;
-import javax.mail.Message.RecipientType;
-import javax.mail.internet.*;
+import jakarta.activation.DataHandler;
+import jakarta.activation.FileDataSource;
+import jakarta.mail.*;
+import jakarta.mail.Message.RecipientType;
+import jakarta.mail.internet.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
